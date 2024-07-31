@@ -1,0 +1,107 @@
+﻿@using DeVesen.Bazaar.Client.Services
+@using DeVesen.Bazaar.Client.Components.ArticleCategory
+@using DeVesen.Bazaar.Client.Models
+
+@page "/article-category"
+
+@inject ArticleCategoryService ArticleCategoryService;
+@inject IDialogService DialogService
+
+<MudTable T="ArticleCategory"
+          FixedHeader
+          Hover
+          Items="@_elements"
+          SortLabel="Sort By"
+          OnRowClick="OnTableRowClickedAsync"
+          Filter="e => ArticleCategoryService.FilterFunc(e, _articleCategorySearch)">
+    <ToolBarContent>
+        <MudGrid Spacing="0">
+            <MudItem xs="0" sm="6" />
+            <MudItem xs="10" sm="5">
+                <MudTextField Placeholder="Suche"
+                              DebounceInterval="700"
+                              Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Filled.Search"
+                              IconSize="Size.Medium"
+                              @bind-Value="_articleCategorySearch"
+                              Class="mt-0"></MudTextField>
+            </MudItem>
+            <MudItem xs="2" sm="1"
+                     Class="d-flex justify-center">
+                <MudIconButton Color="Color.Primary"
+                               Icon="@Icons.Material.Filled.Add"
+                               Variant="Variant.Filled"
+                               Size="Size.Small"
+                               Class="align-self-end"
+                               OnClick="CreateArticleCategoryAsync"/>
+            </MudItem>
+        </MudGrid>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh><MudTableSortLabel SortBy="new Func<ArticleCategory, object>(x => x.Name)">Bezeichnung</MudTableSortLabel></MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Bezeichnung">@context.Name</MudTd>
+    </RowTemplate>
+</MudTable>
+
+@code {
+
+    private string _articleCategorySearch = string.Empty;
+    private IEnumerable<ArticleCategory> _elements = Enumerable.Empty<ArticleCategory>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        await ReloadElementsAsync();
+    }
+
+    private async Task CreateArticleCategoryAsync()
+    {
+        var options = new DialogOptions
+        {
+            CloseOnEscapeKey = true,
+            DisableBackdropClick = true
+        };
+
+        var forceNext = false;
+
+        do
+        {
+            var parameters = new DialogParameters<ArticleCategoryCreateDialog> { { x => x.ForceNext, forceNext } };
+
+            var dlg = await DialogService.ShowAsync<ArticleCategoryCreateDialog>("Artikel-Kategorie anlegen", parameters, options);
+            var result = await dlg.Result;
+
+            forceNext = result.Canceled is false && (bool)result.Data;
+
+            await ReloadElementsAsync();
+
+            StateHasChanged();
+        } while (forceNext);
+    }
+
+    private async Task ReloadElementsAsync()
+    {
+        _elements = await ArticleCategoryService.GetAllAsync();
+    }
+
+    private async Task OnTableRowClickedAsync(TableRowClickEventArgs<ArticleCategory> args)
+    {
+        var parameters = new DialogParameters<ArticleCategoryEditDialog> { { x => x.Item, args.Item } };
+
+        var options = new DialogOptions
+        {
+            CloseOnEscapeKey = true,
+            DisableBackdropClick = true
+        };
+
+        var dlg = await DialogService.ShowAsync<ArticleCategoryEditDialog>("Artikel-Kategorie ändern", parameters, options);
+        var result = await dlg.Result;
+
+        if (result.Canceled is false)
+        {
+            await ReloadElementsAsync();
+        }
+    }
+}

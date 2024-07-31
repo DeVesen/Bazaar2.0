@@ -1,0 +1,20 @@
+﻿<MudButton StartIcon="@Icons.Material.Filled.Delete"
+           Variant="Variant.Filled"
+           Color="Color.Primary"
+           Disabled="@(Enabled is false)"
+           OnClick="OnClick">Löschen</MudButton>
+
+@code {
+    /// <summary>
+    /// If true, the button will be enabled.
+    /// </summary>
+    [Parameter]
+    [Category(CategoryTypes.Button.Behavior)]
+    public bool Enabled { get; set; } = true;
+
+    /// <summary>
+    /// Button click event.
+    /// </summary>
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnClick { get; set; }
+}

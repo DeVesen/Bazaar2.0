@@ -1,0 +1,23 @@
+﻿<div class="d-flex justify-center align-content-center" Style="width: 100%; height: 100%;">
+    
+    <MudButton OnClick="DoOnClick">
+        <MudIcon Icon="@Icon"
+                 Size="Size.Large"
+                 Style="width: 55%; height: 100%;" />
+    </MudButton>
+</div>
+
+@code {
+
+    [Parameter]
+    public required string Icon { get; set; }
+
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+
+    private async Task DoOnClick()
+    {
+        await OnClick.InvokeAsync();
+    }
+
+}

@@ -1,0 +1,154 @@
+﻿@using DeVesen.Bazaar.Client.Services
+@using DeVesen.Bazaar.Client.Components.Common
+@using DeVesen.Bazaar.Client.Models
+@using DeVesen.Bazaar.Client.Validator
+
+@inject ArticleValidator ArticleValidator
+@inject ArticleCategoryService ArticleCategoryService
+@inject ManufacturerService ManufacturerService
+
+<MudForm IsValid="@IsValid"
+         IsTouched="@IsTouched"
+         IsValidChanged="@IsValidChanged"
+         IsTouchedChanged="@IsTouchedChanged"
+         FieldChanged="OnFormFieldChangedAsync"
+         Model="Item"
+         Validation="@(ArticleValidator.ValidateAsync)"
+         Style="margin-bottom: 20px; min-width: 370px">
+    <MudGrid>
+        <MudItem xs="12" sm="3">
+            <MudTextField T="long"
+                          Required
+                          Label="Nummer"
+                          ShrinkLabel
+                          Disabled="@DisableNumber"
+                          DebounceInterval="500"
+                          Margin="Margin.Dense"
+                          Variant="Variant.Outlined"
+                          @bind-Value="Item.Number"
+                          For="@(() => Item.Number)" />
+        </MudItem>
+        <MudItem xs="12" sm="9">
+            <MudTextField T="string"
+                          Required
+                          Label="Title"
+                          ShrinkLabel
+                          DebounceInterval="500"
+                          Margin="Margin.Dense"
+                          Variant="Variant.Outlined"
+                          @bind-Value="Item.Title"
+                          For="@(() => Item.Title)" />
+        </MudItem>
+        <MudItem xs="12" sm="6">
+            <MudAutocomplete T="string"
+                             Required
+                             Dense
+                             ShrinkLabel
+                             Label="Kategorie"
+                             DebounceInterval="500"
+                             SearchFuncWithCancel="@CategoryAutoCompleteSearch"
+                             Variant="Variant.Outlined"
+                             Margin="Margin.Dense"
+                             @bind-Value="Item.ArticleCategory"
+                             For="@(() => Item.ArticleCategory)" />
+        </MudItem>
+        <MudItem xs="12" sm="6">
+            <MudAutocomplete T="string"
+                             Required
+                             Dense
+                             ShrinkLabel
+                             Label="Hersteller"
+                             DebounceInterval="500"
+                             SearchFuncWithCancel="@ManufacturerAutoCompleteSearch"
+                             Variant="Variant.Outlined"
+                             Margin="Margin.Dense"
+                             @bind-Value="Item.Manufacturer"
+                             For="@(() => Item.Manufacturer)" />
+        </MudItem>
+        <MudItem xs="12" sm="6">
+            <MudTextField T="double"
+                          Required
+                          Label="Preis"
+                          ShrinkLabel
+                          DebounceInterval="500"
+                          Margin="Margin.Dense"
+                          Variant="Variant.Outlined"
+                          @bind-Value="Item.Price01"
+                          For="@(() => Item.Price01)" />
+        </MudItem>
+        <MudItem xs="12" sm="6">
+            <MudTextField T="double?"
+                          Label="Preis alternativ"
+                          ShrinkLabel
+                          DebounceInterval="500"
+                          Margin="Margin.Dense"
+                          Variant="Variant.Outlined"
+                          @bind-Value="Item.Price02"
+                          For="@(() => Item.Price02)" />
+        </MudItem>
+        <MudItem xs="12" sm="12">
+            <MudTextField T="string"
+                          Label="Notize"
+                          ShrinkLabel
+                          DebounceInterval="500"
+                          Margin="Margin.Dense"
+                          Variant="Variant.Outlined"
+                          Lines="4"
+                          @bind-Value="Item.Description"
+                          For="@(() => Item.Description)" />
+        </MudItem>
+    </MudGrid>
+    
+</MudForm>
+
+@code {
+    [Parameter]
+    public required bool DisableNumber { get; set; }
+
+    [Parameter]
+    public required Article Item { get; set; }
+
+    [Parameter]
+    public required EventCallback<Article> ItemChanged { get; set; }
+
+    [Parameter]
+    public bool IsValid { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> IsValidChanged { get; set; }
+
+    [Parameter]
+    public bool IsTouched { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> IsTouchedChanged { get; set; }
+
+    private async Task OnFormFieldChangedAsync()
+    {
+        await ItemChanged.InvokeAsync(Item);
+    }
+
+    private async Task<IEnumerable<string>> CategoryAutoCompleteSearch(string value, CancellationToken token)
+    {
+        var elements = await ArticleCategoryService.GetAllAsync();
+        return elements.Where(Compare)
+                       .Select(p => p.Name);
+
+        bool Compare(ArticleCategory category)
+        {
+            return category.Name.ToLower().Contains(value.Trim().ToLower());
+        }
+    }
+
+    private async Task<IEnumerable<string>> ManufacturerAutoCompleteSearch(string value, CancellationToken token)
+    {
+        var elements = await ManufacturerService.GetAllAsync();
+        return elements.Where(Compare)
+                       .Select(p => p.Name);
+
+        bool Compare(Manufacturer category)
+        {
+            return category.Name.ToLower().Contains(value.Trim().ToLower());
+        }
+    }
+}

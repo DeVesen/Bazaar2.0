@@ -1,0 +1,129 @@
+﻿@using DeVesen.Bazaar.Client.Services
+@using DeVesen.Bazaar.Client.Components.Common.ToolBar
+@using DeVesen.Bazaar.Client.Components.Vendor
+@using DeVesen.Bazaar.Client.Models
+
+@page "/vendors"
+
+@inject StatisticsOverviewService StatisticsOverviewService
+@inject NavigationService NavigationService
+@inject IDialogService DialogService
+
+<div class="d-flex flex-column gap-4 px-1">
+    <MudToolBar WrapContent Dense DisableGutters>
+        <MudSpacer />
+        <ToolBarIconButton Icon="@Icons.Material.TwoTone.PersonAddAlt"
+                           OnClick="CreateElementAsync" />
+        <ToolBarSearchField T="string"
+                            OuterStyle="max-width: 200px"
+                            OuterClass="pl-2"
+                            Value="@_searchText"
+                            ValueChanged="OnSearchChangedAsync" />
+        <ToolBarGenederSelect Value="@_genderType"
+                              ValueChanged="OnGenderChangedAsync" />
+    </MudToolBar>
+
+    <MudGrid Spacing="1">
+        @foreach (var element in @_elements)
+        {
+            <MudItem xs="12" md="4" lg="3">
+                <VendorCard VendorItem="@element"
+                            OnEdit="x => ModifyElementAsync(x.MasterData)"
+                            OnArticle="OnArticleAsync"/>
+            </MudItem>
+        }
+    </MudGrid>
+</div>
+
+
+@code {
+    
+    private IEnumerable<VendorOverviewItem> _elements = Enumerable.Empty<VendorOverviewItem>();
+    private string _searchText = string.Empty;
+    private ToolBarGenederSelect.GenderType _genderType = ToolBarGenederSelect.GenderType.All;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        await ReloadElementsAsync();
+    }
+
+    private async Task CreateElementAsync()
+    {
+        var options = new DialogOptions
+            {
+                CloseOnEscapeKey = true,
+                DisableBackdropClick = true
+            };
+
+        bool forceNext;
+
+        do
+        {
+            var dlg = await DialogService.ShowAsync<VendorCreateDialog>("Verkäufer anlegen", options);
+            var result = await dlg.Result;
+
+            forceNext = result.Canceled is false && (bool)result.Data;
+
+            await ReloadElementsAsync();
+
+            StateHasChanged();
+        } while (forceNext);
+    }
+
+    private async Task ModifyElementAsync(Vendor vendor)
+    {
+        var parameters = new DialogParameters<VendorEditDialog> { { x => x.Item, vendor } };
+
+        var options = new DialogOptions
+            {
+                CloseOnEscapeKey = true,
+                DisableBackdropClick = true
+            };
+
+        var dlg = await DialogService.ShowAsync<VendorEditDialog>("Verkäufer ändern", parameters, options);
+        var result = await dlg.Result;
+
+        if (result.Canceled is false)
+        {
+            await ReloadElementsAsync();
+        }
+    }
+
+    private async Task OnArticleAsync(VendorOverviewItem args)
+    {
+        NavigationService.Vendor.ToArticle(args.MasterData.Id);
+        await Task.CompletedTask;
+    }
+
+    private async Task OnSearchChangedAsync(string newValue)
+    {
+        _searchText = newValue;
+
+        await ReloadElementsAsync();
+    }
+
+    private async Task OnGenderChangedAsync(ToolBarGenederSelect.GenderType newGenderType)
+    {
+        _genderType = newGenderType;
+
+        await ReloadElementsAsync();
+    }
+
+    private async Task ReloadElementsAsync()
+    {
+        _elements = await StatisticsOverviewService.GetVendorOverviewAsync();
+
+        _elements = _elements.Where(p => p.Contains(_searchText));
+
+        switch (_genderType)
+        {
+            case ToolBarGenederSelect.GenderType.Male:
+                _elements = _elements.Where(p => p.MasterData.Salutation == "Male");
+                break;
+            case ToolBarGenederSelect.GenderType.Female:
+                _elements = _elements.Where(p => p.MasterData.Salutation == "Female");
+                break;
+        }
+    }
+}

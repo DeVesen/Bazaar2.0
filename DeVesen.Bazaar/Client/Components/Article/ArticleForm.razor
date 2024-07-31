@@ -1,0 +1,55 @@
+﻿@using DeVesen.Bazaar.Client.Services
+@using DeVesen.Bazaar.Client.Components.Common
+@using DeVesen.Bazaar.Client.Models
+
+@inject ArticleService ArticleService
+
+<div style="width: 552px; height: 425px">
+    <MudTabs Rounded
+             ApplyEffectsToContainer
+             Elevation="2"
+             PanelClass="pa-6"
+             Position="Position.Bottom"
+             Class="h-100">
+        <MudTabPanel Class="h-100"
+                     Icon="@Icons.Material.Filled.Article">
+            <ArticleMasterDataForm DisableNumber
+                                   @bind-IsValid="_isMasterDataValid"
+                                   @bind-IsValid:after="@OnStatusChanged"
+                                   @bind-IsTouched="@_isMasterDataTouched"
+                                   @bind-IsTouched:after="@OnStatusChanged"
+                                   @bind-Item="ArticleItem"/>
+        </MudTabPanel>
+        <MudTabPanel Class="h-100"
+                     
+                     Icon="@Icons.Material.Filled.ShapeLine">
+            <ArticleStatisticsForm @bind-Item="ArticleItem"/>
+        </MudTabPanel>
+    </MudTabs>
+</div>
+
+@code {
+
+    [Parameter]
+    public required Article ArticleItem { get; set; }
+
+    [Parameter]
+    public bool IsValid { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> IsValidChanged { get; set; }
+
+    private bool _isMasterDataValid;
+    private bool _isMasterDataTouched;
+
+    private async Task OnStatusChanged()
+    {
+        var isMasterDataValid = _isMasterDataTouched is false || (_isMasterDataTouched && _isMasterDataValid);
+
+        if (IsValid != isMasterDataValid)
+        {
+            IsValid = isMasterDataValid;
+            await IsValidChanged.InvokeAsync(isMasterDataValid);
+        }
+    }
+}

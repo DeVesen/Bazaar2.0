@@ -1,0 +1,48 @@
+﻿
+<MudMenu Icon="@GetStateIcon()">
+    <MudMenuItem Icon="@Icons.Material.TwoTone.Transgender" OnClick="OnAllClicked">Alle</MudMenuItem>
+    <MudMenuItem Icon="@Icons.Material.TwoTone.Male" OnClick="OnMaleClicked">Männlich</MudMenuItem>
+    <MudMenuItem Icon="@Icons.Material.TwoTone.Female" OnClick="OnFeMaleClicked">Weiblich</MudMenuItem>
+</MudMenu>
+
+@code {
+
+    public enum GenderType
+    {
+        All,
+        Male,
+        Female
+    }
+
+    [Parameter]
+    public GenderType Value { get; set; } = GenderType.All;
+
+    [Parameter]
+    public EventCallback<GenderType> ValueChanged { get; set; }
+
+    private async Task OnAllClicked()
+    {
+        await ValueChanged.InvokeAsync(GenderType.All);
+    }
+
+    private async Task OnMaleClicked()
+    {
+        await ValueChanged.InvokeAsync(GenderType.Male);
+    }
+
+    private async Task OnFeMaleClicked()
+    {
+        await ValueChanged.InvokeAsync(GenderType.Female);
+    }
+
+    private string GetStateIcon()
+    {
+        return Value switch
+        {
+            GenderType.All => Icons.Material.TwoTone.Transgender,
+            GenderType.Male => Icons.Material.TwoTone.Male,
+            GenderType.Female => Icons.Material.TwoTone.Female,
+            _ => throw new ArgumentOutOfRangeException()
+        };
+    }
+}

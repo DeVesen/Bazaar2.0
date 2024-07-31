@@ -1,0 +1,92 @@
+﻿@using DeVesen.Bazaar.Client.Services
+@using DeVesen.Bazaar.Client.Components.Common
+@using DeVesen.Bazaar.Client.Models
+
+<MudForm @ref="_fromRef"
+        IsValid="@IsValid"
+        IsTouched="@IsTouched"
+        IsValidChanged="@IsValidChanged"
+        IsTouchedChanged="@IsTouchedChanged"
+        FieldChanged="OnFormFieldChangedAsync"
+        Model="Item"
+        Validation="@Validation"
+        Style="margin-bottom: 20px; min-width: 370px">
+    <MudGrid>
+        <MudItem xs="12">
+            <MudTextField @ref="_nameRef"
+                          T="string"
+                          Required
+                          Label="Bezeichnung"
+                          @bind-Value="Item.Name"
+                          OnKeyUp="OnNameKeyUpAsync"
+                          For="@(() => Item.Name)"/>
+        </MudItem>
+    </MudGrid>
+    
+</MudForm>
+
+@code {
+    private MudForm _fromRef = null!;
+    private MudTextField<string> _nameRef = null!;
+
+    [Parameter]
+    public required Manufacturer Item { get; set; }
+
+    [Parameter]
+    public required EventCallback<Manufacturer> ItemChanged { get; set; }
+
+    [Parameter]
+    public bool IsValid { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> IsValidChanged { get; set; }
+
+    [Parameter]
+    public bool IsTouched { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> IsTouchedChanged { get; set; }
+
+    [Parameter]
+    public EventCallback RequestSave { get; set; }
+
+    [Parameter]
+    [Category(CategoryTypes.FormComponent.Validation)]
+    public object? Validation { get; set; } = null;
+
+    private async Task OnFormFieldChangedAsync()
+    {
+        await ItemChanged.InvokeAsync(Item);
+    }
+
+    private async Task OnNameKeyUpAsync(KeyboardEventArgs args)
+    {
+        if (args.Key != "Enter")
+        {
+            return;
+        }
+
+        if (_fromRef.IsValid)
+        {
+            await RequestSave.InvokeAsync();
+            return;
+        }
+
+        await _fromRef.Validate();
+
+        if (_fromRef.IsValid)
+        {
+            await RequestSave.InvokeAsync();
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await _nameRef.FocusAsync();
+            await _nameRef.FocusAsync();
+        }
+    }
+
+}

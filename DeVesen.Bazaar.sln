@@ -1,0 +1,53 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34511.84
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentation", "{2F4D7058-D5A3-4B5E-8AB6-C6F148BE7319}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{1CBD02FD-DBBB-40D0-AC9C-6A96BC855EEE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeVesen.Bazaar.Server", "DeVesen.Bazaar\Server\DeVesen.Bazaar.Server.csproj", "{B5E99E87-8163-4A31-BA94-53EE1DED178C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeVesen.Bazaar.Client", "DeVesen.Bazaar\Client\DeVesen.Bazaar.Client.csproj", "{D10BA03D-B87E-4A2D-96C9-1E3133CFF980}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeVesen.Bazaar.Shared", "DeVesen.Bazaar\Shared\DeVesen.Bazaar.Shared.csproj", "{87D53E22-8284-4E97-9B95-D511F0ED2C4A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeVesen.Bazaar.Server.Tests", "DeVesen.Bazaar.Server.Tests\DeVesen.Bazaar.Server.Tests.csproj", "{A5A02190-7028-43EB-85E5-B5FB34BE4361}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B5E99E87-8163-4A31-BA94-53EE1DED178C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5E99E87-8163-4A31-BA94-53EE1DED178C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5E99E87-8163-4A31-BA94-53EE1DED178C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5E99E87-8163-4A31-BA94-53EE1DED178C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D10BA03D-B87E-4A2D-96C9-1E3133CFF980}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D10BA03D-B87E-4A2D-96C9-1E3133CFF980}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D10BA03D-B87E-4A2D-96C9-1E3133CFF980}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D10BA03D-B87E-4A2D-96C9-1E3133CFF980}.Release|Any CPU.Build.0 = Release|Any CPU
+		{87D53E22-8284-4E97-9B95-D511F0ED2C4A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{87D53E22-8284-4E97-9B95-D511F0ED2C4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{87D53E22-8284-4E97-9B95-D511F0ED2C4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{87D53E22-8284-4E97-9B95-D511F0ED2C4A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A5A02190-7028-43EB-85E5-B5FB34BE4361}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A5A02190-7028-43EB-85E5-B5FB34BE4361}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A5A02190-7028-43EB-85E5-B5FB34BE4361}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A5A02190-7028-43EB-85E5-B5FB34BE4361}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B5E99E87-8163-4A31-BA94-53EE1DED178C} = {2F4D7058-D5A3-4B5E-8AB6-C6F148BE7319}
+		{D10BA03D-B87E-4A2D-96C9-1E3133CFF980} = {2F4D7058-D5A3-4B5E-8AB6-C6F148BE7319}
+		{87D53E22-8284-4E97-9B95-D511F0ED2C4A} = {2F4D7058-D5A3-4B5E-8AB6-C6F148BE7319}
+		{A5A02190-7028-43EB-85E5-B5FB34BE4361} = {1CBD02FD-DBBB-40D0-AC9C-6A96BC855EEE}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5E9CE496-656F-4BDB-B539-939D202005B8}
+	EndGlobalSection
+EndGlobal

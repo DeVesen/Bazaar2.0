@@ -1,0 +1,44 @@
+﻿@using DeVesen.Bazaar.Client.Components.Common.Buttons
+@using DeVesen.Bazaar.Client.Models
+@using DeVesen.Bazaar.Client.Services
+@using DeVesen.Bazaar.Client.Validator
+
+@inject ManufacturerService ArticleCategoryService
+@inject ManufacturerValidator ArticleCategoryValidator
+
+<MudDialog>
+    <DialogContent>
+        <ManufacturerForm IsValid="@_isValid"
+                             IsTouched="@_isTouched"
+                             IsValidChanged="@(x => _isValid = x)"
+                             IsTouchedChanged="@(x => _isTouched = x)"
+                             @bind-Item="_item"
+                             Validation="@(ArticleCategoryValidator.ValidateAsync)"
+                             RequestSave="SubmitAsync" />
+        
+        <MudCheckBox @bind-Value="@ForceNext" Label="weiterer"></MudCheckBox>
+    </DialogContent>
+    <DialogActions>
+        <DvButtonSave OnClick="SubmitAsync" />
+        <DvButtonCancel OnClick="Cancel" />
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
+
+    [Parameter] public bool ForceNext { get; set; }
+
+    private Manufacturer _item = Manufacturer.New;
+    private bool _isValid;
+    private bool _isTouched;
+
+    private async Task SubmitAsync()
+    {
+        await ArticleCategoryService.CreateAsync(_item);
+
+        MudDialog.Close(DialogResult.Ok(ForceNext));
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+}

@@ -1,0 +1,12 @@
+﻿<ListingElement Icon="@Icon">
+    <MudText>@Value</MudText>
+</ListingElement>
+
+@code {
+
+    [Parameter]
+    public required string Icon { get; set; }
+
+    [Parameter]
+    public required string Value { get; set; }
+}

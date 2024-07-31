@@ -1,0 +1,14 @@
+﻿
+<div class="d-flex gap-4">
+    <MudIcon Icon="@Icon" />
+    @ChildContent
+</div>
+
+@code {
+
+    [Parameter]
+    public required string Icon { get; set; }
+
+    [Parameter]
+    public required RenderFragment ChildContent { get; set; }
+}

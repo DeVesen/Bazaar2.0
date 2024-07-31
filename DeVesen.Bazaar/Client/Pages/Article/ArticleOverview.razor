@@ -1,0 +1,157 @@
+﻿@using DeVesen.Bazaar.Client.Services
+@using DeVesen.Bazaar.Client.Components.Common.ToolBar
+@using DeVesen.Bazaar.Client.Components.Article
+@using DeVesen.Bazaar.Client.Models
+
+@page "/articles"
+@page "/vendors/{vendorId}/articles"
+
+@inject ArticleService ArticleService;
+@inject IDialogService DialogService
+
+<div class="d-flex flex-column gap-4 px-1">
+    <MudToolBar WrapContent Dense DisableGutters>
+        <MudSpacer />
+        @if (IsVendorMode)
+        {
+            <ToolBarIconButton Icon="@Icons.Material.TwoTone.NoteAdd"
+                               OnClick="CreateElementAsync" />
+        }
+        <ToolBarSearchField T="long?"
+                            OuterStyle="max-width: 100px"
+                            OuterClass="pl-2"
+                            Label="Nummer"
+                            Value="@_searchNumber"
+                            ValueChanged="OnNumberSearchChangedAsync" />
+        <ToolBarSearchField T="string"
+                            OuterStyle="max-width: 200px"
+                            OuterClass="px-2"
+                            Label="Textsuche"
+                            Value="@_searchText"
+                            ValueChanged="OnTextSearchChangedAsync" />
+    </MudToolBar>
+
+    <MudTable T="Article"
+              FixedHeader
+              Hover
+              Items="@_elements"
+              SortLabel="Sort By"
+              OnRowClick="x => ModifyElementAsync(x.Item)">
+        <HeaderContent>
+            <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Number)">Nummer</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Title)">Title</MudTableSortLabel></MudTh>
+            <MudTh>Status</MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.ArticleCategory)">Kategorie</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Manufacturer)">Manufacturer</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Price01)">Preis</MudTableSortLabel></MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Nummer">@context.Number</MudTd>
+            <MudTd DataLabel="Titel">@context.Title</MudTd>
+            <MudTd DataLabel="Status">@GetStatus(context)</MudTd>
+            <MudTd DataLabel="ArticleCategory">@context.ArticleCategory</MudTd>
+            <MudTd DataLabel="Manufacturer">@context.Manufacturer</MudTd>
+            <MudTd DataLabel="Price01">@context.Price01</MudTd>
+        </RowTemplate>
+    </MudTable>
+</div>
+
+@code {
+
+    [Parameter]
+    public string? VendorId { get; set; }
+
+    private bool IsVendorMode => string.IsNullOrWhiteSpace(VendorId) is false;
+
+    private IEnumerable<Article> _elements = Enumerable.Empty<Article>();
+    private long? _searchNumber;
+    private string _searchText = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        await ReloadElementsAsync();
+    }
+
+    private async Task CreateElementAsync()
+    {
+        await Task.CompletedTask;
+    }
+
+    private async Task ModifyElementAsync(Article article)
+    {
+        var parameters = new DialogParameters<ArticleEditDialog>
+        {
+            { x => x.Item, article }
+        };
+
+        var options = new DialogOptions
+        {
+            CloseOnEscapeKey = true,
+            DisableBackdropClick = true
+        };
+
+        var dlg = await DialogService.ShowAsync<ArticleEditDialog>("Artikel ändern", parameters, options);
+        var result = await dlg.Result;
+
+        if (result.Canceled is false)
+        {
+            await ReloadElementsAsync();
+        }
+    }
+
+    private async Task OnNumberSearchChangedAsync(long? newValue)
+    {
+        _searchNumber = newValue;
+
+        await ReloadElementsAsync();
+    }
+
+    private async Task OnTextSearchChangedAsync(string newValue)
+    {
+        _searchText = newValue;
+
+        await ReloadElementsAsync();
+    }
+
+    private async Task ReloadElementsAsync()
+    {
+        _elements = await ArticleService.GetAllAsync();
+
+        _elements = _elements.Where(p => p.Contains(_searchText));
+
+        if (_searchNumber.HasValue)
+        {
+            _elements = _elements.Where(p => p.Number == _searchNumber);
+        }
+
+        if (string.IsNullOrWhiteSpace(VendorId) is false)
+        {
+            _elements = _elements.Where(p => p.VendorId.Equals(VendorId, StringComparison.InvariantCulture));
+        }
+    }
+
+    private static string GetStatus(Article article)
+    {
+        if (article.Settled.HasValue && article.Sold.HasValue)
+        {
+            return "Abgerechnet";
+        }
+        else if (article.Settled.HasValue && article.Sold.HasValue is false)
+        {
+            return "Zurückgegeben";
+        }
+        else if (article.Sold.HasValue)
+        {
+            return "Verkauft";
+        }
+        else if (article.ApprovedForSale.HasValue)
+        {
+            return "Freigegeben";
+        }
+        else
+        {
+            return string.Empty;
+        }
+    }
+}

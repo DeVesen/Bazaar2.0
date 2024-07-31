@@ -1,0 +1,36 @@
+﻿
+<MudIconButton Icon="@Icon"
+               Color="@Color"
+               Size="@Size"
+               Variant="@Variant"
+               Title="@Title"
+               OnClick="@OnClick" />
+
+@code {
+    [Parameter]
+    public string? Title { get; set; }
+
+    [Parameter]
+    public required string Icon { get; set; }
+
+    [Parameter]
+    public Color IconColor { get; set; } = Color.Inherit;
+
+    [Parameter]
+    public Size? IconSize { get; set; }
+
+    [Parameter]
+    public string? IconClass { get; set; }
+
+    [Parameter]
+    public Color Color { get; set; } = Color.Default;
+
+    [Parameter]
+    public Size Size { get; set; } = Size.Medium;
+
+    [Parameter]
+    public Variant Variant { get; set; } = Variant.Text;
+
+    [Parameter]
+    public required EventCallback<MouseEventArgs> OnClick { get; set; }
+}

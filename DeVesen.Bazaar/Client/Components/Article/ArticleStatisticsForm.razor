@@ -1,0 +1,96 @@
+﻿@using DeVesen.Bazaar.Client.Services
+@using DeVesen.Bazaar.Client.Components.Common
+@using DeVesen.Bazaar.Client.Models
+
+<MudForm Model="Item"
+         Style="margin-bottom: 20px; min-width: 370px"
+         Class="h-100">
+
+    <div class="d-flex flex-column gap-4 h-100">
+        
+        <MudPaper Class="d-flex p-4 justify-space-between">
+            @if (IsApprovedForSale)
+            {
+                <MudText>@($"Freigegeben um {Item.ApprovedForSale:HH:mm} Uhr am {Item.ApprovedForSale:dd.MM.yyyy}")</MudText>
+                @if (IsApprovedForSaleResetPossible)
+                {
+                    <MudIconButton Size="Size.Small"
+                                   Icon="@Icons.Material.TwoTone.Delete"
+                                   OnClick="ResetApprovedForSale"></MudIconButton>
+                }
+            }
+            else
+            {
+                <MudButton FullWidth OnClick="ApproveForSale">Jetzt freigeben</MudButton>
+            }
+        </MudPaper>
+    
+        @if (IsSold)
+        {
+            <MudPaper Class="d-flex p-4 justify-space-between">
+                <MudText>@($"Verkauft für {Item.SoldAt:#.##} € um {Item.Sold:HH:mm} Uhr am {Item.Sold:dd.MM.yyyy}")</MudText>
+                @if (IsSoldResetPossible)
+                {
+                    <MudIconButton Size="Size.Small"
+                                   Icon="@Icons.Material.TwoTone.Delete"
+                                   OnClick="ResetSold"></MudIconButton>
+                }
+            </MudPaper>
+        }
+    
+        @if (IsSettled)
+        {
+            <MudPaper Class="d-flex p-4 justify-space-between">
+                @if (IsSold)
+                {
+                    <MudText>@($"Abgerechnet um {Item.Settled:HH:mm} Uhr am {Item.Settled:dd.MM.yyyy}")</MudText>
+                }
+                else
+                {
+                    <MudText>@($"Reckgegeben um {Item.Settled:HH:mm} Uhr am {Item.Settled:dd.MM.yyyy}")</MudText>
+                }
+                <MudIconButton Size="Size.Small"
+                               Icon="@Icons.Material.TwoTone.Delete"
+                               OnClick="ResetSettled"></MudIconButton>
+            </MudPaper>
+        }
+
+    </div>
+
+</MudForm>
+
+@code {
+    [Parameter]
+    public required Article Item { get; set; }
+
+    [Parameter]
+    public required EventCallback<Article> ItemChanged { get; set; }
+
+    private bool IsApprovedForSale => Item.ApprovedForSale.HasValue;
+    private bool IsSold => Item.Sold.HasValue;
+    private bool IsSettled => Item.Settled.HasValue;
+
+    private bool IsApprovedForSaleResetPossible => IsSold is false && IsSettled is false;
+    private bool IsSoldResetPossible => IsSettled is false;
+
+    private void ApproveForSale()
+    {
+        Item.ApprovedForSale = DateTime.Now;
+    }
+
+    private void ResetApprovedForSale()
+    {
+        Item.ApprovedForSale = null;
+    }
+
+    private void ResetSold()
+    {
+        Item.Sold = null;
+        Item.SoldAt = null;
+    }
+
+    private void ResetSettled()
+    {
+        Item.Settled = null;
+    }
+}
