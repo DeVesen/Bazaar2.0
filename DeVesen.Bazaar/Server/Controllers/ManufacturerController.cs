@@ -31,7 +31,7 @@ public class ManufacturerController : ControllerBase
     [HttpPost]
     public async Task<ActionResult> CreateAsync([FromBody] ManufacturerCreateDto dto)
     {
-        var element = (Guid.NewGuid(), dto).ToDomain();
+        var element = dto.ToDomain();
         var result = await _manufacturerValidator.ValidateAsync(element);
 
         if (result.IsValid is false)
@@ -44,20 +44,15 @@ public class ManufacturerController : ControllerBase
         return Ok();
     }
 
-    [HttpPut("{idStr}")]
-    public async Task<ActionResult> UpdateAsync(string idStr, [FromBody] ManufacturerUpdateDto dto)
+    [HttpPut("{id}")]
+    public async Task<ActionResult> UpdateAsync(string id, [FromBody] ManufacturerUpdateDto dto)
     {
-        if (Guid.TryParse(idStr, out var itemId) is false)
+        if (await _manufacturerStorage.ExistByIdAsync(id) is false)
         {
-            return BadRequest("ID is not in valid format!");
+            return NotFound(ResourceText.Transform(ResourceText.Manufacturer.NotFoundById, _ => id));
         }
 
-        if (await _manufacturerStorage.ExistByIdAsync(itemId) is false)
-        {
-            return NotFound(ResourceText.Transform(ResourceText.Manufacturer.NotFoundById, _ => idStr));
-        }
-
-        var element = (itemId, dto).ToDomain();
+        var element = (id, dto).ToDomain();
         var result = await _manufacturerValidator.ValidateAsync(element);
 
         if (result.IsValid is false)
@@ -70,20 +65,15 @@ public class ManufacturerController : ControllerBase
         return Ok();
     }
 
-    [HttpDelete("{idStr}")]
-    public async Task<ActionResult> DeleteAsync(string idStr)
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> DeleteAsync(string id)
     {
-        if (Guid.TryParse(idStr, out var itemId) is false)
+        if (await _manufacturerStorage.ExistByIdAsync(id) is false)
         {
-            return BadRequest("ID is not in valid format!");
+            return NotFound(ResourceText.Transform(ResourceText.Manufacturer.NotFoundById, _ => id));
         }
 
-        if (await _manufacturerStorage.ExistByIdAsync(itemId) is false)
-        {
-            return NotFound(ResourceText.Transform(ResourceText.Manufacturer.NotFoundById, _ => idStr));
-        }
-
-        await _manufacturerStorage.DeleteAsync(itemId);
+        await _manufacturerStorage.DeleteAsync(id);
 
         return Ok();
     }

@@ -10,23 +10,23 @@ public static class Faker
 {
     public static class Entity
     {
-        public static ArticleCategoryEntity ArticleCategory1 => GetArticleCategoryEntity(Guid.Parse("477939A9-72FC-404B-8D31-6EB6C5BF3083"), "ArticleCategory_1");
-        public static ArticleCategoryEntity ArticleCategory2 => GetArticleCategoryEntity(Guid.Parse("60B10954-8129-4611-AF1F-C7CE6F00125A"), "ArticleCategory_2");
-        public static ArticleCategoryEntity ArticleCategory3 => GetArticleCategoryEntity(Guid.Parse("D515CC4A-46A3-474A-A200-7AC5187FB3B6"), "ArticleCategory_3");
-        public static ArticleCategoryEntity GetArticleCategoryEntity(Guid? id = null, string? name = null)
+        public static ArticleCategoryEntity ArticleCategory1 => GetArticleCategoryEntity("1", "ArticleCategory_1");
+        public static ArticleCategoryEntity ArticleCategory2 => GetArticleCategoryEntity("2", "ArticleCategory_2");
+        public static ArticleCategoryEntity ArticleCategory3 => GetArticleCategoryEntity("3", "ArticleCategory_3");
+        public static ArticleCategoryEntity GetArticleCategoryEntity(string? id = null, string? name = null)
             => new()
             {
-                Id = id ?? Guid.NewGuid(),
+                Id = id ?? "4",
                 Name = name ?? $"AC_{Guid.NewGuid()}"
             };
 
-        public static ManufacturerEntity Manufacturer1 => GetManufacturerEntity(Guid.Parse("477939A9-72FC-404B-8D31-6EB6C5BF3083"), "Manufacturer_1");
-        public static ManufacturerEntity Manufacturer2 => GetManufacturerEntity(Guid.Parse("60B10954-8129-4611-AF1F-C7CE6F00125A"), "Manufacturer_2");
-        public static ManufacturerEntity Manufacturer3 => GetManufacturerEntity(Guid.Parse("D515CC4A-46A3-474A-A200-7AC5187FB3B6"), "Manufacturer_3");
-        public static ManufacturerEntity GetManufacturerEntity(Guid? id = null, string? name = null)
+        public static ManufacturerEntity Manufacturer1 => GetManufacturerEntity("4", "Manufacturer_1");
+        public static ManufacturerEntity Manufacturer2 => GetManufacturerEntity("5", "Manufacturer_2");
+        public static ManufacturerEntity Manufacturer3 => GetManufacturerEntity("6", "Manufacturer_3");
+        public static ManufacturerEntity GetManufacturerEntity(string? id = null, string? name = null)
             => new()
             {
-                Id = id ?? Guid.NewGuid(),
+                Id = id ?? "7",
                 Name = name ?? $"AC_{Guid.NewGuid()}"
             };
 
@@ -81,21 +81,21 @@ public static class Faker
 
     public static class Domain
     {
-        public static ArticleCategory ArticleCategory1 => GetArticleCategory(Guid.Parse("477939A9-72FC-404B-8D31-6EB6C5BF3083"), "ArticleCategory_1");
-        public static ArticleCategory ArticleCategory2 => GetArticleCategory(Guid.Parse("60B10954-8129-4611-AF1F-C7CE6F00125A"), "ArticleCategory_2");
-        public static ArticleCategory GetArticleCategory(Guid? id = null, string? name = null)
+        public static ArticleCategory ArticleCategory1 => GetArticleCategory("1", "ArticleCategory_1");
+        public static ArticleCategory ArticleCategory2 => GetArticleCategory("2", "ArticleCategory_2");
+        public static ArticleCategory GetArticleCategory(string? id = null, string? name = null)
             => new()
             {
-                Id = id ?? Guid.NewGuid(),
+                Id = id ?? "4",
                 Name = name ?? $"AC_{Guid.NewGuid()}"
             };
 
-        public static Manufacturer Manufacturer1 => GetManufacturer(Guid.Parse("477939A9-72FC-404B-8D31-6EB6C5BF3083"), "Manufacturer_1");
-        public static Manufacturer Manufacturer2 => GetManufacturer(Guid.Parse("60B10954-8129-4611-AF1F-C7CE6F00125A"), "Manufacturer_2");
-        public static Manufacturer GetManufacturer(Guid? id = null, string? name = null)
+        public static Manufacturer Manufacturer1 => GetManufacturer("4", "Manufacturer_1");
+        public static Manufacturer Manufacturer2 => GetManufacturer("5", "Manufacturer_2");
+        public static Manufacturer GetManufacturer(string? id = null, string? name = null)
             => new()
             {
-                Id = id ?? Guid.NewGuid(),
+                Id = id ?? "7",
                 Name = name ?? $"AC_{Guid.NewGuid()}"
             };
 
@@ -148,12 +148,12 @@ public static class Faker
 
     public static class Dto
     {
-        public static ArticleCategory ArticleCategory1 => GetArticleCategory(Guid.Parse("477939A9-72FC-404B-8D31-6EB6C5BF3083"), "ArticleCategory_1");
-        public static ArticleCategory ArticleCategory2 => GetArticleCategory(Guid.Parse("60B10954-8129-4611-AF1F-C7CE6F00125A"), "ArticleCategory_2");
-        public static ArticleCategory GetArticleCategory(Guid? id = null, string? name = null)
+        public static ArticleCategory ArticleCategory1 => GetArticleCategory("1", "ArticleCategory_1");
+        public static ArticleCategory ArticleCategory2 => GetArticleCategory("2", "ArticleCategory_2");
+        public static ArticleCategory GetArticleCategory(string? id = null, string? name = null)
             => new()
             {
-                Id = id ?? Guid.NewGuid(),
+                Id = id ?? "4",
                 Name = name ?? $"AC_{Guid.NewGuid()}"
             };
 
@@ -168,12 +168,12 @@ public static class Faker
             => new(name ?? $"AC_{Guid.NewGuid()}");
 
 
-        public static ManufacturerEntity Manufacturer1 => GetManufacturerEntity(Guid.Parse("477939A9-72FC-404B-8D31-6EB6C5BF3083"), "Manufacturer_1");
-        public static ManufacturerEntity Manufacturer2 => GetManufacturerEntity(Guid.Parse("60B10954-8129-4611-AF1F-C7CE6F00125A"), "Manufacturer_2");
-        public static ManufacturerEntity GetManufacturerEntity(Guid? id = null, string? name = null)
+        public static ManufacturerEntity Manufacturer1 => GetManufacturerEntity("4", "Manufacturer_1");
+        public static ManufacturerEntity Manufacturer2 => GetManufacturerEntity("5", "Manufacturer_2");
+        public static ManufacturerEntity GetManufacturerEntity(string? id = null, string? name = null)
             => new()
             {
-                Id = id ?? Guid.NewGuid(),
+                Id = id ?? "7",
                 Name = name ?? $"AC_{Guid.NewGuid()}"
             };
 

@@ -13,24 +13,40 @@ public class ManufacturerStorage
         _manufacturerRepository = manufacturerRepository;
     }
 
-    public async Task<bool> ExistByIdAsync(Guid id)
+    public async Task<bool> ExistByIdAsync(string id)
     {
-        return await _manufacturerRepository.ExistAsync(id);
+        return await _manufacturerRepository.ExistByIdAsync(id);
     }
 
     public async Task<bool> ExistByNameAsync(string name)
     {
-        return await _manufacturerRepository.ExistAsync(name);
+        return await _manufacturerRepository.ExistByNameAsync(name);
+    }
+
+    public async Task<bool> ExistByNameAsync(string name, string? id)
+    {
+        return await _manufacturerRepository.ExistByNameAsync(name, id);
+    }
+
+    public async Task<Manufacturer> GetByIdAsync(string id)
+    {
+        if (await _manufacturerRepository.ExistByIdAsync(id) is false)
+        {
+            throw new InvalidDataException($"Id '{id}' not found!");
+        }
+
+        var element = await _manufacturerRepository.GetByIdAsync(id);
+        return element.ToDomain();
     }
 
     public async Task<Manufacturer> GetByNameAsync(string name)
     {
-        if (await ExistByNameAsync(name) is false)
+        if (await _manufacturerRepository.ExistByNameAsync(name) is false)
         {
             throw new InvalidDataException($"Name '{name}' not found!");
         }
 
-        var element = await _manufacturerRepository.GetAsync(name);
+        var element = await _manufacturerRepository.GetByNameAsync(name);
         return element.ToDomain();
     }
 
@@ -42,11 +58,11 @@ public class ManufacturerStorage
 
     public async Task CreateAsync(Manufacturer element)
     {
-        if (await ExistByIdAsync(element.Id))
+        if (await _manufacturerRepository.ExistByIdAsync(element.Id))
         {
             throw new InvalidDataException($"Id '{element.Id}' already exist!");
         }
-        if (await ExistByNameAsync(element.Name))
+        if (await _manufacturerRepository.ExistByNameAsync(element.Name))
         {
             throw new InvalidDataException($"Name '{element.Name}' already exist!");
         }
@@ -56,13 +72,13 @@ public class ManufacturerStorage
 
     public async Task UpdateAsync(Manufacturer element)
     {
-        if (await ExistByIdAsync(element.Id) is false)
+        if (await _manufacturerRepository.ExistByIdAsync(element.Id) is false)
         {
             throw new InvalidDataException($"Id '{element.Id}' not found!");
         }
-        if (await ExistByNameAsync(element.Name))
+        if (await _manufacturerRepository.ExistByNameAsync(element.Name))
         {
-            var entity = await GetByNameAsync(element.Name);
+            var entity = await _manufacturerRepository.GetByNameAsync(element.Name);
 
             if (entity != null && entity.Id != element.Id)
             {
@@ -73,9 +89,9 @@ public class ManufacturerStorage
         await _manufacturerRepository.UpdateAsync(element.ToEntity());
     }
 
-    public async Task DeleteAsync(Guid id)
+    public async Task DeleteAsync(string id)
     {
-        if (await ExistByIdAsync(id) is false)
+        if (await _manufacturerRepository.ExistByIdAsync(id) is false)
         {
             throw new InvalidDataException($"Id '{id}' not found!");
         }

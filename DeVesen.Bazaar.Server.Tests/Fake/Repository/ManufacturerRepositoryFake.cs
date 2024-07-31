@@ -14,28 +14,35 @@ public class ManufacturerRepositoryFake : IManufacturerRepository
         InnerList = elements.ToList();
     }
 
-    public async Task<bool> ExistAsync(Guid id)
+    public async Task<bool> ExistByIdAsync(string id)
     {
         await Task.Delay(1);
 
         return InnerList.Any(p => p.Id == id);
     }
 
-    public async Task<bool> ExistAsync(string name, Guid? allowedId = null)
+    public async Task<bool> ExistByNameAsync(string name)
+    {
+        await Task.Delay(1);
+
+        return InnerList.Any(p => p.Name == name);
+    }
+
+    public async Task<bool> ExistByNameAsync(string name, string? allowedId)
     {
         await Task.Delay(1);
 
         return InnerList.Any(p => p.Name == name && p.Id != allowedId);
     }
 
-    public async Task<ManufacturerEntity> GetAsync(Guid id)
+    public async Task<ManufacturerEntity> GetByIdAsync(string id)
     {
         await Task.Delay(1);
 
         return InnerList.First(p => p.Id == id);
     }
 
-    public async Task<ManufacturerEntity> GetAsync(string name)
+    public async Task<ManufacturerEntity> GetByNameAsync(string name)
     {
         await Task.Delay(1);
 
@@ -70,7 +77,7 @@ public class ManufacturerRepositoryFake : IManufacturerRepository
         await Task.Delay(100);
     }
 
-    public async Task DeleteAsync(Guid id)
+    public async Task DeleteAsync(string id)
     {
         var element = InnerList.FirstOrDefault(p => p.Id == id);
 

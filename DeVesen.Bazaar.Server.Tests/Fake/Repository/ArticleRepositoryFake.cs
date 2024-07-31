@@ -14,46 +14,51 @@ public class ArticleRepositoryFake : IArticleRepository
         InnerList = elements.ToList();
     }
 
-    public async Task<bool> ExistAsync(string id)
+    public async Task<bool> ExistByIdAsync(string id)
     {
         await Task.Delay(1);
 
         return InnerList.Any(p => p.Id == id);
     }
 
-    public async Task<bool> ExistAsync(long number)
+    public async Task<bool> ExistByNumberAsync(long number)
     {
         await Task.Delay(1);
 
         return InnerList.Any(p => p.Number == number);
     }
 
-    public async Task<ArticleEntity> GetAsync(string id)
+    public async Task<bool> ExistByNumberAsync(long number, string? allowedId)
     {
         await Task.Delay(1);
 
-        return InnerList.First(p => p.Id == id);
+        return InnerList.Any(p => p.Number == number && p.Id != allowedId);
     }
 
-    public async Task<ArticleEntity> GetAsync(long number)
+    public async Task<(bool Exist, ArticleEntity? Entity)> TryGetByIdAsync(string id)
     {
-        await Task.Delay(1);
+        var entity = InnerList.FirstOrDefault(p => p.Id == id);
 
-        return InnerList.First(p => p.Number == number);
+        return await Task.FromResult((entity != null, entity));
+    }
+
+    public async Task<(bool Exist, ArticleEntity? Entity)> TryGetByNumberAsync(long number)
+    {
+        var entity = InnerList.FirstOrDefault(p => p.Number == number);
+
+        return await Task.FromResult((entity != null, entity));
     }
 
     public async Task<IEnumerable<ArticleEntity>> GetAllAsync()
     {
-        await Task.Delay(1);
-
-        return InnerList.AsEnumerable();
+        return await Task.FromResult(InnerList.AsEnumerable());
     }
 
     public async Task CreateAsync(ArticleEntity entity)
     {
         InnerList.Add(entity);
 
-        await Task.Delay(100);
+        await Task.Delay(1);
     }
 
     public async Task UpdateAsync(ArticleEntity entity)
@@ -67,7 +72,7 @@ public class ArticleRepositoryFake : IArticleRepository
 
         InnerList[elementIndex] = entity;
 
-        await Task.Delay(100);
+        await Task.Delay(1);
     }
 
     public async Task DeleteAsync(string id)
@@ -81,6 +86,6 @@ public class ArticleRepositoryFake : IArticleRepository
 
         InnerList.Remove(element);
 
-        await Task.Delay(100);
+        await Task.Delay(1);
     }
 }

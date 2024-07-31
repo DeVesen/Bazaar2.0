@@ -31,7 +31,7 @@ public class VendorController : ControllerBase
     [HttpPost]
     public async Task<ActionResult> CreateAsync([FromBody] VendorCreateDto dto)
     {
-        var element = (dto.ToShortHash(), dto).ToDomain();
+        var element = dto.ToDomain();
         var result = await _vendorValidator.ValidateAsync(element);
 
         if (result.IsValid is false)

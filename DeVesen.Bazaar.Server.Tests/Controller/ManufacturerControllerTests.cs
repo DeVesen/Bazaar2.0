@@ -112,7 +112,7 @@ public class ManufacturerControllerTests
         var dto = Faker.Dto.GetManufacturerUpdate("Update FooBar");
 
         // Act
-        var result = await controller.UpdateAsync(Faker.Dto.Manufacturer2.Id.ToString(), dto);
+        var result = await controller.UpdateAsync(Faker.Dto.Manufacturer2.Id, dto);
 
         // Assert
         result.Should().BeOfType<NotFoundObjectResult>();
@@ -131,7 +131,7 @@ public class ManufacturerControllerTests
         var dto = Faker.Dto.GetManufacturerUpdate("Update FooBar");
 
         // Act
-        var result = await controller.UpdateAsync(Faker.Dto.Manufacturer2.Id.ToString(), dto);
+        var result = await controller.UpdateAsync(Faker.Dto.Manufacturer2.Id, dto);
 
         // Assert
         result.Should().BeOfType<NotFoundObjectResult>();
@@ -150,7 +150,7 @@ public class ManufacturerControllerTests
         var dto = Faker.Dto.GetManufacturerUpdate(Faker.Entity.Manufacturer1.Name);
 
         // Act
-        var result = await controller.UpdateAsync(Faker.Entity.Manufacturer2.Id.ToString(), dto);
+        var result = await controller.UpdateAsync(Faker.Entity.Manufacturer2.Id, dto);
 
         // Assert
         result.Should().BeOfType<BadRequestObjectResult>();
@@ -169,7 +169,7 @@ public class ManufacturerControllerTests
         var dto = Faker.Dto.GetManufacturerUpdate("Hello FooBar");
 
         // Act
-        var result = await controller.UpdateAsync(Faker.Domain.Manufacturer1.Id.ToString(), dto);
+        var result = await controller.UpdateAsync(Faker.Domain.Manufacturer1.Id, dto);
 
         // Assert
         repository.InnerList[0].Id.Should().Be(Faker.Domain.Manufacturer1.Id);
@@ -189,7 +189,7 @@ public class ManufacturerControllerTests
         var controller = new ManufacturerController(storage, validator);
 
         // Act
-        var result = await controller.DeleteAsync(Faker.Domain.Manufacturer2.Id.ToString());
+        var result = await controller.DeleteAsync(Faker.Domain.Manufacturer2.Id);
 
         // Assert
         result.Should().BeOfType<NotFoundObjectResult>();
@@ -207,7 +207,7 @@ public class ManufacturerControllerTests
         var controller = new ManufacturerController(storage, validator);
 
         // Act
-        var result = await controller.DeleteAsync(Faker.Domain.Manufacturer2.Id.ToString());
+        var result = await controller.DeleteAsync(Faker.Domain.Manufacturer2.Id);
 
         // Assert
         result.Should().BeOfType<NotFoundObjectResult>();
@@ -225,7 +225,7 @@ public class ManufacturerControllerTests
         var controller = new ManufacturerController(storage, validator);
 
         // Act
-        var result = await controller.DeleteAsync(Faker.Domain.Manufacturer1.Id.ToString());
+        var result = await controller.DeleteAsync(Faker.Domain.Manufacturer1.Id);
 
         // Assert
         result.Should().BeOfType<OkResult>();
@@ -337,7 +337,7 @@ public class ArticleCategoryControllerTests
         var dto = Faker.Dto.GetArticleCategoryUpdate("Update FooBar");
 
         // Act
-        var result = await controller.UpdateAsync(Faker.Dto.ArticleCategory2.Id.ToString(), dto);
+        var result = await controller.UpdateAsync(Faker.Dto.ArticleCategory2.Id, dto);
 
         // Assert
         result.Should().BeOfType<NotFoundObjectResult>();
@@ -356,7 +356,7 @@ public class ArticleCategoryControllerTests
         var dto = Faker.Dto.GetArticleCategoryUpdate("Update FooBar");
 
         // Act
-        var result = await controller.UpdateAsync(Faker.Dto.ArticleCategory2.Id.ToString(), dto);
+        var result = await controller.UpdateAsync(Faker.Dto.ArticleCategory2.Id, dto);
 
         // Assert
         result.Should().BeOfType<NotFoundObjectResult>();
@@ -375,7 +375,7 @@ public class ArticleCategoryControllerTests
         var dto = Faker.Dto.GetArticleCategoryUpdate(Faker.Entity.ArticleCategory1.Name);
 
         // Act
-        var result = await controller.UpdateAsync(Faker.Entity.ArticleCategory2.Id.ToString(), dto);
+        var result = await controller.UpdateAsync(Faker.Entity.ArticleCategory2.Id, dto);
 
         // Assert
         result.Should().BeOfType<BadRequestObjectResult>();
@@ -394,7 +394,7 @@ public class ArticleCategoryControllerTests
         var dto = Faker.Dto.GetArticleCategoryUpdate("Hello FooBar");
 
         // Act
-        var result = await controller.UpdateAsync(Faker.Domain.ArticleCategory1.Id.ToString(), dto);
+        var result = await controller.UpdateAsync(Faker.Domain.ArticleCategory1.Id, dto);
 
         // Assert
         repository.InnerList[0].Id.Should().Be(Faker.Domain.ArticleCategory1.Id);
@@ -414,7 +414,7 @@ public class ArticleCategoryControllerTests
         var controller = new ArticleCategoryController(storage, validator);
 
         // Act
-        var result = await controller.DeleteAsync(Faker.Domain.ArticleCategory2.Id.ToString());
+        var result = await controller.DeleteAsync(Faker.Domain.ArticleCategory2.Id);
 
         // Assert
         result.Should().BeOfType<NotFoundObjectResult>();
@@ -432,7 +432,7 @@ public class ArticleCategoryControllerTests
         var controller = new ArticleCategoryController(storage, validator);
 
         // Act
-        var result = await controller.DeleteAsync(Faker.Domain.ArticleCategory2.Id.ToString());
+        var result = await controller.DeleteAsync(Faker.Domain.ArticleCategory2.Id);
 
         // Assert
         result.Should().BeOfType<NotFoundObjectResult>();
@@ -450,7 +450,7 @@ public class ArticleCategoryControllerTests
         var controller = new ArticleCategoryController(storage, validator);
 
         // Act
-        var result = await controller.DeleteAsync(Faker.Domain.ArticleCategory1.Id.ToString());
+        var result = await controller.DeleteAsync(Faker.Domain.ArticleCategory1.Id);
 
         // Assert
         result.Should().BeOfType<OkResult>();

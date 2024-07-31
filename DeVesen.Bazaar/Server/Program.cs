@@ -1,5 +1,7 @@
+using DeVesen.Bazaar.Server;
 using DeVesen.Bazaar.Server.Contracts;
-using DeVesen.Bazaar.Server.Repository;
+using DeVesen.Bazaar.Server.Extensions;
+using DeVesen.Bazaar.Server.Repository.LiteDb;
 using DeVesen.Bazaar.Server.Storage;
 using DeVesen.Bazaar.Server.Validator;
 
@@ -10,22 +12,26 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
-builder.Services.AddSingleton<IArticleCategoryRepository, ArticleCategoryRepository>();
-builder.Services.AddSingleton<IManufacturerRepository, ManufacturerRepository>();
-builder.Services.AddSingleton<IVendorRepository, VendorRepository>();
-builder.Services.AddSingleton<IArticleRepository, ArticleRepository>();
+builder.Services.AddSingleton<ILiteDbEngine, LiteDbEngine>(_ => new LiteDbEngine(AppEnvironment.GetDataFilePath("bazaar.data.db")));
 
-builder.Services.AddTransient<ArticleCategoryStorage>();
-builder.Services.AddTransient<ManufacturerStorage>();
-builder.Services.AddTransient<VendorStorage>();
-builder.Services.AddTransient<ArticleStorage>();
+builder.Services.AddTransient<IArticleCategoryRepository, ArticleCategoryLiteDbRepository>()
+                .AddTransient<IManufacturerRepository, ManufacturerLiteDbRepository>()
+                .AddTransient<IVendorRepository, VendorLiteDbRepository>()
+                .AddTransient<IArticleRepository, ArticleLiteDbRepository>();
 
-builder.Services.AddTransient<ArticleCategoryValidator>();
-builder.Services.AddTransient<ManufacturerValidator>();
-builder.Services.AddTransient<VendorValidator>();
-builder.Services.AddTransient<ArticleValidator>();
+builder.Services.AddTransient<ArticleCategoryStorage>()
+                .AddTransient<ManufacturerStorage>()
+                .AddTransient<VendorStorage>()
+                .AddTransient<ArticleStorage>();
+
+builder.Services.AddTransient<ArticleCategoryValidator>()
+                .AddTransient<ManufacturerValidator>()
+                .AddTransient<VendorValidator>()
+                .AddTransient<ArticleValidator>();
 
 var app = builder.Build();
+
+await app.Services.SetupAppEnvironment();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

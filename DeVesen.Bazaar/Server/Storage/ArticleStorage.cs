@@ -17,18 +17,41 @@ public class ArticleStorage
 
     public async Task<bool> ExistByIdAsync(string id)
     {
-        return await _articleRepository.ExistAsync(id);
+        return await _articleRepository.ExistByIdAsync(id);
     }
 
     public async Task<bool> ExistByNumberAsync(long number)
     {
-        return await _articleRepository.ExistAsync(number);
+        return await _articleRepository.ExistByNumberAsync(number);
+    }
+
+    public async Task<bool> ExistByNumberAsync(long number, string? allowedId)
+    {
+        return await _articleRepository.ExistByNumberAsync(number, allowedId);
+    }
+
+    public async Task<Article> GetByIdAsync(string id)
+    {
+        var element = await _articleRepository.TryGetByIdAsync(id);
+
+        if (element.Exist is false)
+        {
+            throw new InvalidDataException($"Id '{id}' not found!");
+        }
+
+        return element.Entity!.ToDomain();
     }
 
     public async Task<Article> GetByNumberAsync(long number)
     {
-        var element = await _articleRepository.GetAsync(number);
-        return element.ToDomain();
+        var element = await _articleRepository.TryGetByNumberAsync(number);
+
+        if (element.Exist is false)
+        {
+            throw new InvalidDataException($"Number '{number}' not found!");
+        }
+
+        return element.Entity!.ToDomain();
     }
 
     public async Task<IEnumerable<Article>> GetAllAsync()
@@ -70,6 +93,7 @@ public class ArticleStorage
         {
             throw new InvalidDataException($"Id '{element.Id}' already exist!");
         }
+
         if (await ExistByNumberAsync(element.Number))
         {
             throw new InvalidDataException($"Name '{element.Number}' already exist!");
@@ -89,6 +113,7 @@ public class ArticleStorage
         {
             throw new InvalidDataException($"Id '{element.Id}' not found!");
         }
+
         if (await ExistByNumberAsync(element.Number))
         {
             var entity = await GetByNumberAsync(element.Number);
@@ -107,7 +132,7 @@ public class ArticleStorage
         await _articleRepository.UpdateAsync(element.ToEntity());
     }
 
-    public async Task DeleteAsync(string id)
+    public async Task DeleteByIdAsync(string id)
     {
         if (await ExistByIdAsync(id) is false)
         {
@@ -115,5 +140,17 @@ public class ArticleStorage
         }
 
         await _articleRepository.DeleteAsync(id);
+    }
+
+    public async Task DeleteByNumberAsync(long number)
+    {
+        var element = await _articleRepository.TryGetByNumberAsync(number);
+
+        if (element.Exist is false)
+        {
+            throw new InvalidDataException($"Number '{number}' not found!");
+        }
+
+        await _articleRepository.DeleteAsync(element.Entity!.Id);
     }
 }

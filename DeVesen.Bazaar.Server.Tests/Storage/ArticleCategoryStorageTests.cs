@@ -211,9 +211,10 @@ namespace DeVesen.Bazaar.Server.Tests.Storage
         public async Task CreateAsync_ContainedEntityName_ExpectException()
         {
             // Arrange
+            const string entityId = "19";
+
             var repository = new ArticleCategoryRepositoryFake(Faker.Entity.ArticleCategory1);
             var storage = new ArticleCategoryStorage(repository);
-            var entityId = Guid.Parse("59429FFE-EC6B-45BD-91CE-1075589B9668");
 
             // Act
             var act = () => storage.CreateAsync(Faker.Domain.GetArticleCategory(entityId, Faker.Entity.ArticleCategory1.Name));

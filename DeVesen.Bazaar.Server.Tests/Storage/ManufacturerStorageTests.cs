@@ -211,9 +211,10 @@ public class ManufacturerStorageTests
     public async Task CreateAsync_ContainedEntityName_ExpectException()
     {
         // Arrange
+        const string entityId = "19";
+
         var repository = new ManufacturerRepositoryFake(Faker.Entity.Manufacturer1);
         var storage = new ManufacturerStorage(repository);
-        var entityId = Guid.Parse("59429FFE-EC6B-45BD-91CE-1075589B9668");
 
         // Act
         var act = () => storage.CreateAsync(Faker.Domain.GetManufacturer(entityId, Faker.Entity.Manufacturer1.Name));

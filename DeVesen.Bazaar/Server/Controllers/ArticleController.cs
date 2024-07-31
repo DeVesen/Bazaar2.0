@@ -41,7 +41,7 @@ public class ArticleController : ControllerBase
     [HttpPost]
     public async Task<ActionResult> CreateAsync([FromBody] ArticleCreateDto dto)
     {
-        var element = (dto.ToShortHash(), dto).ToDomain();
+        var element = dto.ToDomain();
         var result = await _articleValidator.ValidateAsync(element);
 
         if (result.IsValid is false)
@@ -83,7 +83,7 @@ public class ArticleController : ControllerBase
             return NotFound(ResourceText.Transform(ResourceText.Article.NotFoundById, _ => id));
         }
 
-        await _articleStorage.DeleteAsync(id);
+        await _articleStorage.DeleteByIdAsync(id);
 
         return Ok();
     }

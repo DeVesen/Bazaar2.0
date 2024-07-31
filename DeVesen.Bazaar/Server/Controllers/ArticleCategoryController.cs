@@ -31,7 +31,7 @@ public class ArticleCategoryController : ControllerBase
     [HttpPost]
     public async Task<ActionResult> CreateAsync([FromBody] ArticleCategoryCreateDto dto)
     {
-        var element = (Guid.NewGuid(), dto).ToDomain();
+        var element = dto.ToDomain();
         var result = await _articleCategoryValidator.ValidateAsync(element);
 
         if (result.IsValid is false)
@@ -44,20 +44,15 @@ public class ArticleCategoryController : ControllerBase
         return Ok();
     }
 
-    [HttpPut("{idStr}")]
-    public async Task<ActionResult> UpdateAsync(string idStr, [FromBody] ArticleCategoryUpdateDto dto)
+    [HttpPut("{id}")]
+    public async Task<ActionResult> UpdateAsync(string id, [FromBody] ArticleCategoryUpdateDto dto)
     {
-        if (Guid.TryParse(idStr, out var itemId) is false)
+        if (await _articleCategoryStorage.ExistByIdAsync(id) is false)
         {
-            return BadRequest("ID is not in valid format!");
+            return NotFound(ResourceText.Transform(ResourceText.ArticleCategory.NotFoundById, _ => id));
         }
 
-        if (await _articleCategoryStorage.ExistByIdAsync(itemId) is false)
-        {
-            return NotFound(ResourceText.Transform(ResourceText.ArticleCategory.NotFoundById, _ => idStr));
-        }
-
-        var element = (itemId, dto).ToDomain();
+        var element = (id, dto).ToDomain();
         var result = await _articleCategoryValidator.ValidateAsync(element);
 
         if (result.IsValid is false)
@@ -70,20 +65,15 @@ public class ArticleCategoryController : ControllerBase
         return Ok();
     }
 
-    [HttpDelete("{idStr}")]
-    public async Task<ActionResult> DeleteAsync(string idStr)
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> DeleteAsync(string id)
     {
-        if (Guid.TryParse(idStr, out var itemId) is false)
+        if (await _articleCategoryStorage.ExistByIdAsync(id) is false)
         {
-            return BadRequest("ID is not in valid format!");
+            return NotFound(ResourceText.Transform(ResourceText.ArticleCategory.NotFoundById, _ => id));
         }
 
-        if (await _articleCategoryStorage.ExistByIdAsync(itemId) is false)
-        {
-            return NotFound(ResourceText.Transform(ResourceText.ArticleCategory.NotFoundById, _ => idStr));
-        }
-
-        await _articleCategoryStorage.DeleteAsync(itemId);
+        await _articleCategoryStorage.DeleteAsync(id);
 
         return Ok();
     }

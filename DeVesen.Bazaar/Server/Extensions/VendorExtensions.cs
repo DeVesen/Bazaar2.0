@@ -34,17 +34,17 @@ public static class VendorExtensions
             Note = entity.Note
         };
 
-    public static Vendor ToDomain(this (string id, VendorCreateDto dto) data)
+    public static Vendor ToDomain(this VendorCreateDto dto)
         => new()
         {
-            Id = data.id,
-            Salutation = data.dto.Salutation,
-            FirstName = data.dto.FirstName,
-            LastName = data.dto.LastName,
-            Address = data.dto.Address,
-            EMail = data.dto.EMail,
-            Phone = data.dto.Phone,
-            Note = data.dto.Note
+            Id = dto.ToShortHash(),
+            Salutation = dto.Salutation,
+            FirstName = dto.FirstName,
+            LastName = dto.LastName,
+            Address = dto.Address,
+            EMail = dto.EMail,
+            Phone = dto.Phone,
+            Note = dto.Note
         };
 
     public static Vendor ToDomain(this (string id, VendorUpdateDto dto) data)
@@ -73,7 +73,7 @@ public static class VendorExtensions
             Note = data.Note
         };
 
-    public static string ToShortHash(this VendorCreateDto dto)
+    private static string ToShortHash(this VendorCreateDto dto)
     {
         var builder = new StringBuilder();
 

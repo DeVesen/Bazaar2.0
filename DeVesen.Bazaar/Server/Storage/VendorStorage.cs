@@ -26,7 +26,7 @@ public class VendorStorage
 
     public async Task CreateAsync(Vendor element)
     {
-        if (await ExistByIdAsync(element.Id))
+        if (await _vendorRepository.ExistByIdAsync(element.Id))
         {
             throw new InvalidDataException($"Id '{element.Id}' already exist!");
         }
@@ -36,7 +36,7 @@ public class VendorStorage
 
     public async Task UpdateAsync(Vendor element)
     {
-        if (await ExistByIdAsync(element.Id) is false)
+        if (await _vendorRepository.ExistByIdAsync(element.Id) is false)
         {
             throw new InvalidDataException($"Id '{element.Id}' not found!");
         }
@@ -46,7 +46,7 @@ public class VendorStorage
 
     public async Task DeleteAsync(string id)
     {
-        if (await ExistByIdAsync(id) is false)
+        if (await _vendorRepository.ExistByIdAsync(id) is false)
         {
             throw new InvalidDataException($"Id '{id}' not found!");
         }

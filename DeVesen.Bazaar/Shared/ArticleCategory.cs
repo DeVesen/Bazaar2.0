@@ -3,7 +3,7 @@
 namespace DeVesen.Bazaar.Shared;
 
 [ExcludeFromCodeCoverage]
-public record ArticleCategoryDto(Guid Id, string Name);
+public record ArticleCategoryDto(string Id, string Name);
 
 [ExcludeFromCodeCoverage]
 public record ArticleCategoryCreateDto(string Name);

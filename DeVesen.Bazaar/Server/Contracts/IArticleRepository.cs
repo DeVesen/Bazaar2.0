@@ -4,13 +4,15 @@ namespace DeVesen.Bazaar.Server.Contracts;
 
 public interface IArticleRepository
 {
-    public Task<bool> ExistAsync(string id);
+    public Task<bool> ExistByIdAsync(string id);
 
-    public Task<bool> ExistAsync(long number);
+    public Task<bool> ExistByNumberAsync(long number);
 
-    public Task<ArticleEntity> GetAsync(string id);
+    public Task<bool> ExistByNumberAsync(long number, string? allowedId);
 
-    public Task<ArticleEntity> GetAsync(long number);
+    public Task<(bool Exist, ArticleEntity? Entity)> TryGetByIdAsync(string id);
+
+    public Task<(bool Exist, ArticleEntity? Entity)> TryGetByNumberAsync(long number);
 
     public Task<IEnumerable<ArticleEntity>> GetAllAsync();
 

@@ -3,7 +3,7 @@
 namespace DeVesen.Bazaar.Shared;
 
 [ExcludeFromCodeCoverage]
-public record ManufacturerDto(Guid Id, string Name);
+public record ManufacturerDto(string Id, string Name);
 
 [ExcludeFromCodeCoverage]
 public record ManufacturerCreateDto(string Name);

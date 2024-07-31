@@ -182,7 +182,7 @@ public class ArticleStorageTests
 
 
     [Fact]
-    public async Task DeleteAsync_EmptyRepository_ExpectException()
+    public async Task DeleteByIdAsync_EmptyRepository_ExpectException()
     {
         // Arrange
         var vendorRepository = new VendorRepositoryFake();
@@ -190,14 +190,14 @@ public class ArticleStorageTests
         var storage = new ArticleStorage(vendorRepository, articleRepository);
 
         // Act
-        var act = () => storage.DeleteAsync(Faker.Domain.Article2.Id);
+        var act = () => storage.DeleteByIdAsync(Faker.Domain.Article2.Id);
 
         // Assert
         (await act.Should().ThrowAsync<InvalidDataException>()).WithMessage($"Id '{Faker.Domain.Article2.Id}' not found!");
     }
 
     [Fact]
-    public async Task DeleteAsync_ContainedOtherEntity_ExpectException()
+    public async Task DeleteByIdAsync_ContainedOtherEntity_ExpectException()
     {
         // Arrange
         var vendorRepository = new VendorRepositoryFake();
@@ -205,14 +205,14 @@ public class ArticleStorageTests
         var storage = new ArticleStorage(vendorRepository, articleRepository);
 
         // Act
-        var act = () => storage.DeleteAsync(Faker.Domain.Article2.Id);
+        var act = () => storage.DeleteByIdAsync(Faker.Domain.Article2.Id);
 
         // Assert
         (await act.Should().ThrowAsync<InvalidDataException>()).WithMessage($"Id '{Faker.Domain.Article2.Id}' not found!");
     }
 
     [Fact]
-    public async Task DeleteAsync_ContainedEntity_ExpectUpdate()
+    public async Task DeleteByIdAsync_ContainedEntity_ExpectUpdate()
     {
         // Arrange
         var vendorRepository = new VendorRepositoryFake();
@@ -220,7 +220,52 @@ public class ArticleStorageTests
         var storage = new ArticleStorage(vendorRepository, articleRepository);
 
         // Act
-        await storage.DeleteAsync(Faker.Domain.Article1.Id);
+        await storage.DeleteByIdAsync(Faker.Domain.Article1.Id);
+
+        // Assert
+    }
+
+
+    [Fact]
+    public async Task DeleteByNumberAsync_EmptyRepository_ExpectException()
+    {
+        // Arrange
+        var vendorRepository = new VendorRepositoryFake();
+        var articleRepository = new ArticleRepositoryFake();
+        var storage = new ArticleStorage(vendorRepository, articleRepository);
+
+        // Act
+        var act = () => storage.DeleteByNumberAsync(Faker.Domain.Article2.Number);
+
+        // Assert
+        (await act.Should().ThrowAsync<InvalidDataException>()).WithMessage($"Number '{Faker.Domain.Article2.Number}' not found!");
+    }
+
+    [Fact]
+    public async Task DeleteByNumberAsync_ContainedOtherEntity_ExpectException()
+    {
+        // Arrange
+        var vendorRepository = new VendorRepositoryFake();
+        var articleRepository = new ArticleRepositoryFake(Faker.Entity.Article1);
+        var storage = new ArticleStorage(vendorRepository, articleRepository);
+
+        // Act
+        var act = () => storage.DeleteByNumberAsync(Faker.Domain.Article2.Number);
+
+        // Assert
+        (await act.Should().ThrowAsync<InvalidDataException>()).WithMessage($"Number '{Faker.Domain.Article2.Number}' not found!");
+    }
+
+    [Fact]
+    public async Task DeleteByNumberAsync_ContainedEntity_ExpectUpdate()
+    {
+        // Arrange
+        var vendorRepository = new VendorRepositoryFake();
+        var articleRepository = new ArticleRepositoryFake(Faker.Entity.Article1);
+        var storage = new ArticleStorage(vendorRepository, articleRepository);
+
+        // Act
+        await storage.DeleteByNumberAsync(Faker.Domain.Article1.Number);
 
         // Assert
     }

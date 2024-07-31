@@ -4,13 +4,15 @@ namespace DeVesen.Bazaar.Server.Contracts;
 
 public interface IArticleCategoryRepository
 {
-    public Task<bool> ExistAsync(Guid id);
+    public Task<bool> ExistByIdAsync(string id);
 
-    public Task<bool> ExistAsync(string name);
+    public Task<bool> ExistByNameAsync(string name, string? allowedId);
 
-    public Task<ArticleCategoryEntity> GetAsync(Guid id);
+    public Task<ArticleCategoryEntity> GetByIdAsync(string id);
 
-    public Task<ArticleCategoryEntity> GetAsync(string name);
+    public Task<bool> ExistByNameAsync(string name);
+
+    public Task<ArticleCategoryEntity> GetByNameAsync(string name);
 
     public Task<IEnumerable<ArticleCategoryEntity>> GetAllAsync();
 
@@ -18,5 +20,5 @@ public interface IArticleCategoryRepository
 
     public Task UpdateAsync(ArticleCategoryEntity entity);
 
-    public Task DeleteAsync(Guid id);
+    public Task DeleteAsync(string id);
 }

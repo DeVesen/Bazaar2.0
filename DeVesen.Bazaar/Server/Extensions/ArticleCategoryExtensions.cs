@@ -1,6 +1,8 @@
 using DeVesen.Bazaar.Server.Domain;
 using DeVesen.Bazaar.Server.Infrastructure;
 using DeVesen.Bazaar.Shared;
+using System.Text;
+using DeVesen.Bazaar.Shared.Basics;
 
 namespace DeVesen.Bazaar.Server.Extensions;
 
@@ -20,14 +22,14 @@ public static class ArticleCategoryExtensions
             Name = entity.Name
         };
 
-    public static ArticleCategory ToDomain(this (Guid id, ArticleCategoryCreateDto dto) data)
+    public static ArticleCategory ToDomain(this ArticleCategoryCreateDto dto)
         => new()
         {
-            Id = data.id,
-            Name = data.dto.Name
+            Id = dto.ToShortHash(),
+            Name = dto.Name
         };
 
-    public static ArticleCategory ToDomain(this (Guid id, ArticleCategoryUpdateDto dto) data)
+    public static ArticleCategory ToDomain(this (string id, ArticleCategoryUpdateDto dto) data)
         => new()
         {
             Id = data.id,
@@ -36,4 +38,15 @@ public static class ArticleCategoryExtensions
 
     public static ArticleCategoryDto ToDto(this ArticleCategory data)
         => new(data.Id, data.Name);
+
+    private static string ToShortHash(this ArticleCategoryCreateDto dto)
+    {
+        var builder = new StringBuilder();
+
+        builder.Append(dto.Name);
+        builder.Append(Guid.NewGuid().ToString());
+        builder.Append(DateTime.UtcNow.Ticks);
+
+        return builder.ToString().ToShortHash();
+    }
 }

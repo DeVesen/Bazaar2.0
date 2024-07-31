@@ -2,12 +2,8 @@
 
 public record ArticleCategory
 {
-    public required Guid Id { get; init; }
-    public required string Name { get; set; }
+    public string? Id { get; set; }
+    public string Name { get; set; } = string.Empty;
 
-    public static ArticleCategory New => new()
-    {
-        Id = Guid.NewGuid(),
-        Name = string.Empty
-    };
+    public static ArticleCategory New => new();
 }

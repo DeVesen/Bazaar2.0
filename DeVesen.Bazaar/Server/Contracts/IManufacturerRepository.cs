@@ -4,13 +4,15 @@ namespace DeVesen.Bazaar.Server.Contracts;
 
 public interface IManufacturerRepository
 {
-    public Task<bool> ExistAsync(Guid id);
+    public Task<bool> ExistByIdAsync(string id);
 
-    public Task<bool> ExistAsync(string name, Guid? allowedId = null);
+    public Task<bool> ExistByNameAsync(string name);
 
-    public Task<ManufacturerEntity> GetAsync(Guid id);
+    public Task<bool> ExistByNameAsync(string name, string? id);
 
-    public Task<ManufacturerEntity> GetAsync(string name);
+    public Task<ManufacturerEntity> GetByIdAsync(string id);
+
+    public Task<ManufacturerEntity> GetByNameAsync(string name);
 
     public Task<IEnumerable<ManufacturerEntity>> GetAllAsync();
 
@@ -18,5 +20,5 @@ public interface IManufacturerRepository
 
     public Task UpdateAsync(ManufacturerEntity entity);
 
-    public Task DeleteAsync(Guid id);
+    public Task DeleteAsync(string id);
 }

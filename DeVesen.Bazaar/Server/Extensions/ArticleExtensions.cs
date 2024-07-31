@@ -46,23 +46,23 @@ public static class ArticleExtensions
             Description = entity.Description
         };
 
-    public static Article ToDomain(this (string id, ArticleCreateDto dto) data)
+    public static Article ToDomain(this ArticleCreateDto dto)
         => new()
         {
-            Id = data.id,
-            VendorId = data.dto.VendorId,
-            Number = data.dto.Number,
-            Title = data.dto.Title,
-            ArticleCategory = data.dto.ArticleCategory,
-            Manufacturer = data.dto.Manufacturer,
-            Created = data.dto.ApprovedForSale ?? DateTime.Now,
-            ApprovedForSale = data.dto.ApprovedForSale,
+            Id = dto.ToShortHash(),
+            VendorId = dto.VendorId,
+            Number = dto.Number,
+            Title = dto.Title,
+            ArticleCategory = dto.ArticleCategory,
+            Manufacturer = dto.Manufacturer,
+            Created = dto.ApprovedForSale ?? DateTime.Now,
+            ApprovedForSale = dto.ApprovedForSale,
             Sold = null,
             SoldAt = null,
             Settled = null,
-            Price01 = data.dto.Price01,
-            Price02 = data.dto.Price02,
-            Description = data.dto.Description
+            Price01 = dto.Price01,
+            Price02 = dto.Price02,
+            Description = dto.Description
         };
 
     public static Article ToDomain(this (string id, ArticleUpdateDto dto) data)
@@ -113,7 +113,7 @@ public static class ArticleExtensions
             Manufacturer = dto.Manufacturer
         };
 
-    public static string ToShortHash(this ArticleCreateDto dto)
+    private static string ToShortHash(this ArticleCreateDto dto)
     {
         var builder = new StringBuilder();
 

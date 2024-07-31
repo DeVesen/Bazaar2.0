@@ -13,14 +13,30 @@ namespace DeVesen.Bazaar.Server.Storage
             _articleCategoryRepository = articleCategoryRepository;
         }
 
-        public async Task<bool> ExistByIdAsync(Guid id)
+        public async Task<bool> ExistByIdAsync(string id)
         {
-            return await _articleCategoryRepository.ExistAsync(id);
+            return await _articleCategoryRepository.ExistByIdAsync(id);
         }
 
         public async Task<bool> ExistByNameAsync(string name)
         {
-            return await _articleCategoryRepository.ExistAsync(name);
+            return await _articleCategoryRepository.ExistByNameAsync(name);
+        }
+
+        public async Task<bool> ExistByNameAsync(string name, string? allowedId)
+        {
+            return await _articleCategoryRepository.ExistByNameAsync(name, allowedId);
+        }
+
+        public async Task<ArticleCategory> GetByIdAsync(string id)
+        {
+            if (await ExistByIdAsync(id) is false)
+            {
+                throw new InvalidDataException($"Id '{id}' not found!");
+            }
+
+            var element = await _articleCategoryRepository.GetByIdAsync(id);
+            return element.ToDomain();
         }
 
         public async Task<ArticleCategory> GetByNameAsync(string name)
@@ -30,7 +46,7 @@ namespace DeVesen.Bazaar.Server.Storage
                 throw new InvalidDataException($"Name '{name}' not found!");
             }
 
-            var element = await _articleCategoryRepository.GetAsync(name);
+            var element = await _articleCategoryRepository.GetByNameAsync(name);
             return element.ToDomain();
         }
 
@@ -73,7 +89,7 @@ namespace DeVesen.Bazaar.Server.Storage
             await _articleCategoryRepository.UpdateAsync(element.ToEntity());
         }
 
-        public async Task DeleteAsync(Guid id)
+        public async Task DeleteAsync(string id)
         {
             if (await ExistByIdAsync(id) is false)
             {
