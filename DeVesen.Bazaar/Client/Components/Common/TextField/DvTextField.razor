@@ -1,0 +1,55 @@
+﻿@typeparam T
+
+@inherits MudTextField<T>
+
+<CascadingValue Value="false" Name="SubscribeToParentForm" IsFixed>
+    <MudTextField T="T"
+                  ShrinkLabel="@ShrinkLabel"
+                  Margin="@Margin"
+                  Variant="@Variant"
+                  Label="@Label"
+                  AutoFocus="@AutoFocus"
+                  Placeholder="@Placeholder"
+                  DebounceInterval="@DebounceInterval"
+                  Value="@Value"
+                  ReadOnly="@ReadOnly"
+                  Disabled="@Disabled"
+                  Required="@Required"
+                  RequiredError="@RequiredError"
+                  Error="@Error"
+                  ErrorId="@ErrorId"
+                  ErrorText="@ErrorText"
+                  Adornment="@Adornment"
+                  AdornmentColor="@AdornmentColor"
+                  AdornmentText="@AdornmentText"
+                  AdornmentIcon="@AdornmentIcon"
+                  AdornmentAriaLabel="@AdornmentAriaLabel"
+                  Validation="@Validation"
+                  IconSize="@IconSize"
+                  ValueChanged="OnValueChanged"
+                  TextChanged="OnTextChanged"
+                  OnKeyDown="InvokeKeyDownAsync"
+                  OnKeyUp="InvokeKeyUpAsync"
+                  OnBlur="OnBlurredAsync" />
+</CascadingValue>
+
+@code {
+    private async Task OnTextChanged(string newText)
+    {
+        await SetTextAsync(newText);
+    }
+
+    private async Task OnValueChanged(T newValue)
+    {
+        await SetValueAsync(newValue, true, true);
+    }
+
+    public void ReRender()
+    {
+        Console.WriteLine($"ReRender");
+        Console.WriteLine($"Error=>{Error}");
+        Console.WriteLine($"ErrorText=>{ErrorText}");
+
+        ForceRender(true);
+    }
+}

@@ -1,0 +1,111 @@
+﻿@typeparam T
+@inherits MudAutocomplete<T>
+
+<CascadingValue Value="false" Name="SubscribeToParentForm" IsFixed>
+    <MudAutocomplete T="T"
+                     Text="@Text"
+                     Value="@Value"
+                     Counter="@Counter"
+                     Error="@Error"
+                     ErrorId="@ErrorId"
+                     ErrorText="@ErrorText"
+                     MaxLength="@MaxLength"
+                     Pattern="@Pattern"
+                     Required="@Required"
+                     Adornment="@Adornment"
+                     AdornmentIcon="@AdornmentIcon"
+                     AdornmentText="@AdornmentText"
+                     AutoFocus="@AutoFocus"
+                     Clearable="@Clearable"
+                     CoerceText="@CoerceText"
+                     CoerceValue="@CoerceValue"
+                     Converter="@Converter"
+                     Culture="@Culture"
+                     DebounceInterval="@DebounceInterval"
+                     Disabled="@Disabled"
+                     Format="@Format"
+                     HelperText="@HelperText"
+                     HelperTextOnFocus="@HelperTextOnFocus"
+                     Immediate="@Immediate"
+                     InputMode="@InputMode"
+                     KeyDownPreventDefault="@KeyDownPreventDefault"
+                     KeyUpPreventDefault="@KeyUpPreventDefault"
+                     Label="@Label"
+                     Lines="@Lines"
+                     OnlyValidateIfDirty="@OnlyValidateIfDirty"
+                     Placeholder="@Placeholder"
+                     ReadOnly="@ReadOnly"
+                     ResetValueOnEmptyText="@ResetValueOnEmptyText"
+                     SelectOnActivation="@SelectOnActivation"
+                     ShowProgressIndicator="@ShowProgressIndicator"
+                     Strict="@Strict"
+                     TextUpdateSuppression="@TextUpdateSuppression"
+                     AdornmentAriaLabel="@AdornmentAriaLabel"
+                     AdornmentColor="@AdornmentColor"
+                     Underline="@Underline"
+                     FullWidth="@FullWidth"
+                     IconSize="@IconSize"
+                     Margin="@Margin"
+                     OpenIcon="@OpenIcon"
+                     ProgressIndicatorColor="@ProgressIndicatorColor"
+                     ShrinkLabel="@ShrinkLabel"
+                     Variant="@Variant"
+                     AfterItemsTemplate="@AfterItemsTemplate"
+                     BeforeItemsTemplate="@BeforeItemsTemplate"
+                     ItemDisabledFunc="@ItemDisabledFunc"
+                     ItemDisabledTemplate="@ItemDisabledTemplate"
+                     ItemSelectedTemplate="@ItemSelectedTemplate"
+                     ItemTemplate="@ItemTemplate"
+                     MaxItems="@MaxItems"
+                     MoreItemsTemplate="@MoreItemsTemplate"
+                     NoItemsTemplate="@NoItemsTemplate"
+                     ProgressIndicatorInPopoverTemplate="@ProgressIndicatorInPopoverTemplate"
+                     ProgressIndicatorTemplate="@ProgressIndicatorTemplate"
+                     SearchFunc="@SearchFunc"
+                     SelectValueOnTab="@SelectValueOnTab"
+                     ToStringFunc="@ToStringFunc"
+                     AnchorOrigin="@AnchorOrigin"
+                     Dense="@Dense"
+                     ListClass="@ListClass"
+                     ListItemClass="@ListItemClass"
+                     MaxHeight="@MaxHeight"
+                     PopoverClass="@PopoverClass"
+                     TransformOrigin="@TransformOrigin"
+                     Class="@Class"
+                     Style="@Style"
+                     Tag="@Tag"
+                     UserAttributes="@UserAttributes"
+                     OpenChanged="@OpenChanged"
+                     OnAdornmentClick="@OnAdornmentClick"
+                     OnBlur="OnBlurredAsync"
+                     OnClearButtonClick="@OnClearButtonClick"
+                     OnInternalInputChanged="@OnInternalInputChanged"
+                     OnKeyDown="InvokeKeyDownAsync"
+                     OnKeyUp="InvokeKeyUpAsync"
+                     ReturnedItemsCountChanged="@ReturnedItemsCountChanged"
+                     TextChanged="OnTextChanged"
+                     ValueChanged="OnValueChanged" />
+</CascadingValue>
+
+@code {
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender && _value != null)
+        {
+            Text = string.Empty;
+            UpdateTextPropertyAsync(true);
+        }
+
+        base.OnAfterRender(firstRender);
+    }
+
+    private async Task OnTextChanged(string newText)
+    {
+        await SetTextAsync(newText, true);
+    }
+
+    private async Task OnValueChanged(T newValue)
+    {
+        await SetValueAsync(newValue, true, true);
+    }
+}

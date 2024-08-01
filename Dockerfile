@@ -13,11 +13,11 @@ COPY ["DeVesen.Bazaar/Shared/DeVesen.Bazaar.Shared.csproj", "DeVesen.Bazaar/Shar
 RUN dotnet restore --runtime linux-arm64 "./DeVesen.Bazaar/Server/DeVesen.Bazaar.Server.csproj"
 COPY . .
 WORKDIR "/src/DeVesen.Bazaar/Server"
-RUN dotnet build --runtime linux-arm64 "./DeVesen.Bazaar.Server.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet build "./DeVesen.Bazaar.Server.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish --runtime linux-arm64 "./DeVesen.Bazaar.Server.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./DeVesen.Bazaar.Server.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app

@@ -75,7 +75,31 @@
 
     private async Task CreateElementAsync()
     {
-        await Task.CompletedTask;
+        var options = new DialogOptions
+            {
+                CloseOnEscapeKey = true,
+                BackdropClick = false
+            };
+
+        var forceNext = false;
+
+        do
+        {
+            var parameters = new DialogParameters<ArticleCreateDialog>
+            {
+                { x => x.ForceNext, forceNext },
+                { x => x.VendorId, VendorId }
+            };
+
+            var dlg = await DialogService.ShowAsync<ArticleCreateDialog>("Artikel anlegen", parameters, options);
+            var result = await dlg.Result;
+
+            forceNext = result!.Canceled is false && (bool)result.Data!;
+
+            await ReloadElementsAsync();
+
+            StateHasChanged();
+        } while (forceNext);
     }
 
     private async Task ModifyElementAsync(Article article)

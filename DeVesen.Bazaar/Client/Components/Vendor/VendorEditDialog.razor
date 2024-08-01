@@ -8,16 +8,14 @@
 
 <MudDialog>
     <DialogContent>
-        <VendorForm IsValid="@_isValid"
-                    IsTouched="@_isTouched"
-                    IsValidChanged="@(x => _isValid = x)"
-                    IsTouchedChanged="@(x => _isTouched = x)"
+        <VendorForm @bind-IsValid="_isValid"
+                    @bind-IsTouched="_isTouched"
                     @bind-Item="Item"
                     Validation="@(VendorValidator.ValidateAsync)"
                     RequestSave="SubmitAsync"/>
     </DialogContent>
     <DialogActions>
-        <DvButtonSave OnClick="SubmitAsync" />
+        <DvButtonSave Enabled="@(_isValid && _isTouched)" OnClick="SubmitAsync" />
         <DvButtonDelete OnClick="DeleteAsync" />
         <DvButtonCancel OnClick="Cancel" />
     </DialogActions>

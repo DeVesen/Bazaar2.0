@@ -63,6 +63,11 @@ namespace DeVesen.Bazaar.Server.Extensions
 
             foreach (var item in initialCategories)
             {
+                if (await storage.ExistByNameAsync(item))
+                {
+                    continue;
+                }
+
                 await storage.CreateAsync(new Manufacturer
                 {
                     Id = (Guid.NewGuid() + item).ToShortHash(),
@@ -103,6 +108,11 @@ namespace DeVesen.Bazaar.Server.Extensions
 
             foreach (var item in initialCategories)
             {
+                if (await storage.ExistByNameAsync(item))
+                {
+                    continue;
+                }
+
                 await storage.CreateAsync(new ArticleCategory
                 {
                     Id = (Guid.NewGuid() + item).ToShortHash(),

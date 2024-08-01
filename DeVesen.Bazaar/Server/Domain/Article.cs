@@ -11,7 +11,7 @@ public record Article
     public required DateTime Created { get; init; }
     public required double Price01 { get; init; }
     public double? Price02 { get; init; }
-    public string Description { get; init; } = string.Empty;
+    public string? Description { get; init; }
     public DateTime? ApprovedForSale { get; init; } = null;
     public DateTime? Sold { get; init; } = null;
     public double? SoldAt { get; init; } = null;

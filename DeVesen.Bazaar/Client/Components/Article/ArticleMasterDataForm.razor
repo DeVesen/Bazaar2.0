@@ -1,101 +1,72 @@
 ﻿@using DeVesen.Bazaar.Client.Services
-@using DeVesen.Bazaar.Client.Components.Common
 @using DeVesen.Bazaar.Client.Models
 @using DeVesen.Bazaar.Client.Validator
+@using DeVesen.Bazaar.Client.Components.Common.Autocomplete
+@using DeVesen.Bazaar.Client.Components.Common.TextField
 
 @inject ArticleValidator ArticleValidator
 @inject ArticleCategoryService ArticleCategoryService
 @inject ManufacturerService ManufacturerService
 
-<MudForm IsValid="@IsValid"
-         IsTouched="@IsTouched"
-         IsValidChanged="@IsValidChanged"
-         IsTouchedChanged="@IsTouchedChanged"
+<MudForm IsValid="IsValid"
+         IsValidChanged="OnIsValidChanged"
+         IsTouched="IsTouched"
+         IsTouchedChanged="OnIsTouchedChanged"
          FieldChanged="OnFormFieldChangedAsync"
          Model="Item"
          Validation="@(ArticleValidator.ValidateAsync)"
          Style="margin-bottom: 20px; min-width: 370px">
-    <MudGrid>
+    <MudGrid Spacing="2">
         <MudItem xs="12" sm="3">
-            <MudTextField T="long"
-                          Required
-                          Label="Nummer"
-                          ShrinkLabel
-                          Disabled="@DisableNumber"
-                          DebounceInterval="500"
-                          Margin="Margin.Dense"
-                          Variant="Variant.Outlined"
-                          @bind-Value="Item.Number"
-                          For="@(() => Item.Number)" />
+            <DvTextField T="long"
+                         Required
+                         Label="Nummer"
+                         Disabled="@DisableNumber"
+                         @bind-Value="Item.Number"
+                         For="@(() => Item.Number)" />
         </MudItem>
         <MudItem xs="12" sm="9">
-            <MudTextField T="string"
-                          Required
-                          Label="Title"
-                          ShrinkLabel
-                          DebounceInterval="500"
-                          Margin="Margin.Dense"
-                          Variant="Variant.Outlined"
-                          @bind-Value="Item.Title"
-                          For="@(() => Item.Title)" />
+            <DvTextField T="string"
+                         Required
+                         Label="Title"
+                         @bind-Value="Item.Title"
+                         For="@(() => Item.Title)" />
         </MudItem>
         <MudItem xs="12" sm="6">
-            <MudAutocomplete T="string"
-                             Required
-                             Dense
-                             ShrinkLabel
-                             Label="Kategorie"
-                             DebounceInterval="500"
-                             SearchFunc="@CategoryAutoCompleteSearch"
-                             Variant="Variant.Outlined"
-                             Margin="Margin.Dense"
-                             @bind-Value="Item.ArticleCategory"
-                             For="@(() => Item.ArticleCategory)" />
+            <DvAutocomplete T="string"
+                            Required
+                            Label="Kategorie"
+                            @bind-Value="Item.ArticleCategory"
+                            For="@(() => Item.ArticleCategory)"
+                            SearchFunc="@CategoryAutoCompleteSearch" />
         </MudItem>
         <MudItem xs="12" sm="6">
-            <MudAutocomplete T="string"
-                             Required
-                             Dense
-                             ShrinkLabel
-                             Label="Hersteller"
-                             DebounceInterval="500"
-                             SearchFunc="@ManufacturerAutoCompleteSearch"
-                             Variant="Variant.Outlined"
-                             Margin="Margin.Dense"
-                             @bind-Value="Item.Manufacturer"
-                             For="@(() => Item.Manufacturer)" />
+            <DvAutocomplete T="string"
+                            Required
+                            Label="Hersteller"
+                            @bind-Value="Item.Manufacturer"
+                            For="@(() => Item.Manufacturer)"
+                            SearchFunc="@ManufacturerAutoCompleteSearch" />
         </MudItem>
         <MudItem xs="12" sm="6">
-            <MudTextField T="double"
-                          Required
-                          Label="Preis"
-                          ShrinkLabel
-                          DebounceInterval="500"
-                          Margin="Margin.Dense"
-                          Variant="Variant.Outlined"
-                          @bind-Value="Item.Price01"
-                          For="@(() => Item.Price01)" />
+            <DvTextField T="double"
+                         Required
+                         Label="Preis"
+                         @bind-Value="Item.Price01"
+                         For="@(() => Item.Price01)" />
         </MudItem>
         <MudItem xs="12" sm="6">
-            <MudTextField T="double?"
-                          Label="Preis alternativ"
-                          ShrinkLabel
-                          DebounceInterval="500"
-                          Margin="Margin.Dense"
-                          Variant="Variant.Outlined"
-                          @bind-Value="Item.Price02"
-                          For="@(() => Item.Price02)" />
+            <DvTextField T="double?"
+                         Label="Preis alternativ"
+                         @bind-Value="Item.Price02"
+                         For="@(() => Item.Price02)" />
         </MudItem>
         <MudItem xs="12" sm="12">
-            <MudTextField T="string"
-                          Label="Notize"
-                          ShrinkLabel
-                          DebounceInterval="500"
-                          Margin="Margin.Dense"
-                          Variant="Variant.Outlined"
-                          Lines="4"
-                          @bind-Value="Item.Description"
-                          For="@(() => Item.Description)" />
+            <DvTextField T="string"
+                         Label="Notize"
+                         Lines="4"
+                         @bind-Value="Item.Description"
+                         For="@(() => Item.Description)" />
         </MudItem>
     </MudGrid>
     
@@ -122,6 +93,20 @@
 
     [Parameter]
     public EventCallback<bool> IsTouchedChanged { get; set; }
+
+    private async Task OnIsValidChanged(bool newValue)
+    {
+        IsValid = newValue;
+
+        await IsValidChanged.InvokeAsync(newValue);
+    }
+
+    private async Task OnIsTouchedChanged(bool newValue)
+    {
+        IsTouched = newValue;
+
+        await IsTouchedChanged.InvokeAsync(newValue);
+    }
 
     private async Task OnFormFieldChangedAsync()
     {

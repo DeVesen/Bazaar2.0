@@ -4,34 +4,32 @@
 
 @inject ArticleService ArticleService
 
-<div style="width: 552px; height: 425px">
-    <MudTabs Rounded
-             ApplyEffectsToContainer
-             Elevation="2"
-             PanelClass="pa-6"
-             Position="Position.Bottom"
-             Class="h-100">
-        <MudTabPanel Class="h-100"
-                     Icon="@Icons.Material.Filled.Article">
-            <ArticleMasterDataForm DisableNumber
-                                   @bind-IsValid="_isMasterDataValid"
-                                   @bind-IsValid:after="@OnStatusChanged"
-                                   @bind-IsTouched="@_isMasterDataTouched"
-                                   @bind-IsTouched:after="@OnStatusChanged"
-                                   @bind-Item="ArticleItem"/>
-        </MudTabPanel>
-        <MudTabPanel Class="h-100"
-                     
-                     Icon="@Icons.Material.Filled.ShapeLine">
-            <ArticleStatisticsForm @bind-Item="ArticleItem"/>
-        </MudTabPanel>
-    </MudTabs>
-</div>
+<MudTabs Rounded
+         ApplyEffectsToContainer
+         Elevation="2"
+         PanelClass="pa-2"
+         Position="Position.Bottom">
+    <MudTabPanel Icon="@Icons.Material.Filled.Article">
+        <ArticleMasterDataForm DisableNumber
+                               @bind-IsValid="_isMasterDataValid"
+                               @bind-IsValid:after="@OnStatusChanged"
+                               @bind-IsTouched="@_isMasterDataTouched"
+                               @bind-IsTouched:after="@OnStatusChanged"
+                               @bind-Item="Item"
+                               @bind-Item:after="@OnItemChanged" />
+    </MudTabPanel>
+    <MudTabPanel Icon="@Icons.Material.Filled.ShapeLine">
+        <ArticleStatisticsForm @bind-Item="Item" />
+    </MudTabPanel>
+</MudTabs>
 
 @code {
 
     [Parameter]
-    public required Article ArticleItem { get; set; }
+    public required Article Item { get; set; }
+
+    [Parameter]
+    public EventCallback<Article> ItemChanged { get; set; }
 
     [Parameter]
     public bool IsValid { get; set; }
@@ -51,5 +49,10 @@
             IsValid = isMasterDataValid;
             await IsValidChanged.InvokeAsync(isMasterDataValid);
         }
+    }
+
+    private async Task OnItemChanged()
+    {
+        await ItemChanged.InvokeAsync(Item);
     }
 }

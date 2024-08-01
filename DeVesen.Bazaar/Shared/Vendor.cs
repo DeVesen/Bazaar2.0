@@ -9,10 +9,10 @@ public record VendorDto
     public required string Salutation { get; init; }
     public required string FirstName { get; init; }
     public required string LastName { get; init; }
-    public string Address { get; init; } = string.Empty;
-    public string EMail { get; init; } = string.Empty;
-    public string Phone { get; init; } = string.Empty;
-    public string Note { get; init; } = string.Empty;
+    public string? Address { get; init; }
+    public string? EMail { get; init; }
+    public string? Phone { get; init; }
+    public string? Note { get; init; }
 }
 
 [ExcludeFromCodeCoverage]
@@ -21,10 +21,10 @@ public record VendorCreateDto
     public required string Salutation { get; init; }
     public required string FirstName { get; init; }
     public required string LastName { get; init; }
-    public string Address { get; init; } = string.Empty;
-    public string EMail { get; init; } = string.Empty;
-    public string Phone { get; init; } = string.Empty;
-    public string Note { get; init; } = string.Empty;
+    public string? Address { get; init; }
+    public string? EMail { get; init; }
+    public string? Phone { get; init; }
+    public string? Note { get; init; }
 }
 
 [ExcludeFromCodeCoverage]
@@ -33,10 +33,10 @@ public record VendorUpdateDto
     public required string Salutation { get; init; }
     public required string FirstName { get; init; }
     public required string LastName { get; init; }
-    public string Address { get; init; } = string.Empty;
-    public string EMail { get; init; } = string.Empty;
-    public string Phone { get; init; } = string.Empty;
-    public string Note { get; init; } = string.Empty;
+    public string? Address { get; init; }
+    public string? EMail { get; init; }
+    public string? Phone { get; init; }
+    public string? Note { get; init; }
 }
 
 [ExcludeFromCodeCoverage]

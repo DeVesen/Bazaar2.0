@@ -1,27 +1,24 @@
 ﻿@using DeVesen.Bazaar.Client.Services
-@using DeVesen.Bazaar.Client.Components.Common
+@using DeVesen.Bazaar.Client.Components.Common.TextField
 @using DeVesen.Bazaar.Client.Models
 
-<MudForm @ref="_fromRef"
-        IsValid="@IsValid"
-        IsTouched="@IsTouched"
-        IsValidChanged="@IsValidChanged"
-        IsTouchedChanged="@IsTouchedChanged"
-        FieldChanged="OnFormFieldChangedAsync"
-        Model="Item"
-        Validation="@Validation"
-        Style="margin-bottom: 20px; min-width: 370px">
-    <MudGrid>
+<MudForm IsValid="@IsValid"
+         IsTouched="@IsTouched"
+         IsValidChanged="@IsValidChanged"
+         IsTouchedChanged="@IsTouchedChanged"
+         FieldChanged="OnFormFieldChangedAsync"
+         Model="Item"
+         Validation="@Validation"
+         Style="margin-bottom: 20px; min-width: 370px">
+    <MudGrid Spacing="2">
         <MudItem xs="12" sm="2">
-            <MudSelect @ref="_salutationRef"
-                       T="string"
+            <MudSelect T="string"
                        Required
                        ShrinkLabel
-                       Label="Anrede"
                        Margin="Margin.Dense"
                        Variant="Variant.Outlined"
+                       Label="Anrede"
                        Value="@Item.Salutation"
-                       ValueChanged="p => OnSalutationChanged(_salutationRef, p)"
                        For="@(() => Item.Salutation)">
                 <MudSelectItem Value="@("Male")">
                     <MudIcon Icon="@Icons.Material.TwoTone.Male"></MudIcon>
@@ -32,86 +29,48 @@
             </MudSelect>
         </MudItem>
         <MudItem xs="12" sm="5">
-            <MudTextField @ref="_firstNameRef"
-                          T="string"
-                          Required
-                          Label="Vorname"
-                          ShrinkLabel
-                          Margin="Margin.Dense"
-                          Variant="Variant.Outlined"
-                          @bind-Value="Item.FirstName"
-                          OnKeyUp="p => OnKeyUpAsync(_firstNameRef, p)"
-                          For="@(() => Item.FirstName)" />
+            <DvTextField T="string"
+                         Required
+                         Label="Vorname"
+                         @bind-Value="Item.FirstName"
+                         For="@(() => Item.FirstName)" />
         </MudItem>
         <MudItem xs="12" sm="5">
-            <MudTextField @ref="_lastNamRef"
-                          T="string"
-                          Required
-                          Label="Nachname"
-                          ShrinkLabel
-                          Margin="Margin.Dense"
-                          Variant="Variant.Outlined"
-                          @bind-Value="Item.LastName"
-                          OnKeyUp="p => OnKeyUpAsync(_lastNamRef, p)"
-                          For="@(() => Item.LastName)" />
+            <DvTextField T="string"
+                         Required
+                         Label="Nachname"
+                         @bind-Value="Item.LastName"
+                         For="@(() => Item.LastName)" />
         </MudItem>
         <MudItem xs="12" sm="12">
-            <MudTextField @ref="_addressRef"
-                          T="string"
-                          Label="Anschrift"
-                          ShrinkLabel
-                          Margin="Margin.Dense"
-                          Variant="Variant.Outlined"
-                          @bind-Value="Item.Address"
-                          OnKeyUp="p => OnKeyUpAsync(_addressRef, p)"
-                          For="@(() => Item.Address)" />
+            <DvTextField T="string"
+                         Label="Anschrift"
+                         @bind-Value="Item.Address"
+                         For="@(() => Item.Address)" />
         </MudItem>
         <MudItem xs="12" sm="6">
-            <MudTextField @ref="_mailRef"
-                          T="string"
-                          Label="E-Mail"
-                          ShrinkLabel
-                          Margin="Margin.Dense"
-                          Variant="Variant.Outlined"
-                          @bind-Value="Item.EMail"
-                          OnKeyUp="p => OnKeyUpAsync(_mailRef, p)"
-                          For="@(() => Item.EMail)" />
+            <DvTextField T="string"
+                         Label="E-Mail"
+                         @bind-Value="Item.EMail"
+                         For="@(() => Item.EMail)" />
         </MudItem>
         <MudItem xs="12" sm="6">
-            <MudTextField @ref="_phoneRef"
-                          T="string"
-                          Label="Telefon"
-                          ShrinkLabel
-                          Margin="Margin.Dense"
-                          Variant="Variant.Outlined"
-                          @bind-Value="Item.Phone"
-                          OnKeyUp="p => OnKeyUpAsync(_phoneRef, p)"
-                          For="@(() => Item.Phone)" />
+            <DvTextField T="string"
+                         Label="Telefon"
+                         @bind-Value="Item.Phone"
+                         For="@(() => Item.Phone)" />
         </MudItem>
         <MudItem xs="12" sm="12">
-            <MudTextField @ref="_noteRef"
-                          T="string"
-                          Label="Notiz"
-                          ShrinkLabel
-                          Margin="Margin.Dense"
-                          Variant="Variant.Outlined"
-                          @bind-Value="Item.Note"
-                          OnKeyUp="p => OnKeyUpAsync(_noteRef, p)"
-                          For="@(() => Item.Note)" />
+            <DvTextField T="string"
+                         Label="Notiz"
+                         @bind-Value="Item.Note"
+                         For="@(() => Item.Note)" />
         </MudItem>
     </MudGrid>
     
 </MudForm>
 
 @code {
-    private MudForm _fromRef = null!;
-    private MudSelect<string> _salutationRef = null!;
-    private MudTextField<string> _firstNameRef = null!;
-    private MudTextField<string> _lastNamRef = null!;
-    private MudTextField<string> _addressRef = null!;
-    private MudTextField<string> _mailRef = null!;
-    private MudTextField<string> _phoneRef = null!;
-    private MudTextField<string> _noteRef = null!;
 
     [Parameter]
     public required Vendor Item { get; set; }
@@ -141,69 +100,6 @@
     private async Task OnFormFieldChangedAsync()
     {
         await ItemChanged.InvokeAsync(Item);
-    }
-
-    private async Task OnSalutationChanged(object source, string newSelection)
-    {
-        Item.Salutation = newSelection;
-
-        await FocusToNext(source);
-    }
-
-    private async Task OnKeyUpAsync(object source, KeyboardEventArgs args)
-    {
-        if (args.Key != "Enter")
-        {
-            return;
-        }
-
-        await FocusToNext(source);
-    }
-
-    private async Task FocusToFirst()
-    {
-        await FocusToNext(null!);
-    }
-
-    private async Task FocusToNext(object referenceInput)
-    {
-        if (_salutationRef == referenceInput)
-        {
-            await _firstNameRef.FocusAsync();
-        }
-        else if (_firstNameRef == referenceInput)
-        {
-            await _lastNamRef.FocusAsync();
-        }
-        else if (_lastNamRef == referenceInput)
-        {
-            await _addressRef.FocusAsync();
-        }
-        else if (_addressRef == referenceInput)
-        {
-            await _mailRef.FocusAsync();
-        }
-        else if (_mailRef == referenceInput)
-        {
-            await _phoneRef.FocusAsync();
-        }
-        else if (_phoneRef == referenceInput)
-        {
-            await _noteRef.FocusAsync();
-        }
-        else
-        {
-            await _salutationRef.FocusAsync();
-            await _salutationRef.OpenMenu();
-        }
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            await FocusToFirst();
-        }
     }
 
 }

@@ -49,5 +49,9 @@ public class ArticleValidator : BaseValidator<Article>
 
     public new Func<object, string, Task<IEnumerable<string>>> ValidateAsync =>
         async (model, propertyName) =>
-            await base.ValidateAsync((Article)model, propertyName);
+        {
+            var result = (await base.ValidateAsync((Article)model, propertyName)).ToArray();
+
+            return result;
+        };
 }

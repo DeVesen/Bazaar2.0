@@ -1,10 +1,8 @@
 ﻿@using DeVesen.Bazaar.Client.Components.Common.Buttons
 @using DeVesen.Bazaar.Client.Models
 @using DeVesen.Bazaar.Client.Services
-@using DeVesen.Bazaar.Client.Validator
 
 @inject ArticleService ArticleService
-@inject ArticleValidator ArticleValidator
 
 <MudDialog>
     <DialogContent>
@@ -12,9 +10,7 @@
                      IsTouched="@_isTouched"
                      IsValidChanged="@(x => _isValid = x)"
                      IsTouchedChanged="@(x => _isTouched = x)"
-                     DisableNumber
-                     @bind-Item="_item"
-                     Validation="@(ArticleValidator.ValidateAsync)" />
+                     @bind-Item="_item" />
     </DialogContent>
     <DialogActions>
         <DvButtonSave Enabled="@EnabledSubmit" OnClick="SubmitAsync" />
@@ -27,11 +23,20 @@
 
     [Parameter] public bool ForceNext { get; set; }
 
+    [Parameter] public required string VendorId { get; set; }
+
     private bool EnabledSubmit => _isValid && _isTouched;
 
-    private Article _item = Article.New;
+    private Article _item = null!;
     private bool _isValid;
     private bool _isTouched;
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        _item = Article.CreateNew(VendorId);
+    }
 
     private async Task SubmitAsync()
     {
