@@ -30,8 +30,8 @@ jobs:
     - name: Log in to DockerHub
       uses: docker/login-action@v3.3.0
       with:
-        username: ${{ secrets.DockerHub-Push.DOCKERHUBUSERNAME }}
-        password: ${{ secrets.DockerHub-Push.DOCKERHUBTOKEN }}
+        username: ${{ secrets.DOCKERHUBUSERNAME }}
+        password: ${{ secrets.DOCKERHUBTOKEN }}
         registry: bazaar2.0
 
     - name: Build and push Docker image
