@@ -61,7 +61,7 @@
         var options = new DialogOptions
         {
             CloseOnEscapeKey = true,
-            DisableBackdropClick = true
+            BackdropClick = false
         };
 
         var forceNext = false;
@@ -93,7 +93,7 @@
         var options = new DialogOptions
         {
             CloseOnEscapeKey = true,
-            DisableBackdropClick = true
+            BackdropClick = false
         };
 
         var dlg = await DialogService.ShowAsync<ArticleCategoryEditDialog>("Artikel-Kategorie ändern", parameters, options);

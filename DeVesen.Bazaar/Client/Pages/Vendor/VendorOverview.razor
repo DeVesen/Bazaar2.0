@@ -51,10 +51,10 @@
     private async Task CreateElementAsync()
     {
         var options = new DialogOptions
-            {
-                CloseOnEscapeKey = true,
-                DisableBackdropClick = true
-            };
+        {
+            CloseOnEscapeKey = true,
+            BackdropClick = false
+        };
 
         bool forceNext;
 
@@ -76,10 +76,10 @@
         var parameters = new DialogParameters<VendorEditDialog> { { x => x.Item, vendor } };
 
         var options = new DialogOptions
-            {
-                CloseOnEscapeKey = true,
-                DisableBackdropClick = true
-            };
+        {
+            CloseOnEscapeKey = true,
+            BackdropClick = false
+        };
 
         var dlg = await DialogService.ShowAsync<VendorEditDialog>("Verkäufer ändern", parameters, options);
         var result = await dlg.Result;
