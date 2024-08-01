@@ -4,20 +4,20 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
 EXPOSE 8080
 
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["DeVesen.Bazaar/Server/DeVesen.Bazaar.Server.csproj", "DeVesen.Bazaar/Server/"]
 COPY ["DeVesen.Bazaar/Client/DeVesen.Bazaar.Client.csproj", "DeVesen.Bazaar/Client/"]
 COPY ["DeVesen.Bazaar/Shared/DeVesen.Bazaar.Shared.csproj", "DeVesen.Bazaar/Shared/"]
-RUN dotnet restore "./DeVesen.Bazaar/Server/DeVesen.Bazaar.Server.csproj"
+RUN dotnet restore --runtime linux-arm64 "./DeVesen.Bazaar/Server/DeVesen.Bazaar.Server.csproj"
 COPY . .
 WORKDIR "/src/DeVesen.Bazaar/Server"
-RUN dotnet build "./DeVesen.Bazaar.Server.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet build --runtime linux-arm64 "./DeVesen.Bazaar.Server.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./DeVesen.Bazaar.Server.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish --runtime linux-arm64 "./DeVesen.Bazaar.Server.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
