@@ -46,7 +46,7 @@
                              ShrinkLabel
                              Label="Kategorie"
                              DebounceInterval="500"
-                             SearchFuncWithCancel="@CategoryAutoCompleteSearch"
+                             SearchFunc="@CategoryAutoCompleteSearch"
                              Variant="Variant.Outlined"
                              Margin="Margin.Dense"
                              @bind-Value="Item.ArticleCategory"
@@ -59,7 +59,7 @@
                              ShrinkLabel
                              Label="Hersteller"
                              DebounceInterval="500"
-                             SearchFuncWithCancel="@ManufacturerAutoCompleteSearch"
+                             SearchFunc="@ManufacturerAutoCompleteSearch"
                              Variant="Variant.Outlined"
                              Margin="Margin.Dense"
                              @bind-Value="Item.Manufacturer"

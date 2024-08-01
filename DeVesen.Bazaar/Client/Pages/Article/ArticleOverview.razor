@@ -10,7 +10,7 @@
 @inject IDialogService DialogService
 
 <div class="d-flex flex-column gap-4 px-1">
-    <MudToolBar WrapContent Dense DisableGutters>
+    <MudToolBar WrapContent Dense Gutters="false">
         <MudSpacer />
         @if (IsVendorMode)
         {
@@ -36,7 +36,7 @@
               Hover
               Items="@_elements"
               SortLabel="Sort By"
-              OnRowClick="x => ModifyElementAsync(x.Item)">
+              OnRowClick="x => ModifyElementAsync(x.Item!)">
         <HeaderContent>
             <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Number)">Nummer</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Title)">Title</MudTableSortLabel></MudTh>
@@ -94,7 +94,7 @@
         var dlg = await DialogService.ShowAsync<ArticleEditDialog>("Artikel ändern", parameters, options);
         var result = await dlg.Result;
 
-        if (result.Canceled is false)
+        if (result!.Canceled is false)
         {
             await ReloadElementsAsync();
         }

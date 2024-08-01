@@ -10,7 +10,7 @@
 @inject IDialogService DialogService
 
 <div class="d-flex flex-column gap-4 px-1">
-    <MudToolBar WrapContent Dense DisableGutters>
+    <MudToolBar WrapContent Dense Gutters="false">
         <MudSpacer />
         <ToolBarIconButton Icon="@Icons.Material.TwoTone.PersonAddAlt"
                            OnClick="CreateElementAsync" />
@@ -63,7 +63,7 @@
             var dlg = await DialogService.ShowAsync<VendorCreateDialog>("Verkäufer anlegen", options);
             var result = await dlg.Result;
 
-            forceNext = result.Canceled is false && (bool)result.Data;
+            forceNext = result!.Canceled is false && (bool)result.Data!;
 
             await ReloadElementsAsync();
 
@@ -84,7 +84,7 @@
         var dlg = await DialogService.ShowAsync<VendorEditDialog>("Verkäufer ändern", parameters, options);
         var result = await dlg.Result;
 
-        if (result.Canceled is false)
+        if (result!.Canceled is false)
         {
             await ReloadElementsAsync();
         }

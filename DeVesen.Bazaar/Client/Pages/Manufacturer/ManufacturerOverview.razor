@@ -73,7 +73,7 @@
             var dlg = await DialogService.ShowAsync<ManufacturerCreateDialog>("Artikel-Kategorie anlegen", parameters, options);
             var result = await dlg.Result;
 
-            forceNext = result.Canceled is false && (bool)result.Data;
+            forceNext = result!.Canceled is false && (bool)result.Data!;
 
             await ReloadElementsAsync();
 
@@ -99,7 +99,7 @@
         var dlg = await DialogService.ShowAsync<ManufacturerEditDialog>("Artikel-Kategorie ändern", parameters, options);
         var result = await dlg.Result;
 
-        if (result.Canceled is false)
+        if (result!.Canceled is false)
         {
             await ReloadElementsAsync();
         }

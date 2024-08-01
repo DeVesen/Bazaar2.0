@@ -18,10 +18,12 @@ namespace DeVesen.Bazaar.Server.Extensions
 
         private static void CheckDataDirectory()
         {
-            if (Directory.Exists(AppEnvironment.DataDirectory) is false)
+            if (Directory.Exists(AppEnvironment.DataDirectory))
             {
-                Directory.CreateDirectory(AppEnvironment.DataDirectory);
+                return;
             }
+
+            Directory.CreateDirectory(AppEnvironment.DataDirectory);
         }
 
         public static async Task InitializeStorage(this ManufacturerStorage storage)
