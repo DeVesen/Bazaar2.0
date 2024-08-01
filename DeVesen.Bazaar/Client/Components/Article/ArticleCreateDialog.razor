@@ -3,6 +3,7 @@
 @using DeVesen.Bazaar.Client.Services
 
 @inject ArticleService ArticleService
+@inject SystemClock SystemClock
 
 <MudDialog>
     <DialogContent>
@@ -40,6 +41,8 @@
 
     private async Task SubmitAsync()
     {
+        _item.ApprovedForSale = SystemClock.GetNow();
+
         await ArticleService.CreateAsync(_item);
 
         MudDialog.Close(DialogResult.Ok(ForceNext));

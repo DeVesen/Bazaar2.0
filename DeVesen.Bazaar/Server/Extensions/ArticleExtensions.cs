@@ -103,6 +103,15 @@ public static class ArticleExtensions
             Description = data.Description
         };
 
+    public static VendorArticleStatisticDto ToDto(this VendorArticleStatistic data)
+        => new()
+        {
+            Open = data.Open,
+            Sold = data.Sold,
+            Settled = data.Settled,
+            Turnover = data.Turnover
+        };
+
     public static ArticleFilter ToDomain(this ArticleFilterDto dto)
         => new()
         {

@@ -16,6 +16,13 @@ public record VendorDto
 }
 
 [ExcludeFromCodeCoverage]
+public record VendorViewDto
+{
+    public required VendorDto Item { get; init; }
+    public required VendorArticleStatisticDto Statistic { get; init; }
+}
+
+[ExcludeFromCodeCoverage]
 public record VendorCreateDto
 {
     public required string Salutation { get; init; }
@@ -43,4 +50,15 @@ public record VendorUpdateDto
 public record VendorCreatedDto
 {
     public required string Id { get; init; }
+}
+
+[ExcludeFromCodeCoverage]
+public record VendorArticleStatisticDto
+{
+    public long Open { get; init; } = 0;
+    public long Sold { get; init; } = 0;
+    public long Settled { get; init; } = 0;
+    public double Turnover { get; init; } = 0;
+
+
 }

@@ -10,11 +10,13 @@ namespace DeVesen.Bazaar.Client.Services;
 public class ArticleService
 {
     private readonly HttpClient _httpClient;
+    private readonly SnackBarService _snackBarService;
 
     public ArticleService(IWebAssemblyHostEnvironment hostEnvironment,
-        HttpClient httpClient)
+        HttpClient httpClient, SnackBarService snackBarService)
     {
         _httpClient = httpClient;
+        _snackBarService = snackBarService;
         _httpClient.BaseAddress = hostEnvironment.GetApiEndpointUrl("api/v1/Article");
     }
 
@@ -59,9 +61,14 @@ public class ArticleService
 
         var response = await _httpClient.PostAsJsonAsync(requestUri, createDto);
 
-        return response.IsSuccessStatusCode
-            ? Response.Valid()
-            : Response.Invalid();
+        if (response.IsSuccessStatusCode)
+        {
+            _snackBarService.AddInfo("Erfolgreich angelegt ...");
+            return Response.Valid();
+        }
+
+        _snackBarService.AddError($"Ausnahmefehler {response.StatusCode}");
+        return Response.Invalid();
     }
 
     public async Task<Response> UpdateAsync(Article element)
@@ -86,9 +93,14 @@ public class ArticleService
 
         var response = await _httpClient.PutAsJsonAsync(requestUri, updateDto);
 
-        return response.IsSuccessStatusCode
-            ? Response.Valid()
-            : Response.Invalid();
+        if (response.IsSuccessStatusCode)
+        {
+            _snackBarService.AddInfo("Erfolgreich aktualisiert ...");
+            return Response.Valid();
+        }
+
+        _snackBarService.AddError($"Ausnahmefehler {response.StatusCode}");
+        return Response.Invalid();
     }
 
     public async Task<Response> DeleteAsync(Article element)
@@ -97,9 +109,14 @@ public class ArticleService
 
         var response = await _httpClient.DeleteAsync(requestUri);
 
-        return response.IsSuccessStatusCode
-            ? Response.Valid()
-            : Response.Invalid();
+        if (response.IsSuccessStatusCode)
+        {
+            _snackBarService.AddInfo("Erfolgreich gelöscht ...");
+            return Response.Valid();
+        }
+
+        _snackBarService.AddError($"Ausnahmefehler {response.StatusCode}");
+        return Response.Invalid();
     }
 
     public bool FilterFunc(Manufacturer dto, string filterString)

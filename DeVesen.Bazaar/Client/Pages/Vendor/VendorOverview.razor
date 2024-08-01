@@ -6,8 +6,8 @@
 
 @page "/vendors"
 
-@inject StatisticsOverviewService StatisticsOverviewService
 @inject NavigationService NavigationService
+@inject VendorService VendorService
 @inject IDialogService DialogService
 
 <div class="d-flex flex-column gap-4 px-1">
@@ -29,7 +29,7 @@
         {
             <MudItem xs="12" md="4" lg="3">
                 <VendorCard VendorItem="@element"
-                            OnEdit="x => ModifyElementAsync(x.MasterData)"
+                            OnEdit="x => ModifyElementAsync(x.Item)"
                             OnArticle="OnArticleAsync"/>
             </MudItem>
         }
@@ -39,7 +39,7 @@
 
 @code {
     
-    private IEnumerable<VendorOverviewItem> _elements = Enumerable.Empty<VendorOverviewItem>();
+    private IEnumerable<VendorView> _elements = Enumerable.Empty<VendorView>();
     private string _searchText = string.Empty;
     private ToolBarGenederSelect.GenderType _genderType = ToolBarGenederSelect.GenderType.All;
 
@@ -91,9 +91,9 @@
         }
     }
 
-    private async Task OnArticleAsync(VendorOverviewItem args)
+    private async Task OnArticleAsync(VendorView args)
     {
-        NavigationService.Vendor.ToArticle(args.MasterData.Id);
+        NavigationService.Vendor.ToArticle(args.Item.Id);
         await Task.CompletedTask;
     }
 
@@ -113,17 +113,17 @@
 
     private async Task ReloadElementsAsync()
     {
-        _elements = await StatisticsOverviewService.GetVendorOverviewAsync();
+        _elements = await VendorService.GetAllAsync();
 
         _elements = _elements.Where(p => p.Contains(_searchText));
 
         switch (_genderType)
         {
             case ToolBarGenederSelect.GenderType.Male:
-                _elements = _elements.Where(p => p.MasterData.Salutation == "Male");
+                _elements = _elements.Where(p => p.Item.Salutation == "Male");
                 break;
             case ToolBarGenederSelect.GenderType.Female:
-                _elements = _elements.Where(p => p.MasterData.Salutation == "Female");
+                _elements = _elements.Where(p => p.Item.Salutation == "Female");
                 break;
         }
     }

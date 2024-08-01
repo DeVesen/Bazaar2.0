@@ -10,27 +10,38 @@ namespace DeVesen.Bazaar.Client.Services;
 public class VendorService
 {
     private readonly HttpClient _httpClient;
+    private readonly SnackBarService _snackBarService;
 
-    public VendorService(IWebAssemblyHostEnvironment hostEnvironment,
-        HttpClient httpClient)
+    public VendorService(IWebAssemblyHostEnvironment hostEnvironment, HttpClient httpClient, SnackBarService snackBarService)
     {
         _httpClient = httpClient;
+        _snackBarService = snackBarService;
         _httpClient.BaseAddress = hostEnvironment.GetApiEndpointUrl("api/v1/Vendor");
     }
 
-    public async Task<IEnumerable<Vendor>> GetAllAsync()
+    public async Task<IEnumerable<VendorView>> GetAllAsync()
     {
-        var dtoList = await _httpClient.GetFromJsonAsync<IEnumerable<VendorDto>>("");
+        var dtoList = await _httpClient.GetFromJsonAsync<IEnumerable<VendorViewDto>>("");
 
-        return dtoList!.Select(p => new Vendor
+        return dtoList!.Select(p => new VendorView
         {
-            Id = p.Id,
-            Salutation = p.Salutation,
-            FirstName = p.FirstName,
-            LastName = p.LastName,
-            Address = p.Address,
-            EMail = p.EMail,
-            Phone = p.Phone
+            Item = new Vendor
+            {
+                Id = p.Item.Id,
+                Salutation = p.Item.Salutation,
+                FirstName = p.Item.FirstName,
+                LastName = p.Item.LastName,
+                Address = p.Item.Address,
+                EMail = p.Item.EMail,
+                Phone = p.Item.Phone
+            },
+            Statistic = new VendorArticleStatistic
+            {
+                Open = p.Statistic.Open,
+                Sold = p.Statistic.Sold,
+                Settled = p.Statistic.Settled,
+                Turnover = p.Statistic.Turnover,
+            }
         });
     }
 
@@ -50,9 +61,14 @@ public class VendorService
 
         var response = await _httpClient.PostAsJsonAsync(requestUri, createDto);
 
-        return response.IsSuccessStatusCode
-            ? Response.Valid()
-            : Response.Invalid();
+        if (response.IsSuccessStatusCode)
+        {
+            _snackBarService.AddInfo("Erfolgreich angelegt ...");
+            return Response.Valid();
+        }
+
+        _snackBarService.AddError($"Ausnahmefehler {response.StatusCode}");
+        return Response.Invalid();
     }
 
     public async Task<Response> UpdateAsync(Vendor element)
@@ -71,9 +87,14 @@ public class VendorService
 
         var response = await _httpClient.PutAsJsonAsync(requestUri, updateDto);
 
-        return response.IsSuccessStatusCode
-            ? Response.Valid()
-            : Response.Invalid();
+        if (response.IsSuccessStatusCode)
+        {
+            _snackBarService.AddInfo("Erfolgreich aktualisiert ...");
+            return Response.Valid();
+        }
+
+        _snackBarService.AddError($"Ausnahmefehler {response.StatusCode}");
+        return Response.Invalid();
     }
 
     public async Task<Response> DeleteAsync(Vendor element)
@@ -82,8 +103,13 @@ public class VendorService
 
         var response = await _httpClient.DeleteAsync(requestUri);
 
-        return response.IsSuccessStatusCode
-            ? Response.Valid()
-            : Response.Invalid();
+        if (response.IsSuccessStatusCode)
+        {
+            _snackBarService.AddInfo("Erfolgreich gelöscht ...");
+            return Response.Valid();
+        }
+
+        _snackBarService.AddError($"Ausnahmefehler {response.StatusCode}");
+        return Response.Invalid();
     }
 }

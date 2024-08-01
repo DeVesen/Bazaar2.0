@@ -1,5 +1,4 @@
 ﻿using DeVesen.Bazaar.Client.Models;
-using DeVesen.Bazaar.Client.Services;
 using DeVesen.Bazaar.Shared.Basics;
 using FluentValidation;
 

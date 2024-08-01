@@ -10,15 +10,15 @@
             </MudAvatar>
         </CardHeaderAvatar>
         <CardHeaderContent>
-            <MudText Typo="Typo.body1">@VendorItem.MasterData.GetTotalName()</MudText>
-            <MudText Typo="Typo.body2">@VendorItem.MasterData.Id</MudText>
+            <MudText Typo="Typo.body1">@VendorItem.Item.GetTotalName()</MudText>
+            <MudText Typo="Typo.body2">@VendorItem.Item.Id</MudText>
         </CardHeaderContent>
         <CardHeaderActions>
         </CardHeaderActions>
     </MudCardHeader>
     <MudCardContent>
-        <ListingElementText Icon="@Icons.Material.TwoTone.AreaChart" Value="@VendorItem.Stats.ToString()" />
-        <ListingElementText Icon="@Icons.Material.TwoTone.Info" Value="@VendorItem.MasterData.Note" />
+        <ListingElementText Icon="@Icons.Material.TwoTone.AreaChart" Value="@VendorItem.Statistic.ToString()" />
+        <ListingElementText Icon="@Icons.Material.TwoTone.Info" Value="@VendorItem.Item.Note" />
     </MudCardContent>
     <MudCardActions>
         <div class="w-100 d-flex justify-space-between">
@@ -38,16 +38,16 @@
 @code {
 
     [Parameter]
-    public required VendorOverviewItem VendorItem { get; set; }
+    public required VendorView VendorItem { get; set; }
 
     [Parameter]
-    public EventCallback<VendorOverviewItem> OnEdit { get; set; }
+    public EventCallback<VendorView> OnEdit { get; set; }
 
     [Parameter]
-    public EventCallback<VendorOverviewItem> OnArticle { get; set; }
+    public EventCallback<VendorView> OnArticle { get; set; }
 
     [Parameter]
-    public EventCallback<VendorOverviewItem> OnImportArticle { get; set; }
+    public EventCallback<VendorView> OnImportArticle { get; set; }
 
     private async Task DoEdit()
     {

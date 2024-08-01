@@ -16,12 +16,12 @@
                 {
                     <MudIconButton Size="Size.Small"
                                    Icon="@Icons.Material.TwoTone.Delete"
-                                   OnClick="ResetApprovedForSale"></MudIconButton>
+                                   OnClick="ResetApprovedForSaleAsync"></MudIconButton>
                 }
             }
             else
             {
-                <MudButton FullWidth OnClick="ApproveForSale">Jetzt freigeben</MudButton>
+                <MudButton FullWidth OnClick="ApproveForSaleAsync">Jetzt freigeben</MudButton>
             }
         </MudPaper>
     
@@ -33,7 +33,7 @@
                 {
                     <MudIconButton Size="Size.Small"
                                    Icon="@Icons.Material.TwoTone.Delete"
-                                   OnClick="ResetSold"></MudIconButton>
+                                   OnClick="ResetSoldAsync"></MudIconButton>
                 }
             </MudPaper>
         }
@@ -51,7 +51,7 @@
                 }
                 <MudIconButton Size="Size.Small"
                                Icon="@Icons.Material.TwoTone.Delete"
-                               OnClick="ResetSettled"></MudIconButton>
+                               OnClick="ResetSettledAsync"></MudIconButton>
             </MudPaper>
         }
 
@@ -66,6 +66,12 @@
     [Parameter]
     public required EventCallback<Article> ItemChanged { get; set; }
 
+    [Parameter]
+    public bool IsTouched { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> IsTouchedChanged { get; set; }
+
     private bool IsApprovedForSale => Item.ApprovedForSale.HasValue;
     private bool IsSold => Item.Sold.HasValue;
     private bool IsSettled => Item.Settled.HasValue;
@@ -73,24 +79,47 @@
     private bool IsApprovedForSaleResetPossible => IsSold is false && IsSettled is false;
     private bool IsSoldResetPossible => IsSettled is false;
 
-    private void ApproveForSale()
+    private async Task ApproveForSaleAsync()
     {
         Item.ApprovedForSale = DateTime.Now;
+
+        await SetTouchedAsync();
+        await ItemChanged.InvokeAsync(Item);
     }
 
-    private void ResetApprovedForSale()
+    private async Task ResetApprovedForSaleAsync()
     {
         Item.ApprovedForSale = null;
+
+        await SetTouchedAsync();
+        await ItemChanged.InvokeAsync(Item);
     }
 
-    private void ResetSold()
+    private async Task ResetSoldAsync()
     {
         Item.Sold = null;
         Item.SoldAt = null;
+
+        await SetTouchedAsync();
+        await ItemChanged.InvokeAsync(Item);
     }
 
-    private void ResetSettled()
+    private async Task ResetSettledAsync()
     {
         Item.Settled = null;
+
+        await SetTouchedAsync();
+        await ItemChanged.InvokeAsync(Item);
+    }
+
+    private async Task SetTouchedAsync()
+    {
+        if (IsTouched)
+        {
+            return;
+        }
+
+        IsTouched = true;
+        await IsTouchedChanged.InvokeAsync(IsTouched);
     }
 }

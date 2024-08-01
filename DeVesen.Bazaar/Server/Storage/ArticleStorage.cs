@@ -42,6 +42,21 @@ public class ArticleStorage
         return element.Entity!.ToDomain();
     }
 
+    public async Task<IEnumerable<VendorArticleStatistic>> GetStatisticPerVendor()
+    {
+        var articles = await GetAllAsync(new ArticleFilter());
+        var groupedByVendor = articles.GroupBy(p => p.VendorId);
+
+        return groupedByVendor.Select(p => new VendorArticleStatistic
+        {
+            VendorId = p.Key,
+            Open = p.Count(x => x.ApprovedForSale.HasValue),
+            Sold = p.Count(x => x.Sold.HasValue),
+            Settled = p.Count(x => x.Settled.HasValue),
+            Turnover = p.Where(x => x.SoldAt.HasValue).Sum(y => y.SoldAt!.Value)
+        });
+    }
+
     public async Task<Article> GetByNumberAsync(long number)
     {
         var element = await _articleRepository.TryGetByNumberAsync(number);

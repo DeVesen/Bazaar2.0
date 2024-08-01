@@ -1,4 +1,5 @@
 ﻿using DeVesen.Bazaar.Server.Basics;
+using DeVesen.Bazaar.Server.Domain;
 using DeVesen.Bazaar.Server.Extensions;
 using DeVesen.Bazaar.Server.Storage;
 using DeVesen.Bazaar.Server.Validator;
@@ -12,20 +13,34 @@ namespace DeVesen.Bazaar.Server.Controllers;
 public class VendorController : ControllerBase
 {
     private readonly VendorStorage _vendorStorage;
+    private readonly ArticleStorage _articleStorage;
     private readonly VendorValidator _vendorValidator;
 
     public VendorController(VendorStorage vendorStorage,
+                            ArticleStorage articleStorage,
                             VendorValidator vendorValidator)
     {
         _vendorStorage = vendorStorage;
+        _articleStorage = articleStorage;
         _vendorValidator = vendorValidator;
     }
 
     [HttpGet]
-    public async Task<IEnumerable<VendorDto>> GetAllAsync()
+    public async Task<IEnumerable<VendorViewDto>> GetAllAsync()
     {
-        var elements = await _vendorStorage.GetAllAsync();
-        return elements.Select(p => p.ToDto());
+        var allVendors = (await _vendorStorage.GetAllAsync()).ToArray();
+        var allVendorArticleStats = (await _articleStorage.GetStatisticPerVendor()).ToArray();
+
+        var groupedItems = from vendor in allVendors
+                           join statistic in allVendorArticleStats on vendor.Id equals statistic.VendorId into gj
+            from subVendor2 in gj.DefaultIfEmpty(new VendorArticleStatistic{VendorId = vendor.Id})
+            select new VendorViewDto
+            {
+                Item = vendor.ToDto(),
+                Statistic = subVendor2.ToDto()
+            };
+
+        return groupedItems;
     }
 
     [HttpPost]

@@ -19,7 +19,10 @@
                                @bind-Item:after="@OnItemChanged" />
     </MudTabPanel>
     <MudTabPanel Icon="@Icons.Material.Filled.ShapeLine">
-        <ArticleStatisticsForm @bind-Item="Item" />
+        <ArticleStatisticsForm @bind-Item="Item"
+                               @bind-Item:after="@OnItemChanged"
+                               @bind-IsTouched="@_isStatisticsTouched"
+                               @bind-IsTouched:after="@OnStatusChanged" />
     </MudTabPanel>
 </MudTabs>
 
@@ -39,6 +42,7 @@
 
     private bool _isMasterDataValid;
     private bool _isMasterDataTouched;
+    private bool _isStatisticsTouched;
 
     private async Task OnStatusChanged()
     {

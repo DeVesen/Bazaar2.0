@@ -12,16 +12,16 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddMudServices();
 
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
 builder.Services.AddTransient<NavigationService>();
+builder.Services.AddTransient<SystemClock>();
+builder.Services.AddTransient<SnackBarService>();
 
 builder.Services.AddHttpClient<ArticleCategoryService>();
 builder.Services.AddHttpClient<ManufacturerService>();
 builder.Services.AddHttpClient<VendorService>();
 builder.Services.AddHttpClient<ArticleService>();
-
-builder.Services.AddHttpClient<StatisticsOverviewService>();
 
 builder.Services.AddTransient<ArticleCategoryValidator>();
 builder.Services.AddTransient<ManufacturerValidator>();

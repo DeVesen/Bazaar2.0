@@ -18,7 +18,7 @@
                        Margin="Margin.Dense"
                        Variant="Variant.Outlined"
                        Label="Anrede"
-                       Value="@Item.Salutation"
+                       @bind-Value="@Item.Salutation"
                        For="@(() => Item.Salutation)">
                 <MudSelectItem Value="@("Male")">
                     <MudIcon Icon="@Icons.Material.TwoTone.Male"></MudIcon>
@@ -45,6 +45,9 @@
         <MudItem xs="12" sm="12">
             <DvTextField T="string"
                          Label="Anschrift"
+                         Lines="2"
+                         MaxLines="2"
+                         AutoGrow="false"
                          @bind-Value="Item.Address"
                          For="@(() => Item.Address)" />
         </MudItem>
@@ -63,6 +66,9 @@
         <MudItem xs="12" sm="12">
             <DvTextField T="string"
                          Label="Notiz"
+                         Lines="4"
+                         MaxLines="4"
+                         AutoGrow="false"
                          @bind-Value="Item.Note"
                          For="@(() => Item.Note)" />
         </MudItem>
