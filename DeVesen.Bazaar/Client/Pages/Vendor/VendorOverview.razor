@@ -1,5 +1,6 @@
 ﻿@using DeVesen.Bazaar.Client.Services
 @using DeVesen.Bazaar.Client.Components.Common.ToolBar
+@using DeVesen.Bazaar.Client.Components.Common.TextField
 @using DeVesen.Bazaar.Client.Components.Vendor
 @using DeVesen.Bazaar.Client.Models
 
@@ -14,11 +15,11 @@
         <MudSpacer />
         <ToolBarIconButton Icon="@Icons.Material.TwoTone.PersonAddAlt"
                            OnClick="CreateElementAsync" />
-        <ToolBarSearchField T="string"
-                            OuterStyle="max-width: 200px"
-                            OuterClass="pl-2"
-                            Value="@_searchText"
-                            ValueChanged="OnSearchChangedAsync" />
+        <DvTextField T="string"
+                     OuterStyle="max-width: 200px"
+                     OuterClass="pl-2"
+                     Value="@_searchText"
+                     ValueChanged="OnSearchChangedAsync" />
         <ToolBarGenederSelect Value="@_genderType"
                               ValueChanged="OnGenderChangedAsync" />
     </MudToolBar>

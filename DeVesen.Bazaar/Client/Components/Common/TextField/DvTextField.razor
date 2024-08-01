@@ -2,38 +2,46 @@
 
 @inherits MudTextField<T>
 
-<CascadingValue Value="false" Name="SubscribeToParentForm" IsFixed>
-    <MudTextField T="T"
-                  ShrinkLabel="@ShrinkLabel"
-                  Margin="@Margin"
-                  Variant="@Variant"
-                  Label="@Label"
-                  AutoFocus="@AutoFocus"
-                  Placeholder="@Placeholder"
-                  DebounceInterval="@DebounceInterval"
-                  Value="@Value"
-                  ReadOnly="@ReadOnly"
-                  Disabled="@Disabled"
-                  Required="@Required"
-                  RequiredError="@RequiredError"
-                  Error="@Error"
-                  ErrorId="@ErrorId"
-                  ErrorText="@ErrorText"
-                  Adornment="@Adornment"
-                  AdornmentColor="@AdornmentColor"
-                  AdornmentText="@AdornmentText"
-                  AdornmentIcon="@AdornmentIcon"
-                  AdornmentAriaLabel="@AdornmentAriaLabel"
-                  Validation="@Validation"
-                  IconSize="@IconSize"
-                  ValueChanged="OnValueChanged"
-                  TextChanged="OnTextChanged"
-                  OnKeyDown="InvokeKeyDownAsync"
-                  OnKeyUp="InvokeKeyUpAsync"
-                  OnBlur="OnBlurredAsync" />
-</CascadingValue>
+<div style="@OuterStyle" class="@OuterClass">
+    <CascadingValue Value="false" Name="SubscribeToParentForm" IsFixed>
+        <MudTextField T="T"
+                      ShrinkLabel="@ShrinkLabel"
+                      Margin="@Margin"
+                      Variant="@Variant"
+                      Label="@Label"
+                      AutoFocus="@AutoFocus"
+                      Placeholder="@Placeholder"
+                      DebounceInterval="@DebounceInterval"
+                      Value="@Value"
+                      ReadOnly="@ReadOnly"
+                      Disabled="@Disabled"
+                      Required="@Required"
+                      RequiredError="@RequiredError"
+                      Error="@Error"
+                      ErrorId="@ErrorId"
+                      ErrorText="@ErrorText"
+                      Adornment="@Adornment"
+                      AdornmentColor="@AdornmentColor"
+                      AdornmentText="@AdornmentText"
+                      AdornmentIcon="@AdornmentIcon"
+                      AdornmentAriaLabel="@AdornmentAriaLabel"
+                      Validation="@Validation"
+                      IconSize="@IconSize"
+                      ValueChanged="OnValueChanged"
+                      TextChanged="OnTextChanged"
+                      OnKeyDown="InvokeKeyDownAsync"
+                      OnKeyUp="InvokeKeyUpAsync"
+                      OnBlur="OnBlurredAsync" />
+    </CascadingValue>
+</div>
 
 @code {
+    [Parameter]
+    public string? OuterStyle { get; set; }
+
+    [Parameter]
+    public string? OuterClass { get; set; }
+
     private async Task OnTextChanged(string newText)
     {
         await SetTextAsync(newText);

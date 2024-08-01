@@ -1,4 +1,5 @@
 ﻿@using DeVesen.Bazaar.Client.Services
+@using DeVesen.Bazaar.Client.Components.Common.TextField
 @using DeVesen.Bazaar.Client.Components.Common.ToolBar
 @using DeVesen.Bazaar.Client.Components.Article
 @using DeVesen.Bazaar.Client.Models
@@ -17,18 +18,18 @@
             <ToolBarIconButton Icon="@Icons.Material.TwoTone.NoteAdd"
                                OnClick="CreateElementAsync" />
         }
-        <ToolBarSearchField T="long?"
-                            OuterStyle="max-width: 100px"
-                            OuterClass="pl-2"
-                            Label="Nummer"
-                            Value="@_searchNumber"
-                            ValueChanged="OnNumberSearchChangedAsync" />
-        <ToolBarSearchField T="string"
-                            OuterStyle="max-width: 200px"
-                            OuterClass="px-2"
-                            Label="Textsuche"
-                            Value="@_searchText"
-                            ValueChanged="OnTextSearchChangedAsync" />
+        <DvTextField T="long?"
+                     OuterStyle="max-width: 100px"
+                     OuterClass="pl-2"
+                     Label="Nummer"
+                     Value="@_searchNumber"
+                     ValueChanged="OnNumberSearchChangedAsync" />
+        <DvTextField T="string"
+                     OuterStyle="max-width: 200px"
+                     OuterClass="px-2"
+                     Label="Textsuche"
+                     Value="@_searchText"
+                     ValueChanged="OnTextSearchChangedAsync" />
     </MudToolBar>
 
     <MudTable T="Article"
