@@ -32,7 +32,6 @@ jobs:
       with:
         username: ${{ secrets.DOCKERHUBUSERNAME }}
         password: ${{ secrets.DOCKERHUBTOKEN }}
-        registry: bazaar2.0
 
     - name: Build and push Docker image
       uses: docker/build-push-action@v5
