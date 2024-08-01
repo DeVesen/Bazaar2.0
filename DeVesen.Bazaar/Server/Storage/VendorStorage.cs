@@ -7,10 +7,12 @@ namespace DeVesen.Bazaar.Server.Storage;
 public class VendorStorage
 {
     private readonly IVendorRepository _vendorRepository;
+    private readonly IArticleRepository _articleRepository;
 
-    public VendorStorage(IVendorRepository vendorRepository)
+    public VendorStorage(IVendorRepository vendorRepository, IArticleRepository articleRepository)
     {
         _vendorRepository = vendorRepository;
+        _articleRepository = articleRepository;
     }
 
     public async Task<bool> ExistByIdAsync(string id)
@@ -51,6 +53,19 @@ public class VendorStorage
             throw new InvalidDataException($"Id '{id}' not found!");
         }
 
+        await DeleteRelatedArticles(id);
+
         await _vendorRepository.DeleteAsync(id);
+    }
+
+    private async Task DeleteRelatedArticles(string vendorId)
+    {
+        var articles = await _articleRepository.GetAllAsync();
+        var relatedArticles = articles.Where(p => p.VendorId == vendorId);
+
+        foreach (var relatedArticle in relatedArticles)
+        {
+            await _articleRepository.DeleteAsync(relatedArticle.Id);
+        }
     }
 }
