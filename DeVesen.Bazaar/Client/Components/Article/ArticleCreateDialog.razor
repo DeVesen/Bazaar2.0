@@ -11,7 +11,7 @@
                      IsTouched="@_isTouched"
                      IsValidChanged="@(x => _isValid = x)"
                      IsTouchedChanged="@(x => _isTouched = x)"
-                     @bind-Item="_item" />
+                     @bind-ArticleItem="_item" />
     </DialogContent>
     <DialogActions>
         <DvButtonSave Enabled="@EnabledSubmit" OnClick="SubmitAsync" />

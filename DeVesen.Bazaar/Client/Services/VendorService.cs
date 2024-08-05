@@ -21,28 +21,7 @@ public class VendorService
 
     public async Task<IEnumerable<VendorView>> GetAllAsync()
     {
-        var dtoList = await _httpClient.GetFromJsonAsync<IEnumerable<VendorViewDto>>("");
-
-        return dtoList!.Select(p => new VendorView
-        {
-            Item = new Vendor
-            {
-                Id = p.Item.Id,
-                Salutation = p.Item.Salutation,
-                FirstName = p.Item.FirstName,
-                LastName = p.Item.LastName,
-                Address = p.Item.Address,
-                EMail = p.Item.EMail,
-                Phone = p.Item.Phone
-            },
-            Statistic = new VendorArticleStatistic
-            {
-                Open = p.Statistic.Open,
-                Sold = p.Statistic.Sold,
-                Settled = p.Statistic.Settled,
-                Turnover = p.Statistic.Turnover,
-            }
-        });
+        return (await _httpClient.GetFromJsonAsync<IEnumerable<VendorView>>(""))!;
     }
 
     public async Task<Response> CreateAsync(Vendor element)

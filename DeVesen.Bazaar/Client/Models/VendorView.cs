@@ -13,6 +13,7 @@ public record VendorView
 
 public record VendorArticleStatistic
 {
+    public long NotOpen { get; set; }
     public long Open { get; set; }
     public long Sold { get; set; }
     public long Settled { get; set; }
@@ -20,6 +21,8 @@ public record VendorArticleStatistic
 
     public override string ToString()
     {
-        return $"{Open} / {Settled} / {Settled}";
+        return NotOpen > 0
+            ? $"{Open} ({NotOpen}) / {Sold} / {Settled}"
+            : $"{Open} / {Sold} / {Settled}";
     }
 }

@@ -55,6 +55,7 @@ public record VendorCreatedDto
 [ExcludeFromCodeCoverage]
 public record VendorArticleStatisticDto
 {
+    public long NotOpen { get; set; } = 0;
     public long Open { get; init; } = 0;
     public long Sold { get; init; } = 0;
     public long Settled { get; init; } = 0;

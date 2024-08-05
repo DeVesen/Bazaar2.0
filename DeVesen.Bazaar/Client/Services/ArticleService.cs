@@ -67,7 +67,9 @@ public class ArticleService
             return Response.Valid();
         }
 
-        _snackBarService.AddError($"Ausnahmefehler {response.StatusCode}");
+        var message = await response.Content.ReadFromJsonAsync<FailedRequestMessage>();
+
+        _snackBarService.AddError($"Ausnahmefehler {response.StatusCode}{Environment.NewLine}{message!.Message}");
         return Response.Invalid();
     }
 
@@ -99,7 +101,9 @@ public class ArticleService
             return Response.Valid();
         }
 
-        _snackBarService.AddError($"Ausnahmefehler {response.StatusCode}");
+        var message = await response.Content.ReadFromJsonAsync<FailedRequestMessage>();
+
+        _snackBarService.AddError($"Ausnahmefehler {response.StatusCode}{Environment.NewLine}{message!.Message}");
         return Response.Invalid();
     }
 
@@ -115,7 +119,9 @@ public class ArticleService
             return Response.Valid();
         }
 
-        _snackBarService.AddError($"Ausnahmefehler {response.StatusCode}");
+        var message = await response.Content.ReadFromJsonAsync<FailedRequestMessage>();
+
+        _snackBarService.AddError($"Ausnahmefehler {response.StatusCode}{Environment.NewLine}{message!.Message}");
         return Response.Invalid();
     }
 

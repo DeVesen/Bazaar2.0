@@ -13,61 +13,61 @@
          IsTouched="IsTouched"
          IsTouchedChanged="OnIsTouchedChanged"
          FieldChanged="OnFormFieldChangedAsync"
-         Model="Item"
+         Model="ArticleItem"
          Validation="@(ArticleValidator.ValidateAsync)"
          Style="margin-bottom: 20px; min-width: 370px">
     <MudGrid Spacing="2">
-        <MudItem xs="12" sm="3">
-            <DvTextField T="long"
-                         Required
-                         Label="Nummer"
-                         Disabled="@DisableNumber"
-                         @bind-Value="Item.Number"
-                         For="@(() => Item.Number)" />
-        </MudItem>
-        <MudItem xs="12" sm="9">
-            <DvTextField T="string"
-                         Required
-                         Label="Title"
-                         @bind-Value="Item.Title"
-                         For="@(() => Item.Title)" />
-        </MudItem>
-        <MudItem xs="12" sm="6">
-            <DvAutocomplete T="string"
-                            Required
-                            Label="Kategorie"
-                            @bind-Value="Item.ArticleCategory"
-                            For="@(() => Item.ArticleCategory)"
-                            SearchFunc="@CategoryAutoCompleteSearch" />
-        </MudItem>
-        <MudItem xs="12" sm="6">
-            <DvAutocomplete T="string"
-                            Required
-                            Label="Hersteller"
-                            @bind-Value="Item.Manufacturer"
-                            For="@(() => Item.Manufacturer)"
-                            SearchFunc="@ManufacturerAutoCompleteSearch" />
-        </MudItem>
-        <MudItem xs="12" sm="6">
-            <DvTextField T="double"
-                         Required
-                         Label="Preis"
-                         @bind-Value="Item.Price01"
-                         For="@(() => Item.Price01)" />
-        </MudItem>
-        <MudItem xs="12" sm="6">
-            <DvTextField T="double?"
-                         Label="Preis alternativ"
-                         @bind-Value="Item.Price02"
-                         For="@(() => Item.Price02)" />
-        </MudItem>
-        <MudItem xs="12" sm="12">
-            <DvTextField T="string"
-                         Label="Notize"
-                         Lines="4"
-                         @bind-Value="Item.Description"
-                         For="@(() => Item.Description)" />
-        </MudItem>
+            <MudItem xs="12" sm="3">
+                <DvTextField T="long"
+                             Required
+                             Label="Nummer"
+                             Disabled="@DisableNumber"
+                             @bind-Value="ArticleItem.Number"
+                             For="@(() => ArticleItem.Number)" />
+            </MudItem>
+            <MudItem xs="12" sm="9">
+                <DvTextField T="string"
+                             Required
+                             Label="Title"
+                             @bind-Value="ArticleItem.Title"
+                             For="@(() => ArticleItem.Title)" />
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <DvAutocomplete T="string"
+                                Required
+                                Label="Kategorie"
+                                @bind-Value="ArticleItem.ArticleCategory"
+                                For="@(() => ArticleItem.ArticleCategory)"
+                                SearchFunc="@CategoryAutoCompleteSearch" />
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <DvAutocomplete T="string"
+                                Required
+                                Label="Hersteller"
+                                @bind-Value="ArticleItem.Manufacturer"
+                                For="@(() => ArticleItem.Manufacturer)"
+                                SearchFunc="@ManufacturerAutoCompleteSearch" />
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <DvTextField T="double"
+                             Required
+                             Label="Preis"
+                             @bind-Value="ArticleItem.Price01"
+                             For="@(() => ArticleItem.Price01)" />
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <DvTextField T="double?"
+                             Label="Preis alternativ"
+                             @bind-Value="ArticleItem.Price02"
+                             For="@(() => ArticleItem.Price02)" />
+            </MudItem>
+            <MudItem xs="12" sm="12">
+                <DvTextField T="string"
+                             Label="Notize"
+                             Lines="4"
+                             @bind-Value="ArticleItem.Description"
+                             For="@(() => ArticleItem.Description)" />
+            </MudItem>
     </MudGrid>
     
 </MudForm>
@@ -77,10 +77,10 @@
     public required bool DisableNumber { get; set; }
 
     [Parameter]
-    public required Article Item { get; set; }
+    public required Article ArticleItem { get; set; }
 
     [Parameter]
-    public required EventCallback<Article> ItemChanged { get; set; }
+    public required EventCallback<Article> ArticleItemChanged { get; set; }
 
     [Parameter]
     public bool IsValid { get; set; }
@@ -110,7 +110,7 @@
 
     private async Task OnFormFieldChangedAsync()
     {
-        await ItemChanged.InvokeAsync(Item);
+        await ArticleItemChanged.InvokeAsync(ArticleItem);
     }
 
     private async Task<IEnumerable<string>> CategoryAutoCompleteSearch(string value, CancellationToken token)

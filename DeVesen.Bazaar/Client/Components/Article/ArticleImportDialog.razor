@@ -1,0 +1,98 @@
+﻿@using DeVesen.Bazaar.Client.Components.Common
+@using DeVesen.Bazaar.Client.Components.Common.Buttons
+@using DeVesen.Bazaar.Client.Models
+@using DeVesen.Bazaar.Client.Services
+
+@inject ArticleService ArticleService
+@inject SystemClock SystemClock
+
+<MudDialog>
+    <DialogContent>
+        <MudGrid Spacing="1">
+            <MudItem xs="12">
+
+                @if (_isLoadingData)
+                {
+                    <MudProgressLinear Color="Color.Secondary" Indeterminate Class="my-7" />
+                }
+                else
+                {
+                    <DvFileUpload OnFilesChanged="OnFilesChangedAsync" />
+                }
+
+            </MudItem>
+            
+            <MudItem>
+                @_loadedData
+            </MudItem>
+        </MudGrid>
+    </DialogContent>
+    <DialogActions>
+        <DvButtonSave OnClick="SubmitAsync" />
+        <DvButtonCancel OnClick="Cancel" />
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
+
+    [Parameter] public required string VendorId { get; set; }
+
+    private bool _isLoadingData = false;
+    private string _loadedData = string.Empty;
+
+    private void SubmitAsync()
+    {
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private async Task OnFilesChangedAsync(InputFileChangeEventArgs file)
+    {
+        _isLoadingData = true;
+
+        var fileStream = file.File.OpenReadStream();
+        var reader = new StreamReader(fileStream);
+
+        var line = await reader.ReadLineAsync();
+
+        while (line != null)
+        {
+            if (TryMapToArticle(line, out var article))
+            {
+                await ArticleService.CreateAsync(article);
+            }
+
+            line = await reader.ReadLineAsync();
+        }
+
+        _isLoadingData = false;
+    }
+
+    private bool TryMapToArticle(string line, out Article value)
+    {
+        var lineParts = line.Split(new[] { ";" }, StringSplitOptions.None);
+
+        if (lineParts.Length != 7)
+        {
+            value = null!;
+            return false;
+        }
+
+        value = new Article
+        {
+            VendorId = VendorId,
+            Number = int.Parse(lineParts[0]),
+            Title = lineParts[1],
+            ArticleCategory = lineParts[2],
+            Manufacturer = lineParts[3],
+            Created = SystemClock.GetNow(),
+            Price01 = double.Parse(lineParts[4]),
+            Price02 = double.TryParse(lineParts[5], out var price02Val) ? price02Val : null,
+            Description = lineParts[6]
+        };
+        
+        return true;
+    }
+}

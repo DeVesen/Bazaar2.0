@@ -3,6 +3,7 @@
 @using DeVesen.Bazaar.Client.Components.Common.TextField
 @using DeVesen.Bazaar.Client.Components.Vendor
 @using DeVesen.Bazaar.Client.Models
+@using DeVesen.Bazaar.Client.Components.Article
 
 @page "/vendors"
 
@@ -30,7 +31,8 @@
             <MudItem xs="12" md="4" lg="3">
                 <VendorCard VendorItem="@element"
                             OnEdit="x => ModifyElementAsync(x.Item)"
-                            OnArticle="OnArticleAsync"/>
+                            OnArticle="OnArticleAsync"
+                            OnImportArticle="OnImportArticleAsync" />
             </MudItem>
         }
     </MudGrid>
@@ -95,6 +97,21 @@
     {
         NavigationService.Vendor.ToArticle(args.Item.Id);
         await Task.CompletedTask;
+    }
+
+    private async Task OnImportArticleAsync(VendorView args)
+    {
+        var parameters = new DialogParameters<ArticleImportDialog> { { x => x.VendorId, args.Item.Id } };
+
+        var options = new DialogOptions
+        {
+            CloseOnEscapeKey = true,
+            BackdropClick = false
+        };
+
+        await DialogService.ShowAsync<ArticleImportDialog>("Artikel importieren", parameters, options);
+
+        StateHasChanged();
     }
 
     private async Task OnSearchChangedAsync(string newValue)

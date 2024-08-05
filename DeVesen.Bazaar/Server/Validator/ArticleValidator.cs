@@ -29,7 +29,7 @@ public class ArticleValidator : BaseValidator<Article>
 
         RuleFor(x => x.Title)
             .NotEmpty().WithMessage(ResourceText.Global.TitleMayNotBeEmpty)
-            .MaximumLength(20).WithMessage(ResourceText.Transform(ResourceText.Global.TitleMayNotBeLongerThan, _ => 20));
+            .MaximumLength(80).WithMessage(ResourceText.Transform(ResourceText.Global.TitleMayNotBeLongerThan, _ => 80));
 
         RuleFor(x => x.ArticleCategory)
             .NotEmpty().WithMessage(ResourceText.Global.ArticleCategoryMayNotBeEmpty)

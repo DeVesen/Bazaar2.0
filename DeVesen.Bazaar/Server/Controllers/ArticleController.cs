@@ -3,6 +3,7 @@ using DeVesen.Bazaar.Server.Extensions;
 using DeVesen.Bazaar.Server.Storage;
 using DeVesen.Bazaar.Server.Validator;
 using DeVesen.Bazaar.Shared;
+using FluentResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DeVesen.Bazaar.Server.Controllers;
@@ -46,7 +47,7 @@ public class ArticleController : ControllerBase
 
         if (result.IsValid is false)
         {
-            return BadRequest(result.Errors.First().ErrorMessage);
+            return BadRequest(new FailedRequestMessage(result.Errors.First().ErrorMessage));
         }
 
         await _articleStorage.CreateAsync(element);
@@ -67,7 +68,7 @@ public class ArticleController : ControllerBase
 
         if (result.IsValid is false)
         {
-            return BadRequest(result.Errors.First().ErrorMessage);
+            return BadRequest(new FailedRequestMessage(result.Errors.First().ErrorMessage));
         }
 
         await _articleStorage.UpdateAsync(element);
@@ -80,7 +81,7 @@ public class ArticleController : ControllerBase
     {
         if (await _articleStorage.ExistByIdAsync(id) is false)
         {
-            return NotFound(ResourceText.Transform(ResourceText.Article.NotFoundById, _ => id));
+            return BadRequest(new FailedRequestMessage(ResourceText.Transform(ResourceText.Article.NotFoundById, _ => id)));
         }
 
         await _articleStorage.DeleteByIdAsync(id);

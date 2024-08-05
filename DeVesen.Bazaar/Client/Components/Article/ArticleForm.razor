@@ -15,12 +15,12 @@
                                @bind-IsValid:after="@OnStatusChanged"
                                @bind-IsTouched="@_isMasterDataTouched"
                                @bind-IsTouched:after="@OnStatusChanged"
-                               @bind-Item="Item"
-                               @bind-Item:after="@OnItemChanged" />
+                               @bind-ArticleItem="Item"
+                               @bind-ArticleItem:after="@OnItemChanged" />
     </MudTabPanel>
     <MudTabPanel Icon="@Icons.Material.Filled.ShapeLine">
         <ArticleStatisticsForm @bind-Item="Item"
-                               @bind-Item:after="@OnItemChanged"
+                               @bind-ArticleItem:after="@OnItemChanged"
                                @bind-IsTouched="@_isStatisticsTouched"
                                @bind-IsTouched:after="@OnStatusChanged" />
     </MudTabPanel>

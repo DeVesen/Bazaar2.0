@@ -1,0 +1,28 @@
+﻿<MudFileUpload T="IBrowserFile" Context="fileInput" Accept=".csv"
+               Hidden="@false"
+               Class="@($"m-0 p-0 w-100 h-100 {Class}")"
+               Style="@Style"
+               InputClass="absolute mud-width-full mud-height-full overflow-hidden z-19 cursor-pointer"
+               InputStyle="opacity:0"
+               OnFilesChanged="@OnFilesChanged">
+    <ActivatorContent>
+        <div class="d-flex justify-space-between rounded-lg border-solid border-2 mud-border-primary">
+            <MudText Typo="Typo.h6" Class="p-2">
+                Datei hier ablegen ...
+            </MudText>
+            <MudIconButton Icon="@Icons.Material.TwoTone.CloudUpload"
+                           Class="z-20"/>
+        </div>
+    </ActivatorContent>
+</MudFileUpload>
+
+@code {
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public string? Style { get; set; }
+
+    [Parameter]
+    public EventCallback<InputFileChangeEventArgs> OnFilesChanged { get; set; }
+}

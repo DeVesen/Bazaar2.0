@@ -106,6 +106,7 @@ public static class ArticleExtensions
     public static VendorArticleStatisticDto ToDto(this VendorArticleStatistic data)
         => new()
         {
+            NotOpen = data.NotOpen,
             Open = data.Open,
             Sold = data.Sold,
             Settled = data.Settled,

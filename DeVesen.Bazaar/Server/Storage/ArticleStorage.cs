@@ -50,6 +50,7 @@ public class ArticleStorage
         return groupedByVendor.Select(p => new VendorArticleStatistic
         {
             VendorId = p.Key,
+            NotOpen = p.Count(x => x.ApprovedForSale.HasValue is false),
             Open = p.Count(x => x.ApprovedForSale.HasValue),
             Sold = p.Count(x => x.Sold.HasValue),
             Settled = p.Count(x => x.Settled.HasValue),
