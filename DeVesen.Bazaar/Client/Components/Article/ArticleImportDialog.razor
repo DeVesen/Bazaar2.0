@@ -28,7 +28,6 @@
         </MudGrid>
     </DialogContent>
     <DialogActions>
-        <DvButtonSave OnClick="SubmitAsync" />
         <DvButtonCancel OnClick="Cancel" />
     </DialogActions>
 </MudDialog>
@@ -40,11 +39,6 @@
 
     private bool _isLoadingData = false;
     private string _loadedData = string.Empty;
-
-    private void SubmitAsync()
-    {
-        MudDialog.Close(DialogResult.Ok(true));
-    }
 
     private void Cancel() => MudDialog.Cancel();
 
@@ -68,6 +62,8 @@
         }
 
         _isLoadingData = false;
+
+        MudDialog.Close(DialogResult.Ok(true));
     }
 
     private bool TryMapToArticle(string line, out Article value)

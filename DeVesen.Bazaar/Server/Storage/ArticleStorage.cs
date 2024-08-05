@@ -85,19 +85,11 @@ public class ArticleStorage
         }
         if (articleFilter.Number != null)
         {
-            elements = elements.Where(p => p.Number == articleFilter.Number);
+            elements = elements.Where(p => p.Number.ToString().Contains(articleFilter.Number.ToString()!));
         }
-        if (articleFilter.Title != null)
+        if (articleFilter.SearchText != null)
         {
-            elements = elements.Where(p => p.Title.ToLower().Contains(articleFilter.Title.ToLower()));
-        }
-        if (articleFilter.ArticleCategory != null)
-        {
-            elements = elements.Where(p => p.ArticleCategory == articleFilter.ArticleCategory);
-        }
-        if (articleFilter.Manufacturer != null)
-        {
-            elements = elements.Where(p => p.Manufacturer == articleFilter.Manufacturer);
+            elements = elements.Where(p => p.Title.ToLower().Contains(articleFilter.SearchText.ToLower()));
         }
 
         return elements.Select(p => p.ToDomain());

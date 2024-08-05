@@ -27,18 +27,32 @@
 
     [Parameter] public bool ForceNext { get; set; }
 
+    [Parameter] public bool ShowForceNext { get; set; }
+
+    [Parameter] public string StartText { get; set; } = string.Empty;
+
     private bool EnabledSubmit => _isValid && _isTouched;
 
     private Vendor _item = Vendor.New;
     private bool _isValid;
     private bool _isTouched;
 
+    protected override void OnParametersSet()
+    {
+        _item.LastName = StartText;
+    }
+
     private async Task SubmitAsync()
     {
-        await VendorService.CreateAsync(_item);
+        var vendorCreated = await VendorService.CreateAsync(_item);
 
-        MudDialog.Close(DialogResult.Ok(ForceNext));
+        if (vendorCreated.IsValid)
+        {
+            MudDialog.Close(DialogResult.Ok(new OkResult(ForceNext, vendorCreated.Value)));
+        }
     }
 
     private void Cancel() => MudDialog.Cancel();
+
+    public record OkResult(bool ForceNext, Vendor Element);
 }

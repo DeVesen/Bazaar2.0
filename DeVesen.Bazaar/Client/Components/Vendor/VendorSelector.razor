@@ -1,0 +1,189 @@
+﻿@using DeVesen.Bazaar.Client.Components.Common.Autocomplete
+@using DeVesen.Bazaar.Client.Models
+@using DeVesen.Bazaar.Client.Services
+@using System.Text
+@using DeVesen.Bazaar.Client.Extensions
+
+@inject VendorService VendorService
+
+@inject IDialogService DialogService
+
+<div class="@OuterClass" style="@OuterStyle">
+    <DvAutocomplete T="VendorSelectBase"
+                    Label="Hersteller"
+                    Clearable
+                    @bind-Value="_selectedItem"
+                    @bind-Value:after="OnSelectedChanged"
+                    SearchFunc="VendorSearchAsync" />
+</div>
+
+@code {
+
+    [Parameter]
+    public Vendor? Item
+    {
+        get
+        {
+            if (_selectedItem is VendorSelectItem item)
+            {
+                return item.Element;
+            }
+            return null;
+        }
+        set
+        {
+            if (_lockChange)
+            {
+                return;
+            }
+
+            _selectedItem = value != null
+                ? VendorSelectItem.Create(value)
+                : null;
+        }
+    }
+
+    [Parameter]
+    public EventCallback<Vendor?> ItemChanged { get; set; }
+
+    [Parameter]
+    public string? OuterStyle { get; set; }
+
+    [Parameter]
+    public string? OuterClass { get; set; }
+
+    public bool IsAddElement => _selectedItem is VendorSelectNewItem;
+
+    private bool _lockChange = false;
+    private VendorSelectBase? _selectedItem = null;
+
+    private async Task<IEnumerable<VendorSelectBase>> VendorSearchAsync(string value, CancellationToken token)
+    {
+        var elements = await VendorService.GetAllAsync();
+
+        if (string.IsNullOrWhiteSpace(value) is false)
+        {
+            elements = elements.Where(p => p.Item.Contains(value));
+        }
+
+        elements = elements.OrderBy(p => p.Item.LastName)
+            .ThenBy(p => p.Item.FirstName)
+            .ThenBy(p => p.Item.Salutation);
+
+        var finalList = elements.Select(p => (VendorSelectBase)VendorSelectItem.Create(p.Item))
+                                .ToList();
+
+        if (string.IsNullOrWhiteSpace(value) is false)
+        {
+            finalList.Add(new VendorSelectNewItem
+            {
+                DisplayText = value
+            });
+        }
+
+        return await Task.FromResult(finalList);
+    }
+
+    private async Task OnSelectedChanged()
+    {
+        _lockChange = true;
+
+        if (_selectedItem == null)
+        {
+            await ItemChanged.InvokeAsync(null);
+        }
+
+        if (_selectedItem is VendorSelectItem selected)
+        {
+            await ItemChanged.InvokeAsync(selected.Element);
+        }
+
+        if (_selectedItem is VendorSelectNewItem newItem)
+        {
+            await AddNewVendor(newItem.DisplayText);
+        }
+
+        _lockChange = false;
+    }
+
+    private async Task AddNewVendor(string startText)
+    {
+        var parameters = new DialogParameters<VendorCreateDialog>
+        {
+            { x => x.ShowForceNext, false },
+            { x => x.ForceNext, false },
+            { x => x.StartText, startText }
+        };
+
+        var options = new DialogOptions
+        {
+            CloseOnEscapeKey = true,
+            BackdropClick = false
+        };
+
+        var result = await DialogService.ShowAsync<VendorCreateDialog>("Verkäufer anlegen", parameters, options)
+                                        .WaitForResult<VendorCreateDialog.OkResult>();
+
+        SetItem(result.Canceled ? null : result.Data.Element);
+    }
+
+    private void SetItem(Vendor? element)
+    {
+        Task.Run(async () =>
+        {
+            _selectedItem = element != null ? VendorSelectItem.Create(element) : null;
+            await ItemChanged.InvokeAsync(element);
+        });
+    }
+
+    private record VendorSelectBase
+    {
+        public required string DisplayText { get; init; }
+
+        public override string ToString() => DisplayText;
+    }
+
+    private record VendorSelectNewItem : VendorSelectBase
+    {
+        public override string ToString() => $"\"{DisplayText}\" erstellen ...";
+    }
+
+    private record VendorSelectItem : VendorSelectBase
+    {
+        public required Vendor Element { get; init; }
+
+        public override string ToString() => DisplayText;
+
+        public static VendorSelectItem Create(Vendor element)
+        {
+            return new VendorSelectItem
+            {
+                Element = element,
+                    DisplayText = CreateDisplayText(element)
+            };
+        }
+
+        private static string CreateDisplayText(Vendor vendor)
+        {
+            var builder = new StringBuilder();
+
+            builder.Append($"{vendor.Id}: {vendor.GetGender()} {vendor.LastName}, {vendor.FirstName}");
+
+            if (string.IsNullOrWhiteSpace(vendor.EMail) is false)
+            {
+                builder.Append($"  - {vendor.EMail}");
+            }
+            if (string.IsNullOrWhiteSpace(vendor.Phone) is false)
+            {
+                builder.Append($"  - {vendor.Phone}");
+            }
+            if (string.IsNullOrWhiteSpace(vendor.Address) is false)
+            {
+                builder.Append($"  - {vendor.Address}");
+            }
+
+            return builder.ToString();
+        }
+    }
+
+}

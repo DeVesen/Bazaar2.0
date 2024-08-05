@@ -19,12 +19,17 @@ public class VendorService
         _httpClient.BaseAddress = hostEnvironment.GetApiEndpointUrl("api/v1/Vendor");
     }
 
+    public async Task<Vendor?> GetAsync(string id)
+    {
+        return (await _httpClient.GetFromJsonAsync<IEnumerable<VendorView>>(""))!.FirstOrDefault(p => p.Item.Id == id)?.Item;
+    }
+
     public async Task<IEnumerable<VendorView>> GetAllAsync()
     {
         return (await _httpClient.GetFromJsonAsync<IEnumerable<VendorView>>(""))!;
     }
 
-    public async Task<Response> CreateAsync(Vendor element)
+    public async Task<Response<Vendor>> CreateAsync(Vendor element)
     {
         var requestUri = _httpClient.BaseAddress;
         var createDto = new VendorCreateDto
@@ -42,12 +47,14 @@ public class VendorService
 
         if (response.IsSuccessStatusCode)
         {
+            var vendor = await response.Content.ReadFromJsonAsync<Vendor>();
+
             _snackBarService.AddInfo("Erfolgreich angelegt ...");
-            return Response.Valid();
+            return Response<Vendor>.Valid(vendor);
         }
 
         _snackBarService.AddError($"Ausnahmefehler {response.StatusCode}");
-        return Response.Invalid();
+        return Response<Vendor>.Invalid();
     }
 
     public async Task<Response> UpdateAsync(Vendor element)

@@ -3,7 +3,6 @@ using DeVesen.Bazaar.Server.Extensions;
 using DeVesen.Bazaar.Server.Storage;
 using DeVesen.Bazaar.Server.Validator;
 using DeVesen.Bazaar.Shared;
-using FluentResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DeVesen.Bazaar.Server.Controllers;
@@ -23,17 +22,9 @@ public class ArticleController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IEnumerable<ArticleDto>> GetAllAsync()
+    public async Task<IEnumerable<ArticleDto>> GetAllAsync([FromQuery] ArticleFilterDto? parameters)
     {
-        var filter = new ArticleFilterDto();
-
-        return await GetFilteredAllAsync(filter);
-    }
-
-    [HttpGet("filter")]
-    public async Task<IEnumerable<ArticleDto>> GetFilteredAllAsync([FromBody] ArticleFilterDto filterDto)
-    {
-        var filter = filterDto.ToDomain();
+        var filter = parameters.ToDomain();
         var elements = await _articleStorage.GetAllAsync(filter);
 
         return elements.Select(p => p.ToDto());

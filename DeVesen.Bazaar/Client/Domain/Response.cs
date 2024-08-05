@@ -2,7 +2,7 @@
 
 public record Response<T> : Response
 {
-    public T? Value { get; init; }
+    public T Value { get; init; } = default!;
 
     public new static Response<T> Invalid()
         => new() { IsValid = false };

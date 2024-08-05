@@ -1,5 +1,8 @@
-﻿namespace DeVesen.Bazaar.Client.Models;
+﻿using System.Diagnostics.CodeAnalysis;
 
+namespace DeVesen.Bazaar.Client.Models;
+
+[ExcludeFromCodeCoverage]
 public record Article
 {
     public string Id { get; init; } = string.Empty;

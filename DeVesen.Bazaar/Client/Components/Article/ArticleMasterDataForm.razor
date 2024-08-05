@@ -17,57 +17,57 @@
          Validation="@(ArticleValidator.ValidateAsync)"
          Style="margin-bottom: 20px; min-width: 370px">
     <MudGrid Spacing="2">
-            <MudItem xs="12" sm="3">
-                <DvTextField T="long"
-                             Required
-                             Label="Nummer"
-                             Disabled="@DisableNumber"
-                             @bind-Value="ArticleItem.Number"
-                             For="@(() => ArticleItem.Number)" />
-            </MudItem>
-            <MudItem xs="12" sm="9">
-                <DvTextField T="string"
-                             Required
-                             Label="Title"
-                             @bind-Value="ArticleItem.Title"
-                             For="@(() => ArticleItem.Title)" />
-            </MudItem>
-            <MudItem xs="12" sm="6">
-                <DvAutocomplete T="string"
-                                Required
-                                Label="Kategorie"
-                                @bind-Value="ArticleItem.ArticleCategory"
-                                For="@(() => ArticleItem.ArticleCategory)"
-                                SearchFunc="@CategoryAutoCompleteSearch" />
-            </MudItem>
-            <MudItem xs="12" sm="6">
-                <DvAutocomplete T="string"
-                                Required
-                                Label="Hersteller"
-                                @bind-Value="ArticleItem.Manufacturer"
-                                For="@(() => ArticleItem.Manufacturer)"
-                                SearchFunc="@ManufacturerAutoCompleteSearch" />
-            </MudItem>
-            <MudItem xs="12" sm="6">
-                <DvTextField T="double"
-                             Required
-                             Label="Preis"
-                             @bind-Value="ArticleItem.Price01"
-                             For="@(() => ArticleItem.Price01)" />
-            </MudItem>
-            <MudItem xs="12" sm="6">
-                <DvTextField T="double?"
-                             Label="Preis alternativ"
-                             @bind-Value="ArticleItem.Price02"
-                             For="@(() => ArticleItem.Price02)" />
-            </MudItem>
-            <MudItem xs="12" sm="12">
-                <DvTextField T="string"
-                             Label="Notize"
-                             Lines="4"
-                             @bind-Value="ArticleItem.Description"
-                             For="@(() => ArticleItem.Description)" />
-            </MudItem>
+        <MudItem xs="12" sm="3">
+            <DvTextField T="long"
+                         Required
+                         Label="Nummer"
+                         Disabled="@DisableNumber"
+                         @bind-Value="ArticleItem.Number"
+                         For="@(() => ArticleItem.Number)" />
+        </MudItem>
+        <MudItem xs="12" sm="9">
+            <DvTextField T="string"
+                         Required
+                         Label="Title"
+                         @bind-Value="ArticleItem.Title"
+                         For="@(() => ArticleItem.Title)" />
+        </MudItem>
+        <MudItem xs="12" sm="6">
+            <DvAutocomplete T="string"
+                            Required
+                            Label="Kategorie"
+                            @bind-Value="ArticleItem.ArticleCategory"
+                            For="@(() => ArticleItem.ArticleCategory)"
+                            SearchFunc="@CategoryAutoCompleteSearch" />
+        </MudItem>
+        <MudItem xs="12" sm="6">
+            <DvAutocomplete T="string"
+                            Required
+                            Label="Hersteller"
+                            @bind-Value="ArticleItem.Manufacturer"
+                            For="@(() => ArticleItem.Manufacturer)"
+                            SearchFunc="@ManufacturerAutoCompleteSearch" />
+        </MudItem>
+        <MudItem xs="12" sm="6">
+            <DvTextField T="double"
+                         Required
+                         Label="Preis"
+                         @bind-Value="ArticleItem.Price01"
+                         For="@(() => ArticleItem.Price01)" />
+        </MudItem>
+        <MudItem xs="12" sm="6">
+            <DvTextField T="double?"
+                         Label="Preis alternativ"
+                         @bind-Value="ArticleItem.Price02"
+                         For="@(() => ArticleItem.Price02)" />
+        </MudItem>
+        <MudItem xs="12" sm="12">
+            <DvTextField T="string"
+                         Label="Notize"
+                         Lines="4"
+                         @bind-Value="ArticleItem.Description"
+                         For="@(() => ArticleItem.Description)" />
+        </MudItem>
     </MudGrid>
     
 </MudForm>

@@ -42,7 +42,7 @@ namespace DeVesen.Bazaar.Client.Services
                 Severity.Info,
                 config =>
                 {
-                    config.VisibleStateDuration = 5000;
+                    config.VisibleStateDuration = 2500;
                 },
                 key);
         }
@@ -65,7 +65,7 @@ namespace DeVesen.Bazaar.Client.Services
                 Severity.Error,
                 config =>
                 {
-                    config.VisibleStateDuration = 8000;
+                    config.VisibleStateDuration = 2500;
                 },
                 key);
         }

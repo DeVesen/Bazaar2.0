@@ -20,7 +20,7 @@
     </MudTabPanel>
     <MudTabPanel Icon="@Icons.Material.Filled.ShapeLine">
         <ArticleStatisticsForm @bind-Item="Item"
-                               @bind-ArticleItem:after="@OnItemChanged"
+                               @bind-Item:after="@OnItemChanged"
                                @bind-IsTouched="@_isStatisticsTouched"
                                @bind-IsTouched:after="@OnStatusChanged" />
     </MudTabPanel>

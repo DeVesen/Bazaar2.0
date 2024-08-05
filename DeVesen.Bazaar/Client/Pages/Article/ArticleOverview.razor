@@ -1,41 +1,37 @@
 ﻿@using DeVesen.Bazaar.Client.Services
-@using DeVesen.Bazaar.Client.Components.Common.TextField
-@using DeVesen.Bazaar.Client.Components.Common.ToolBar
 @using DeVesen.Bazaar.Client.Components.Article
+@using DeVesen.Bazaar.Client.Extensions
 @using DeVesen.Bazaar.Client.Models
+@using DeVesen.Bazaar.Client.State.ArticleOverview
+@using Fluxor
 
 @page "/articles"
 @page "/vendors/{vendorId}/articles"
 
-@inject ArticleService ArticleService;
-@inject IDialogService DialogService
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+
+@inject ArticleOverviewFacade ArticleFacade
+@inject IState<ArticleOverviewState> ArticleState
+
+@inject VendorService VendorService;
+@inject IDialogService DialogService;
 
 <div class="d-flex flex-column gap-4 px-1">
-    <MudToolBar WrapContent Dense Gutters="false">
-        <MudSpacer />
-        @if (IsVendorMode)
-        {
-            <ToolBarIconButton Icon="@Icons.Material.TwoTone.NoteAdd"
-                               OnClick="CreateElementAsync" />
-        }
-        <DvTextField T="long?"
-                     OuterStyle="max-width: 100px"
-                     OuterClass="pl-2"
-                     Label="Nummer"
-                     Value="@_searchNumber"
-                     ValueChanged="OnNumberSearchChangedAsync" />
-        <DvTextField T="string"
-                     OuterStyle="max-width: 200px"
-                     OuterClass="px-2"
-                     Label="Textsuche"
-                     Value="@_searchText"
-                     ValueChanged="OnTextSearchChangedAsync" />
-    </MudToolBar>
+
+    <ArticleOverviewToolbar @bind-Vendor="@_vendor"
+                            @bind-Number="@_number"
+                            @bind-SearchText="@_searchText"
+                            @bind-Vendor:after="OnArticleFilterChange"
+                            @bind-Number:after="OnArticleFilterChange"
+                            @bind-SearchText:after="OnArticleFilterChange"
+                            DisableCreateArticleBtn="@(_vendor == null)"
+                            OnCreateArticleBtnClick="CreateElementAsync"
+                            OnImportArticleBtnClick="ImportArticleAsync" />
 
     <MudTable T="Article"
               FixedHeader
               Hover
-              Items="@_elements"
+              Items="@ArticleState.Value.Articles"
               SortLabel="Sort By"
               OnRowClick="x => ModifyElementAsync(x.Item!)">
         <HeaderContent>
@@ -61,17 +57,23 @@
 
     [Parameter]
     public string? VendorId { get; set; }
-
-    private bool IsVendorMode => string.IsNullOrWhiteSpace(VendorId) is false;
-
-    private IEnumerable<Article> _elements = Enumerable.Empty<Article>();
-    private long? _searchNumber;
-    private string _searchText = string.Empty;
+    
+    private Vendor? _vendor;
+    private string? _number;
+    private string? _searchText;
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        await ReloadElementsAsync();
+
+        _vendor = await VendorService.GetAsync(VendorId ?? string.Empty);
+
+        ArticleFacade.FetchArticles();
+    }
+
+    private void OnArticleFilterChange()
+    {
+        FetchArticleList();
     }
 
     private async Task CreateElementAsync()
@@ -96,8 +98,8 @@
             var result = await dlg.Result;
 
             forceNext = result!.Canceled is false && (bool)result.Data!;
-
-            await ReloadElementsAsync();
+            
+            FetchArticleList();
 
             StateHasChanged();
         } while (forceNext);
@@ -121,39 +123,38 @@
 
         if (result!.Canceled is false)
         {
-            await ReloadElementsAsync();
+            FetchArticleList();
+
+            StateHasChanged();
         }
     }
 
-    private async Task OnNumberSearchChangedAsync(long? newValue)
+    private async Task ImportArticleAsync()
     {
-        _searchNumber = newValue;
+        var parameters = new DialogParameters<ArticleImportDialog> { { x => x.VendorId, _vendor!.Id } };
 
-        await ReloadElementsAsync();
-    }
-
-    private async Task OnTextSearchChangedAsync(string newValue)
-    {
-        _searchText = newValue;
-
-        await ReloadElementsAsync();
-    }
-
-    private async Task ReloadElementsAsync()
-    {
-        _elements = await ArticleService.GetAllAsync();
-
-        _elements = _elements.Where(p => p.Contains(_searchText));
-
-        if (_searchNumber.HasValue)
+        var options = new DialogOptions
         {
-            _elements = _elements.Where(p => p.Number == _searchNumber);
-        }
+            CloseOnEscapeKey = true,
+            BackdropClick = false
+        };
 
-        if (string.IsNullOrWhiteSpace(VendorId) is false)
-        {
-            _elements = _elements.Where(p => p.VendorId.Equals(VendorId, StringComparison.InvariantCulture));
-        }
+        await DialogService.ShowAsync<ArticleImportDialog>("Artikel importieren", parameters, options)
+                           .WaitForResult();
+        
+        FetchArticleList();
+    }
+
+    private void FetchArticleList()
+    {
+        var articleFilter = new ArticleFilter
+            {
+                VendorId = _vendor?.Id,
+                Number = _number,
+                SearchText = _searchText
+            };
+
+        ArticleFacade.FetchArticles(articleFilter);
     }
 
     private static string GetStatus(Article article)

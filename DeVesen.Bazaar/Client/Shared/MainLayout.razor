@@ -1,4 +1,10 @@
-﻿@inherits LayoutComponentBase
+﻿@using Fluxor
+@using DeVesen.Bazaar.Client.State.ArticleOverview
+
+@inherits LayoutComponentBase
+
+@inject ArticleOverviewFacade MenuFacade
+@inject IState<ArticleOverviewState> MenuState
 
 @* Required *@
 <MudThemeProvider />
@@ -9,6 +15,7 @@
 <MudSnackbarProvider />
 
 <div class="page">
+
     <div class="sidebar">
         <NavMenu />
     </div>

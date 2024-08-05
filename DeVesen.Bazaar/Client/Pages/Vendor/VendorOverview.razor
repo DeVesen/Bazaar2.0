@@ -4,6 +4,7 @@
 @using DeVesen.Bazaar.Client.Components.Vendor
 @using DeVesen.Bazaar.Client.Models
 @using DeVesen.Bazaar.Client.Components.Article
+@using DeVesen.Bazaar.Client.Extensions
 
 @page "/vendors"
 
@@ -59,14 +60,17 @@
             BackdropClick = false
         };
 
-        bool forceNext;
+        var forceNext = false;
 
         do
         {
-            var dlg = await DialogService.ShowAsync<VendorCreateDialog>("Verkäufer anlegen", options);
-            var result = await dlg.Result;
+            var result = await DialogService.ShowAsync<VendorCreateDialog>("Verkäufer anlegen", options)
+                                            .WaitForResult<VendorCreateDialog.OkResult>();
 
-            forceNext = result!.Canceled is false && (bool)result.Data!;
+            if (result.Canceled is false)
+            {
+                forceNext = result.Data.ForceNext;
+            }
 
             await ReloadElementsAsync();
 
@@ -84,13 +88,10 @@
             BackdropClick = false
         };
 
-        var dlg = await DialogService.ShowAsync<VendorEditDialog>("Verkäufer ändern", parameters, options);
-        var result = await dlg.Result;
-
-        if (result!.Canceled is false)
-        {
-            await ReloadElementsAsync();
-        }
+        await DialogService.ShowAsync<VendorEditDialog>("Verkäufer ändern", parameters, options)
+                           .WaitForResult();
+        
+        await ReloadElementsAsync();
     }
 
     private async Task OnArticleAsync(VendorView args)
@@ -109,9 +110,10 @@
             BackdropClick = false
         };
 
-        await DialogService.ShowAsync<ArticleImportDialog>("Artikel importieren", parameters, options);
-
-        StateHasChanged();
+        await DialogService.ShowAsync<ArticleImportDialog>("Artikel importieren", parameters, options)
+                           .WaitForResult();
+        
+        await ReloadElementsAsync();
     }
 
     private async Task OnSearchChangedAsync(string newValue)
@@ -133,6 +135,10 @@
         _elements = await VendorService.GetAllAsync();
 
         _elements = _elements.Where(p => p.Contains(_searchText));
+
+        _elements = _elements.OrderBy(p => p.Item.LastName)
+                             .ThenBy(p => p.Item.FirstName)
+                             .ThenBy(p => p.Item.Salutation);
 
         switch (_genderType)
         {

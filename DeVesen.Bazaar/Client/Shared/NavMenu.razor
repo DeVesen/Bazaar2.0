@@ -10,20 +10,24 @@
 <div class="@NavMenuCssClass nav-scrollable" style="background-color: lightgray" @onclick="ToggleNavMenu">
     
     <MudNavMenu Dense Rounded="true" Margin="Margin.Normal" Class="pa-2">
+
         <MudNavLink Href="." Icon="@Icons.Material.Outlined.ShoppingCart">Verkauf</MudNavLink>
+
         <MudNavGroup Title="Stammdaten" Icon="@Icons.Custom.FileFormats.FileDocument" Expanded="true" HideExpandIcon="true">
             <MudNavLink Href="/vendors" Icon="@Icons.Material.Outlined.People">Verkäufer</MudNavLink>
             <MudNavLink Href="/articles" Icon="@Icons.Material.Outlined.Article">Artikel</MudNavLink>
         </MudNavGroup>
+
         <MudNavGroup Title="Basisdaten" Icon="@Icons.Custom.FileFormats.FileCode">
             <MudNavLink Href="/article-category">Artikel Kategorieren</MudNavLink>
             <MudNavLink Href="/article-manufacturer">Artikel Hersteller</MudNavLink>
         </MudNavGroup>
+
     </MudNavMenu>
 </div>
 
 @code {
-    private bool _collapseNavMenu = true;
+    private bool _collapseNavMenu = false;
 
     private string? NavMenuCssClass => _collapseNavMenu ? "collapse" : null;
 

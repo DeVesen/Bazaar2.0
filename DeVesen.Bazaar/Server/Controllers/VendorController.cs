@@ -56,7 +56,7 @@ public class VendorController : ControllerBase
 
         await _vendorStorage.CreateAsync(element);
 
-        return Ok(new VendorCreatedDto { Id = element.Id });
+        return Ok(element);
     }
 
     [HttpPut("{id}")]

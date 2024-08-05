@@ -1,5 +1,7 @@
 using DeVesen.Bazaar.Client;
+using DeVesen.Bazaar.Client.Extensions;
 using DeVesen.Bazaar.Client.Services;
+using DeVesen.Bazaar.Client.State.ArticleOverview;
 using DeVesen.Bazaar.Client.Validator;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
@@ -10,7 +12,10 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-builder.Services.AddMudServices();
+builder.Services.AddMudServices()
+                .ConfigureFluxor();
+
+builder.Services.AddTransient<ArticleOverviewFacade>();
 
 builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 

@@ -1,0 +1,96 @@
+﻿@typeparam T
+
+@inherits MudNumericField<T>
+
+<div style="@OuterStyle" class="@OuterClass">
+    <CascadingValue Value="false" Name="SubscribeToParentForm" IsFixed>
+        <MudNumericField T="T"
+                      ShrinkLabel="@ShrinkLabel"
+                      Margin="@Margin"
+                      Variant="@Variant"
+                      Label="@Label"
+                      AutoFocus="@AutoFocus"
+                      Placeholder="@Placeholder"
+                      DebounceInterval="@DebounceInterval"
+                      Value="@Value"
+                      ReadOnly="@ReadOnly"
+                      Disabled="@Disabled"
+                      Required="@Required"
+                      RequiredError="@RequiredError"
+                      Underline="@Underline"
+                      Class="@Class"
+                      Clearable="@Clearable"
+                      ClearIcon="@ClearIcon"
+                      Converter="@Converter"
+                      Counter="@Counter"
+                      Culture="@Culture"
+                      Format="@Format"
+                      FullWidth="@FullWidth"
+                      HelperId="@HelperId"
+                      HelperText="@HelperText"
+                      HelperTextOnFocus="@HelperTextOnFocus"
+                      Immediate="@Immediate"
+                      InputId="@InputId"
+                      InputMode="@InputMode"
+                      Lines="@Lines"
+                      MaxLength="@MaxLength"
+                      Style="@Style"
+                      OnAdornmentClick="@OnAdornmentClick"
+                      Error="@Error"
+                      ErrorId="@ErrorId"
+                      ErrorText="@ErrorText"
+                      Adornment="@Adornment"
+                      AdornmentColor="@AdornmentColor"
+                      AdornmentText="@AdornmentText"
+                      AdornmentIcon="@AdornmentIcon"
+                      AdornmentAriaLabel="@AdornmentAriaLabel"
+                      Validation="@Validation"
+                      IconSize="@IconSize"
+                      OnDebounceIntervalElapsed="@OnDebounceIntervalElapsed"
+                      OnInternalInputChanged="@OnInternalInputChanged"
+                      OnlyValidateIfDirty="@OnlyValidateIfDirty"
+                      Pattern="@Pattern"
+                      HideSpinButtons="@HideSpinButtons"
+                      InvertMouseWheel="@InvertMouseWheel"
+                      Max="@Max"
+                      Min="@Min"
+                      Step="@Step"
+                      Tag="@Tag"
+                      Text="@Text"
+                      TextUpdateSuppression="@TextUpdateSuppression"
+                      Typo="@Typo"
+                      UserAttributes="@UserAttributes"
+                      ValueChanged="OnValueChanged"
+                      TextChanged="OnTextChanged"
+                      OnKeyDown="InvokeKeyDownAsync"
+                      OnKeyUp="InvokeKeyUpAsync"
+                      OnBlur="OnBlurredAsync" />
+    </CascadingValue>
+</div>
+
+@code {
+    [Parameter]
+    public string? OuterStyle { get; set; }
+
+    [Parameter]
+    public string? OuterClass { get; set; }
+
+    private async Task OnTextChanged(string newText)
+    {
+        await SetTextAsync(newText);
+    }
+
+    private async Task OnValueChanged(T newValue)
+    {
+        await SetValueAsync(newValue, true, true);
+    }
+
+    public void ReRender()
+    {
+        Console.WriteLine($"ReRender");
+        Console.WriteLine($"Error=>{Error}");
+        Console.WriteLine($"ErrorText=>{ErrorText}");
+
+        ForceRender(true);
+    }
+}

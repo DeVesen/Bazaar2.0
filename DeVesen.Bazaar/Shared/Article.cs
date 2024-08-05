@@ -5,11 +5,9 @@ namespace DeVesen.Bazaar.Shared;
 [ExcludeFromCodeCoverage]
 public record ArticleFilterDto
 {
-    public string? VendorId { get; set; } = null;
-    public long? Number { get; set; } = null;
-    public string? Title { get; set; } = null;
-    public string? ArticleCategory { get; set; } = null;
-    public string? Manufacturer { get; set; } = null;
+    public string? VendorId { get; init; } = null;
+    public string? Number { get; init; } = null;
+    public string? SearchText { get; init; } = null;
 }
 
 [ExcludeFromCodeCoverage]

@@ -17,13 +17,13 @@ public record Vendor
     {
         text = text.Trim().ToLower();
 
-        return Id.ToLower().Contains(text) ||
-               FirstName.ToLower().Contains(text) ||
-               LastName.ToLower().Contains(text) ||
-               Note.ToLower().Contains(text);
+        return text.Contains(Id.ToLower()) ||
+               text.Contains(FirstName.ToLower()) ||
+               text.Contains(LastName.ToLower()) ||
+               (Note ?? string.Empty).ToLower().Contains(text);
     }
 
-    private string GetGender()
+    public string GetGender()
     {
         return Salutation switch
         {
@@ -42,6 +42,6 @@ public record Vendor
             gender += " ";
         }
 
-        return $"{gender}{FirstName} {LastName}";
+        return $"{gender} {LastName}, {FirstName}";
     }
 }
