@@ -10,7 +10,7 @@ WORKDIR /src
 COPY ["DeVesen.Bazaar/Server/DeVesen.Bazaar.Server.csproj", "DeVesen.Bazaar/Server/"]
 COPY ["DeVesen.Bazaar/Client/DeVesen.Bazaar.Client.csproj", "DeVesen.Bazaar/Client/"]
 COPY ["DeVesen.Bazaar/Shared/DeVesen.Bazaar.Shared.csproj", "DeVesen.Bazaar/Shared/"]
-RUN dotnet restore --runtime linux-arm64 "./DeVesen.Bazaar/Server/DeVesen.Bazaar.Server.csproj"
+RUN dotnet restore "./DeVesen.Bazaar/Server/DeVesen.Bazaar.Server.csproj"
 COPY . .
 WORKDIR "/src/DeVesen.Bazaar/Server"
 RUN dotnet build "./DeVesen.Bazaar.Server.csproj" -c $BUILD_CONFIGURATION -o /app/build
