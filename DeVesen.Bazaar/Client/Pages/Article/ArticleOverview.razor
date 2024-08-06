@@ -91,7 +91,7 @@
             var parameters = new DialogParameters<ArticleCreateDialog>
             {
                 { x => x.ForceNext, forceNext },
-                { x => x.VendorId, VendorId }
+                { x => x.VendorId, _vendor!.Id }
             };
 
             var dlg = await DialogService.ShowAsync<ArticleCreateDialog>("Artikel anlegen", parameters, options);
