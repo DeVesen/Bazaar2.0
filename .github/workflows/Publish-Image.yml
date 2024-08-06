@@ -39,4 +39,3 @@ jobs:
         context: .
         push: true
         tags: devesen/bazaar2.0:${{ github.run_id }}
-        platforms: linux/arm64
