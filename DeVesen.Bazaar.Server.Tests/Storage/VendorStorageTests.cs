@@ -10,8 +10,9 @@ public class VendorStorageTests
     public async Task ExistByIdAsync_EmptyRepository_ExpectFalse()
     {
         // Arrange
-        var repository = new VendorRepositoryFake();
-        var storage = new VendorStorage(repository);
+        var vendorRepository = new VendorRepositoryFake();
+        var articleRepository = new ArticleRepositoryFake();
+        var storage = new VendorStorage(vendorRepository, articleRepository);
 
         // Act
         var result = await storage.ExistByIdAsync(Faker.Entity.Vendor1.Id);
@@ -24,8 +25,9 @@ public class VendorStorageTests
     public async Task ExistByIdAsync_NotContainedEntity_ExpectFalse()
     {
         // Arrange
-        var repository = new VendorRepositoryFake(Faker.Entity.Vendor2);
-        var storage = new VendorStorage(repository);
+        var vendorRepository = new VendorRepositoryFake(Faker.Entity.Vendor2);
+        var articleRepository = new ArticleRepositoryFake();
+        var storage = new VendorStorage(vendorRepository, articleRepository);
 
         // Act
         var result = await storage.ExistByIdAsync(Faker.Entity.Vendor1.Id);
@@ -38,8 +40,9 @@ public class VendorStorageTests
     public async Task ExistByIdAsync_ContainedEntity_ExpectTrue()
     {
         // Arrange
-        var repository = new VendorRepositoryFake(Faker.Entity.Vendor1);
-        var storage = new VendorStorage(repository);
+        var vendorRepository = new VendorRepositoryFake(Faker.Entity.Vendor1);
+        var articleRepository = new ArticleRepositoryFake();
+        var storage = new VendorStorage(vendorRepository, articleRepository);
 
         // Act
         var result = await storage.ExistByIdAsync(Faker.Entity.Vendor1.Id);
@@ -53,8 +56,9 @@ public class VendorStorageTests
     public async Task GetAllAsync_EmptyRepository_ExpectEmpty()
     {
         // Arrange
-        var repository = new VendorRepositoryFake();
-        var storage = new VendorStorage(repository);
+        var vendorRepository = new VendorRepositoryFake();
+        var articleRepository = new ArticleRepositoryFake();
+        var storage = new VendorStorage(vendorRepository, articleRepository);
 
         // Act
         var result = await storage.GetAllAsync();
@@ -68,8 +72,9 @@ public class VendorStorageTests
     {
         // Arrange
         var expected = new[] { Faker.Entity.Vendor1, Faker.Entity.Vendor2, Faker.Entity.Vendor3 };
-        var repository = new VendorRepositoryFake(Faker.Entity.Vendor1, Faker.Entity.Vendor2, Faker.Entity.Vendor3);
-        var storage = new VendorStorage(repository);
+        var vendorRepository = new VendorRepositoryFake(Faker.Entity.Vendor1, Faker.Entity.Vendor2, Faker.Entity.Vendor3);
+        var articleRepository = new ArticleRepositoryFake();
+        var storage = new VendorStorage(vendorRepository, articleRepository);
 
         // Act
         var result = await storage.GetAllAsync();
@@ -83,36 +88,39 @@ public class VendorStorageTests
     public async Task CreateAsync_EmptyRepository_ExpectOneEntity()
     {
         // Arrange
-        var repository = new VendorRepositoryFake();
-        var storage = new VendorStorage(repository);
+        var vendorRepository = new VendorRepositoryFake();
+        var articleRepository = new ArticleRepositoryFake();
+        var storage = new VendorStorage(vendorRepository, articleRepository);
 
         // Act
         await storage.CreateAsync(Faker.Domain.Vendor2);
 
         // Assert
-        repository.InnerList.Count.Should().Be(1);
+        vendorRepository.InnerList.Count.Should().Be(1);
     }
 
     [Fact]
     public async Task CreateAsync_ContainedEntity_ExpectTwoEntity()
     {
         // Arrange
-        var repository = new VendorRepositoryFake(Faker.Entity.Vendor1);
-        var storage = new VendorStorage(repository);
+        var vendorRepository = new VendorRepositoryFake(Faker.Entity.Vendor1);
+        var articleRepository = new ArticleRepositoryFake();
+        var storage = new VendorStorage(vendorRepository, articleRepository);
 
         // Act
         await storage.CreateAsync(Faker.Domain.Vendor2);
 
         // Assert
-        repository.InnerList.Count.Should().Be(2);
+        vendorRepository.InnerList.Count.Should().Be(2);
     }
 
     [Fact]
     public async Task CreateAsync_ContainedEntityId_ExpectException()
     {
         // Arrange
-        var repository = new VendorRepositoryFake(Faker.Entity.Vendor1);
-        var storage = new VendorStorage(repository);
+        var vendorRepository = new VendorRepositoryFake(Faker.Entity.Vendor1);
+        var articleRepository = new ArticleRepositoryFake();
+        var storage = new VendorStorage(vendorRepository, articleRepository);
         var vendor = Faker.Domain.GetVendor(Faker.Entity.Vendor1.Id);
 
         // Act
@@ -127,8 +135,9 @@ public class VendorStorageTests
     public async Task UpdateAsync_EmptyRepository_ExpectException()
     {
         // Arrange
-        var repository = new VendorRepositoryFake();
-        var storage = new VendorStorage(repository);
+        var vendorRepository = new VendorRepositoryFake();
+        var articleRepository = new ArticleRepositoryFake();
+        var storage = new VendorStorage(vendorRepository, articleRepository);
 
         // Act
         var act = () => storage.UpdateAsync(Faker.Domain.Vendor2);
@@ -141,8 +150,9 @@ public class VendorStorageTests
     public async Task UpdateAsync_ContainedOtherEntity_ExpectException()
     {
         // Arrange
-        var repository = new VendorRepositoryFake(Faker.Entity.Vendor1);
-        var storage = new VendorStorage(repository);
+        var vendorRepository = new VendorRepositoryFake(Faker.Entity.Vendor1);
+        var articleRepository = new ArticleRepositoryFake();
+        var storage = new VendorStorage(vendorRepository, articleRepository);
 
         // Act
         var act = () => storage.UpdateAsync(Faker.Domain.Vendor2);
@@ -155,8 +165,9 @@ public class VendorStorageTests
     public async Task UpdateAsync_ContainedEntity_ExpectUpdate()
     {
         // Arrange
-        var repository = new VendorRepositoryFake(Faker.Entity.Vendor1);
-        var storage = new VendorStorage(repository);
+        var vendorRepository = new VendorRepositoryFake(Faker.Entity.Vendor1);
+        var articleRepository = new ArticleRepositoryFake();
+        var storage = new VendorStorage(vendorRepository, articleRepository);
         var vendor = Faker.Domain.GetVendor(id: Faker.Entity.Vendor1.Id,
             firstName: "Hello Vendor");
 
@@ -164,8 +175,8 @@ public class VendorStorageTests
         await storage.UpdateAsync(vendor);
 
         // Assert
-        repository.InnerList[0].Id.Should().Be(vendor.Id);
-        repository.InnerList[0].FirstName.Should().Be(vendor.FirstName);
+        vendorRepository.InnerList[0].Id.Should().Be(vendor.Id);
+        vendorRepository.InnerList[0].FirstName.Should().Be(vendor.FirstName);
     }
 
 
@@ -173,8 +184,9 @@ public class VendorStorageTests
     public async Task DeleteAsync_EmptyRepository_ExpectException()
     {
         // Arrange
-        var repository = new VendorRepositoryFake();
-        var storage = new VendorStorage(repository);
+        var vendorRepository = new VendorRepositoryFake();
+        var articleRepository = new ArticleRepositoryFake();
+        var storage = new VendorStorage(vendorRepository, articleRepository);
 
         // Act
         var act = () => storage.DeleteAsync(Faker.Domain.Vendor2.Id);
@@ -187,8 +199,9 @@ public class VendorStorageTests
     public async Task DeleteAsync_ContainedOtherEntity_ExpectException()
     {
         // Arrange
-        var repository = new VendorRepositoryFake(Faker.Entity.Vendor1);
-        var storage = new VendorStorage(repository);
+        var vendorRepository = new VendorRepositoryFake(Faker.Entity.Vendor1);
+        var articleRepository = new ArticleRepositoryFake();
+        var storage = new VendorStorage(vendorRepository, articleRepository);
 
         // Act
         var act = () => storage.DeleteAsync(Faker.Domain.Vendor2.Id);
@@ -201,8 +214,9 @@ public class VendorStorageTests
     public async Task DeleteAsync_ContainedEntity_ExpectUpdate()
     {
         // Arrange
-        var repository = new VendorRepositoryFake(Faker.Entity.Vendor1);
-        var storage = new VendorStorage(repository);
+        var vendorRepository = new VendorRepositoryFake(Faker.Entity.Vendor1);
+        var articleRepository = new ArticleRepositoryFake();
+        var storage = new VendorStorage(vendorRepository, articleRepository);
 
         // Act
         await storage.DeleteAsync(Faker.Domain.Vendor1.Id);

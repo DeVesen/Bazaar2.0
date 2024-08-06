@@ -72,7 +72,7 @@ public class ArticleController : ControllerBase
     {
         if (await _articleStorage.ExistByIdAsync(id) is false)
         {
-            return BadRequest(new FailedRequestMessage(ResourceText.Transform(ResourceText.Article.NotFoundById, _ => id)));
+            return NotFound(new FailedRequestMessage(ResourceText.Transform(ResourceText.Article.NotFoundById, _ => id)));
         }
 
         await _articleStorage.DeleteByIdAsync(id);

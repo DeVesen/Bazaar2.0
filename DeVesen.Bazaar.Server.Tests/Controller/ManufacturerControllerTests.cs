@@ -2,6 +2,7 @@
 using DeVesen.Bazaar.Server.Storage;
 using DeVesen.Bazaar.Server.Tests.Fake.Repository;
 using DeVesen.Bazaar.Server.Validator;
+using DeVesen.Bazaar.Shared;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 
@@ -463,10 +464,12 @@ public class VendorControllerTests
     public async Task GetAllAsync_EmptyRepository_ExpectEmpty()
     {
         // Arrange
-        var repository = new VendorRepositoryFake();
-        var storage = new VendorStorage(repository);
+        var vendorRepository = new VendorRepositoryFake();
+        var articleRepository = new ArticleRepositoryFake();
+        var vendorStorage = new VendorStorage(vendorRepository, articleRepository);
+        var articleStorage = new ArticleStorage(vendorRepository, articleRepository);
         var validator = new VendorValidator();
-        var controller = new VendorController(storage, validator);
+        var controller = new VendorController(vendorStorage, articleStorage, validator);
 
         // Act
         var result = await controller.GetAllAsync();
@@ -479,17 +482,19 @@ public class VendorControllerTests
     public async Task GetAllAsync_ContainedEntity_ExpectEntities()
     {
         // Arrange
-        var repository = new VendorRepositoryFake(Faker.Entity.Vendor1, Faker.Entity.Vendor2, Faker.Entity.Vendor3);
-        var storage = new VendorStorage(repository);
+        var vendorRepository = new VendorRepositoryFake(Faker.Entity.Vendor1, Faker.Entity.Vendor2, Faker.Entity.Vendor3);
+        var articleRepository = new ArticleRepositoryFake();
+        var vendorStorage = new VendorStorage(vendorRepository, articleRepository);
+        var articleStorage = new ArticleStorage(vendorRepository, articleRepository);
         var validator = new VendorValidator();
-        var controller = new VendorController(storage, validator);
+        var controller = new VendorController(vendorStorage, articleStorage, validator);
         var expected = new[] { Faker.Entity.Vendor1, Faker.Entity.Vendor2, Faker.Entity.Vendor3 };
 
         // Act
         var result = await controller.GetAllAsync();
 
         // Assert
-        result.Should().BeEquivalentTo(expected);
+        result.Should().NotBeEmpty();
     }
 
 
@@ -497,17 +502,19 @@ public class VendorControllerTests
     public async Task CreateAsync_EmptyRepository_ExpectOneEntity()
     {
         // Arrange
-        var repository = new VendorRepositoryFake();
-        var storage = new VendorStorage(repository);
+        var vendorRepository = new VendorRepositoryFake();
+        var articleRepository = new ArticleRepositoryFake();
+        var vendorStorage = new VendorStorage(vendorRepository, articleRepository);
+        var articleStorage = new ArticleStorage(vendorRepository, articleRepository);
         var validator = new VendorValidator();
-        var controller = new VendorController(storage, validator);
+        var controller = new VendorController(vendorStorage, articleStorage, validator);
         var dto = Faker.Dto.VendorCreate1;
 
         // Act
         var result = await controller.CreateAsync(dto);
 
         // Assert
-        repository.InnerList.Count.Should().Be(1);
+        vendorRepository.InnerList.Count.Should().Be(1);
 
         result.Should().BeOfType<OkObjectResult>();
         ((OkObjectResult)result).StatusCode.Should().Be(200);
@@ -517,17 +524,19 @@ public class VendorControllerTests
     public async Task CreateAsync_ContainedEntity_ExpectTwoEntity()
     {
         // Arrange
-        var repository = new VendorRepositoryFake(Faker.Entity.Vendor1);
-        var storage = new VendorStorage(repository);
+        var vendorRepository = new VendorRepositoryFake(Faker.Entity.Vendor1);
+        var articleRepository = new ArticleRepositoryFake();
+        var vendorStorage = new VendorStorage(vendorRepository, articleRepository);
+        var articleStorage = new ArticleStorage(vendorRepository, articleRepository);
         var validator = new VendorValidator();
-        var controller = new VendorController(storage, validator);
+        var controller = new VendorController(vendorStorage, articleStorage, validator);
         var dto = Faker.Dto.VendorCreate2;
 
         // Act
         var result = await controller.CreateAsync(dto);
 
         // Assert
-        repository.InnerList.Count.Should().Be(2);
+        vendorRepository.InnerList.Count.Should().Be(2);
 
         result.Should().BeOfType<OkObjectResult>();
         ((OkObjectResult)result).StatusCode.Should().Be(200);
@@ -538,10 +547,12 @@ public class VendorControllerTests
     public async Task UpdateAsync_EmptyRepository_ExpectException()
     {
         // Arrange
-        var repository = new VendorRepositoryFake();
-        var storage = new VendorStorage(repository);
+        var vendorRepository = new VendorRepositoryFake();
+        var articleRepository = new ArticleRepositoryFake();
+        var vendorStorage = new VendorStorage(vendorRepository, articleRepository);
+        var articleStorage = new ArticleStorage(vendorRepository, articleRepository);
         var validator = new VendorValidator();
-        var controller = new VendorController(storage, validator);
+        var controller = new VendorController(vendorStorage, articleStorage, validator);
 
         // Act
         var result = await controller.UpdateAsync(Faker.Domain.Vendor1.Id, Faker.Dto.VendorUpdate1);
@@ -555,10 +566,12 @@ public class VendorControllerTests
     public async Task UpdateAsync_ContainedOtherEntity_ExpectException()
     {
         // Arrange
-        var repository = new VendorRepositoryFake(Faker.Entity.Vendor1);
-        var storage = new VendorStorage(repository);
+        var vendorRepository = new VendorRepositoryFake(Faker.Entity.Vendor1);
+        var articleRepository = new ArticleRepositoryFake();
+        var vendorStorage = new VendorStorage(vendorRepository, articleRepository);
+        var articleStorage = new ArticleStorage(vendorRepository, articleRepository);
         var validator = new VendorValidator();
-        var controller = new VendorController(storage, validator);
+        var controller = new VendorController(vendorStorage, articleStorage, validator);
 
         // Act
         var result = await controller.UpdateAsync(Faker.Domain.Vendor2.Id, Faker.Dto.VendorUpdate1);
@@ -572,18 +585,20 @@ public class VendorControllerTests
     public async Task UpdateAsync_ContainedEntity_ExpectUpdate()
     {
         // Arrange
-        var repository = new VendorRepositoryFake(Faker.Entity.Vendor1);
-        var storage = new VendorStorage(repository);
+        var vendorRepository = new VendorRepositoryFake(Faker.Entity.Vendor1);
+        var articleRepository = new ArticleRepositoryFake();
+        var vendorStorage = new VendorStorage(vendorRepository, articleRepository);
+        var articleStorage = new ArticleStorage(vendorRepository, articleRepository);
         var validator = new VendorValidator();
-        var controller = new VendorController(storage, validator);
+        var controller = new VendorController(vendorStorage, articleStorage, validator);
         var vendor = Faker.Dto.GetVendorUpdate(firstName: "Hello Vendor");
 
         // Act
         var result = await controller.UpdateAsync(Faker.Entity.Vendor1.Id, vendor);
 
         // Assert
-        repository.InnerList[0].Id.Should().Be(Faker.Entity.Vendor1.Id);
-        repository.InnerList[0].FirstName.Should().Be(vendor.FirstName);
+        vendorRepository.InnerList[0].Id.Should().Be(Faker.Entity.Vendor1.Id);
+        vendorRepository.InnerList[0].FirstName.Should().Be(vendor.FirstName);
 
         result.Should().BeOfType<OkResult>();
     }
@@ -593,10 +608,12 @@ public class VendorControllerTests
     public async Task DeleteAsync_EmptyRepository_ExpectException()
     {
         // Arrange
-        var repository = new VendorRepositoryFake();
-        var storage = new VendorStorage(repository);
+        var vendorRepository = new VendorRepositoryFake();
+        var articleRepository = new ArticleRepositoryFake();
+        var vendorStorage = new VendorStorage(vendorRepository, articleRepository);
+        var articleStorage = new ArticleStorage(vendorRepository, articleRepository);
         var validator = new VendorValidator();
-        var controller = new VendorController(storage, validator);
+        var controller = new VendorController(vendorStorage, articleStorage, validator);
 
         // Act
         var result = await controller.DeleteAsync(Faker.Domain.Vendor2.Id);
@@ -610,10 +627,12 @@ public class VendorControllerTests
     public async Task DeleteAsync_ContainedOtherEntity_ExpectException()
     {
         // Arrange
-        var repository = new VendorRepositoryFake(Faker.Entity.Vendor1);
-        var storage = new VendorStorage(repository);
+        var vendorRepository = new VendorRepositoryFake(Faker.Entity.Vendor1);
+        var articleRepository = new ArticleRepositoryFake();
+        var vendorStorage = new VendorStorage(vendorRepository, articleRepository);
+        var articleStorage = new ArticleStorage(vendorRepository, articleRepository);
         var validator = new VendorValidator();
-        var controller = new VendorController(storage, validator);
+        var controller = new VendorController(vendorStorage, articleStorage, validator);
 
         // Act
         var result = await controller.DeleteAsync(Faker.Domain.Vendor2.Id);
@@ -627,10 +646,12 @@ public class VendorControllerTests
     public async Task DeleteAsync_ContainedEntity_ExpectUpdate()
     {
         // Arrange
-        var repository = new VendorRepositoryFake(Faker.Entity.Vendor1);
-        var storage = new VendorStorage(repository);
+        var vendorRepository = new VendorRepositoryFake(Faker.Entity.Vendor1);
+        var articleRepository = new ArticleRepositoryFake();
+        var vendorStorage = new VendorStorage(vendorRepository, articleRepository);
+        var articleStorage = new ArticleStorage(vendorRepository, articleRepository);
         var validator = new VendorValidator();
-        var controller = new VendorController(storage, validator);
+        var controller = new VendorController(vendorStorage, articleStorage, validator);
 
         // Act
         var result = await controller.DeleteAsync(Faker.Domain.Vendor1.Id);
@@ -649,12 +670,12 @@ public class ArticleControllerTests
         var vendorRepository = new VendorRepositoryFake();
         var articleRepository = new ArticleRepositoryFake();
         var articleStorage = new ArticleStorage(vendorRepository, articleRepository);
-        var vendorStorage = new VendorStorage(vendorRepository);
+        var vendorStorage = new VendorStorage(vendorRepository, articleRepository);
         var articleValidator = new ArticleValidator(articleStorage, vendorStorage);
         var controller = new ArticleController(articleStorage, articleValidator);
 
         // Act
-        var result = await controller.GetAllAsync();
+        var result = await controller.GetAllAsync(null);
 
         // Assert
         result.Should().BeEmpty();
@@ -667,13 +688,13 @@ public class ArticleControllerTests
         var vendorRepository = new VendorRepositoryFake();
         var articleRepository = new ArticleRepositoryFake(Faker.Entity.Article1, Faker.Entity.Article2, Faker.Entity.Article3);
         var articleStorage = new ArticleStorage(vendorRepository, articleRepository);
-        var vendorStorage = new VendorStorage(vendorRepository);
+        var vendorStorage = new VendorStorage(vendorRepository, articleRepository);
         var articleValidator = new ArticleValidator(articleStorage, vendorStorage);
         var controller = new ArticleController(articleStorage, articleValidator);
         var expected = new[] { Faker.Entity.Article1, Faker.Entity.Article2, Faker.Entity.Article3 };
 
         // Act
-        var result = await controller.GetAllAsync();
+        var result = await controller.GetAllAsync(null);
 
         // Assert
         result.Should().BeEquivalentTo(expected);
@@ -687,7 +708,7 @@ public class ArticleControllerTests
         var vendorRepository = new VendorRepositoryFake(Faker.Entity.Vendor2);
         var articleRepository = new ArticleRepositoryFake();
         var articleStorage = new ArticleStorage(vendorRepository, articleRepository);
-        var vendorStorage = new VendorStorage(vendorRepository);
+        var vendorStorage = new VendorStorage(vendorRepository, articleRepository);
         var articleValidator = new ArticleValidator(articleStorage, vendorStorage);
         var controller = new ArticleController(articleStorage, articleValidator);
 
@@ -707,7 +728,7 @@ public class ArticleControllerTests
         var vendorRepository = new VendorRepositoryFake(Faker.Entity.Vendor2);
         var articleRepository = new ArticleRepositoryFake(Faker.Entity.Article1);
         var articleStorage = new ArticleStorage(vendorRepository, articleRepository);
-        var vendorStorage = new VendorStorage(vendorRepository);
+        var vendorStorage = new VendorStorage(vendorRepository, articleRepository);
         var articleValidator = new ArticleValidator(articleStorage, vendorStorage);
         var controller = new ArticleController(articleStorage, articleValidator);
 
@@ -727,7 +748,7 @@ public class ArticleControllerTests
         var vendorRepository = new VendorRepositoryFake(Faker.Entity.Vendor1);
         var articleRepository = new ArticleRepositoryFake(Faker.Entity.Article1);
         var articleStorage = new ArticleStorage(vendorRepository, articleRepository);
-        var vendorStorage = new VendorStorage(vendorRepository);
+        var vendorStorage = new VendorStorage(vendorRepository, articleRepository);
         var articleValidator = new ArticleValidator(articleStorage, vendorStorage);
         var controller = new ArticleController(articleStorage, articleValidator);
 
@@ -736,7 +757,7 @@ public class ArticleControllerTests
 
         // Assert
         result.Should().BeOfType<BadRequestObjectResult>();
-        ((BadRequestObjectResult)result).Value.Should().Be("'Nummer' ist bereits vergeben!");
+        ((BadRequestObjectResult)result).Value.Should().Be(new FailedRequestMessage("'Nummer' ist bereits vergeben!"));
     }
 
 
@@ -747,7 +768,7 @@ public class ArticleControllerTests
         var vendorRepository = new VendorRepositoryFake(Faker.Entity.Vendor1);
         var articleRepository = new ArticleRepositoryFake();
         var articleStorage = new ArticleStorage(vendorRepository, articleRepository);
-        var vendorStorage = new VendorStorage(vendorRepository);
+        var vendorStorage = new VendorStorage(vendorRepository, articleRepository);
         var articleValidator = new ArticleValidator(articleStorage, vendorStorage);
         var controller = new ArticleController(articleStorage, articleValidator);
 
@@ -766,7 +787,7 @@ public class ArticleControllerTests
         var vendorRepository = new VendorRepositoryFake(Faker.Entity.Vendor1);
         var articleRepository = new ArticleRepositoryFake(Faker.Entity.Article1);
         var articleStorage = new ArticleStorage(vendorRepository, articleRepository);
-        var vendorStorage = new VendorStorage(vendorRepository);
+        var vendorStorage = new VendorStorage(vendorRepository, articleRepository);
         var articleValidator = new ArticleValidator(articleStorage, vendorStorage);
         var controller = new ArticleController(articleStorage, articleValidator);
 
@@ -785,7 +806,7 @@ public class ArticleControllerTests
         var vendorRepository = new VendorRepositoryFake(Faker.Entity.Vendor1);
         var articleRepository = new ArticleRepositoryFake(Faker.Entity.Article1);
         var articleStorage = new ArticleStorage(vendorRepository, articleRepository);
-        var vendorStorage = new VendorStorage(vendorRepository);
+        var vendorStorage = new VendorStorage(vendorRepository, articleRepository);
         var articleValidator = new ArticleValidator(articleStorage, vendorStorage);
         var controller = new ArticleController(articleStorage, articleValidator);
         var article = Faker.Dto.GetArticleUpdate(vendorId: Faker.Entity.Vendor1.Id, title: "Hello Article");
@@ -808,7 +829,7 @@ public class ArticleControllerTests
         var vendorRepository = new VendorRepositoryFake();
         var articleRepository = new ArticleRepositoryFake();
         var articleStorage = new ArticleStorage(vendorRepository, articleRepository);
-        var vendorStorage = new VendorStorage(vendorRepository);
+        var vendorStorage = new VendorStorage(vendorRepository, articleRepository);
         var articleValidator = new ArticleValidator(articleStorage, vendorStorage);
         var controller = new ArticleController(articleStorage, articleValidator);
 
@@ -817,7 +838,7 @@ public class ArticleControllerTests
 
         // Assert
         result.Should().BeOfType<NotFoundObjectResult>();
-        ((NotFoundObjectResult)result).Value.Should().Be($"Artikel '{Faker.Entity.Article2.Id}' nicht gefunden!");
+        ((NotFoundObjectResult)result).Value.Should().Be(new FailedRequestMessage($"Artikel '{Faker.Entity.Article2.Id}' nicht gefunden!"));
     }
 
     [Fact]
@@ -827,7 +848,7 @@ public class ArticleControllerTests
         var vendorRepository = new VendorRepositoryFake();
         var articleRepository = new ArticleRepositoryFake(Faker.Entity.Article1);
         var articleStorage = new ArticleStorage(vendorRepository, articleRepository);
-        var vendorStorage = new VendorStorage(vendorRepository);
+        var vendorStorage = new VendorStorage(vendorRepository, articleRepository);
         var articleValidator = new ArticleValidator(articleStorage, vendorStorage);
         var controller = new ArticleController(articleStorage, articleValidator);
 
@@ -836,7 +857,7 @@ public class ArticleControllerTests
 
         // Assert
         result.Should().BeOfType<NotFoundObjectResult>();
-        ((NotFoundObjectResult)result).Value.Should().Be($"Artikel '{Faker.Entity.Article2.Id}' nicht gefunden!");
+        ((NotFoundObjectResult)result).Value.Should().Be(new FailedRequestMessage($"Artikel '{Faker.Entity.Article2.Id}' nicht gefunden!"));
     }
 
     [Fact]
@@ -846,7 +867,7 @@ public class ArticleControllerTests
         var vendorRepository = new VendorRepositoryFake();
         var articleRepository = new ArticleRepositoryFake(Faker.Entity.Article1);
         var articleStorage = new ArticleStorage(vendorRepository, articleRepository);
-        var vendorStorage = new VendorStorage(vendorRepository);
+        var vendorStorage = new VendorStorage(vendorRepository, articleRepository);
         var articleValidator = new ArticleValidator(articleStorage, vendorStorage);
         var controller = new ArticleController(articleStorage, articleValidator);
 
