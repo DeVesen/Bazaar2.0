@@ -29,42 +29,13 @@ public class ArticleService
             ["SearchText"] = searchText
         };
 
-        var dtoList = await _httpClient.GetFromJsonAsync<IEnumerable<ArticleDto>>(queryBuilder.BuildFinal());
-
-        return dtoList!.Select(data => new Article
-        {
-            Id = data.Id,
-            VendorId = data.VendorId,
-            Number = data.Number,
-            Title = data.Title,
-            ArticleCategory = data.ArticleCategory,
-            Manufacturer = data.Manufacturer,
-            Created = data.Created,
-            ApprovedForSale = data.ApprovedForSale,
-            Sold = data.Sold,
-            SoldAt = data.SoldAt,
-            Settled = data.Settled,
-            Price01 = data.Price01,
-            Price02 = data.Price02,
-            Description = data.Description
-        });
+        return await _httpClient.GetFromJsonAsync<IEnumerable<Article>>(queryBuilder.BuildFinal()) ?? Enumerable.Empty<Article>();
     }
 
     public async Task<Response> CreateAsync(Article element)
     {
         var requestUri = _httpClient.BaseAddress;
-        var createDto = new ArticleCreateDto
-        {
-            VendorId = element.VendorId,
-            Number = element.Number,
-            Title = element.Title,
-            ArticleCategory = element.ArticleCategory,
-            Manufacturer = element.Manufacturer,
-            ApprovedForSale = element.ApprovedForSale,
-            Price01 = element.Price01,
-            Price02 = element.Price02,
-            Description = element.Description
-        };
+        var createDto = element.ToCreateDto();
 
         var response = await _httpClient.PostAsJsonAsync(requestUri, createDto);
 
@@ -83,22 +54,7 @@ public class ArticleService
     public async Task<Response> UpdateAsync(Article element)
     {
         var requestUri = _httpClient.BaseAddress + $"/{element.Id}";
-        var updateDto = new ArticleUpdateDto
-        {
-            VendorId = element.VendorId,
-            Number = element.Number,
-            Title = element.Title,
-            ArticleCategory = element.ArticleCategory,
-            Manufacturer = element.Manufacturer,
-            Created = element.Created,
-            ApprovedForSale = element.ApprovedForSale,
-            Sold = element.Sold,
-            SoldAt = element.SoldAt,
-            Settled = element.Settled,
-            Price01 = element.Price01,
-            Price02 = element.Price02,
-            Description = element.Description
-        };
+        var updateDto = element.ToUpdateDto();
 
         var response = await _httpClient.PutAsJsonAsync(requestUri, updateDto);
 
@@ -132,43 +88,18 @@ public class ArticleService
         return Response.Invalid();
     }
 
-    public bool FilterFunc(Manufacturer dto, string filterString)
+    public async Task<Response> ApproveAsync(long number)
     {
-        if (string.IsNullOrWhiteSpace(filterString))
-            return true;
+        var requestUri = _httpClient.BaseAddress + $"/{number}/approve";
+        var response = await _httpClient.PostAsync(requestUri, null);
 
-        if (dto.Name.Contains(filterString, StringComparison.OrdinalIgnoreCase))
-            return true;
+        if (response.IsSuccessStatusCode)
+        {
+            return Response.Valid();
+        }
 
-        return false;
+        var message = await response.Content.ReadFromJsonAsync<FailedRequestMessage>();
+
+        return Response.Invalid(message!.Message);
     }
-}
-
-public class ApiQueryBuilder
-{
-    private readonly Dictionary<string, string?> _innerDict = new();
-
-    public string? this[string key]
-    {
-        get => _innerDict.TryGetValue(key, out var value) ? value : null;
-        set => _innerDict[key] = value;
-    }
-
-    public void Set(string key, string value)
-    {
-        _innerDict[key] = value;
-    }
-
-    public string Build()
-    {
-        var queryParts = GetQueryParts();
-        var result = queryParts.Aggregate("", (current, next) => current + "&" + next);
-        return result.TrimStart('&').Trim();
-    }
-
-    public string BuildFinal()
-        => "?" + Build();
-
-    private IEnumerable<string> GetQueryParts()
-        => _innerDict.Where(p => p.Value != null).Select(item => $"{item.Key}={item.Value}");
 }

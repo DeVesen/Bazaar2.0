@@ -4,6 +4,7 @@ using DeVesen.Bazaar.Server.Extensions;
 using DeVesen.Bazaar.Server.Repository.LiteDb;
 using DeVesen.Bazaar.Server.Storage;
 using DeVesen.Bazaar.Server.Validator;
+using DeVesen.Bazaar.Shared.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +14,8 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
 builder.Services.AddSingleton<ILiteDbEngine, LiteDbEngine>(_ => new LiteDbEngine(AppEnvironment.GetDataFilePath("bazaar.data.db")));
+
+builder.Services.AddTransient<SystemClock>();
 
 builder.Services.AddTransient<IArticleCategoryRepository, ArticleCategoryLiteDbRepository>()
                 .AddTransient<IManufacturerRepository, ManufacturerLiteDbRepository>()

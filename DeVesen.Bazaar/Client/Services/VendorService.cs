@@ -2,7 +2,6 @@
 using DeVesen.Bazaar.Client.Domain;
 using DeVesen.Bazaar.Client.Extensions;
 using DeVesen.Bazaar.Client.Models;
-using DeVesen.Bazaar.Shared;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
 namespace DeVesen.Bazaar.Client.Services;
@@ -21,27 +20,25 @@ public class VendorService
 
     public async Task<Vendor?> GetAsync(string id)
     {
-        return (await _httpClient.GetFromJsonAsync<IEnumerable<VendorView>>(""))!.FirstOrDefault(p => p.Item.Id == id)?.Item;
+        return (await GetAllAsync(id)).FirstOrDefault()?.Item;
     }
 
-    public async Task<IEnumerable<VendorView>> GetAllAsync()
+    public async Task<IEnumerable<VendorView>> GetAllAsync(string? id = null, string? salutation = null, string? searchText = null)
     {
-        return (await _httpClient.GetFromJsonAsync<IEnumerable<VendorView>>(""))!;
+        var queryBuilder = new ApiQueryBuilder
+        {
+            ["Id"] = id,
+            ["Salutation"] = salutation,
+            ["SearchText"] = searchText
+        };
+
+        return await _httpClient.GetFromJsonAsync<IEnumerable<VendorView>>(queryBuilder.BuildFinal()) ?? Enumerable.Empty<VendorView>();
     }
 
     public async Task<Response<Vendor>> CreateAsync(Vendor element)
     {
         var requestUri = _httpClient.BaseAddress;
-        var createDto = new VendorCreateDto
-        {
-            Salutation = element.Salutation,
-            FirstName = element.FirstName,
-            LastName = element.LastName,
-            Address = element.Address,
-            EMail = element.EMail,
-            Phone = element.Phone,
-            Note = element.Note
-        };
+        var createDto = element.ToCreateDto();
 
         var response = await _httpClient.PostAsJsonAsync(requestUri, createDto);
 
@@ -60,16 +57,7 @@ public class VendorService
     public async Task<Response> UpdateAsync(Vendor element)
     {
         var requestUri = _httpClient.BaseAddress + $"/{element.Id}";
-        var updateDto = new VendorUpdateDto
-        {
-            Salutation = element.Salutation,
-            FirstName = element.FirstName,
-            LastName = element.LastName,
-            Address = element.Address,
-            EMail = element.EMail,
-            Phone = element.Phone,
-            Note = element.Note
-        };
+        var updateDto = element.ToUpdateDto();
 
         var response = await _httpClient.PutAsJsonAsync(requestUri, updateDto);
 

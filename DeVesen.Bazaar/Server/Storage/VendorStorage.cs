@@ -20,9 +20,28 @@ public class VendorStorage
         return await _vendorRepository.ExistByIdAsync(id);
     }
 
-    public async Task<IEnumerable<Vendor>> GetAllAsync()
+    public async Task<IEnumerable<Vendor>> GetAllAsync(VendorFilter filter)
     {
         var elements = await _vendorRepository.GetAllAsync();
+
+        if (string.IsNullOrWhiteSpace(filter.Id) is false)
+        {
+            elements = elements.Where(p => p.Id == filter.Id);
+        }
+        if (string.IsNullOrWhiteSpace(filter.Salutation) is false)
+        {
+            elements = elements.Where(p => p.Salutation == filter.Salutation);
+        }
+        if (string.IsNullOrWhiteSpace(filter.SearchText) is false)
+        {
+            elements = elements.Where(p => p.FirstName.BiContainsIgnoreCase(filter.SearchText)
+                                        || p.LastName.BiContainsIgnoreCase(filter.SearchText)
+                                        || p.Address.BiContainsIgnoreCase(filter.SearchText)
+                                        || p.Phone.BiContainsIgnoreCase(filter.SearchText)
+                                        || p.EMail.BiContainsIgnoreCase(filter.SearchText)
+                                        || p.Note.BiContainsIgnoreCase(filter.SearchText));
+        }
+
         return elements.Select(p => p.ToDomain());
     }
 

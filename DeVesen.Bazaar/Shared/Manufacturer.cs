@@ -3,10 +3,20 @@
 namespace DeVesen.Bazaar.Shared;
 
 [ExcludeFromCodeCoverage]
-public record ManufacturerDto(string Id, string Name);
+public record ManufacturerDto
+{
+    public required string Id { get; init; }
+    public required string Name { get; init; }
+}
 
 [ExcludeFromCodeCoverage]
-public record ManufacturerCreateDto(string Name);
+public record ManufacturerCreateDto
+{
+    public required string Name { get; init; }
+}
 
 [ExcludeFromCodeCoverage]
-public record ManufacturerUpdateDto(string Name);
+public record ManufacturerUpdateDto
+{
+    public required string Name { get; init; }
+}

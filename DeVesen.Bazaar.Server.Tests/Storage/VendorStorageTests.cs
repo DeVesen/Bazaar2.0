@@ -1,4 +1,5 @@
-﻿using DeVesen.Bazaar.Server.Storage;
+﻿using DeVesen.Bazaar.Server.Domain;
+using DeVesen.Bazaar.Server.Storage;
 using DeVesen.Bazaar.Server.Tests.Fake.Repository;
 using FluentAssertions;
 
@@ -58,10 +59,11 @@ public class VendorStorageTests
         // Arrange
         var vendorRepository = new VendorRepositoryFake();
         var articleRepository = new ArticleRepositoryFake();
+        var vendorFilter = new VendorFilter();
         var storage = new VendorStorage(vendorRepository, articleRepository);
 
         // Act
-        var result = await storage.GetAllAsync();
+        var result = await storage.GetAllAsync(vendorFilter);
 
         // Assert
         result.Should().BeEmpty();
@@ -74,10 +76,11 @@ public class VendorStorageTests
         var expected = new[] { Faker.Entity.Vendor1, Faker.Entity.Vendor2, Faker.Entity.Vendor3 };
         var vendorRepository = new VendorRepositoryFake(Faker.Entity.Vendor1, Faker.Entity.Vendor2, Faker.Entity.Vendor3);
         var articleRepository = new ArticleRepositoryFake();
+        var vendorFilter = new VendorFilter();
         var storage = new VendorStorage(vendorRepository, articleRepository);
 
         // Act
-        var result = await storage.GetAllAsync();
+        var result = await storage.GetAllAsync(vendorFilter);
 
         // Assert
         result.Should().BeEquivalentTo(expected);

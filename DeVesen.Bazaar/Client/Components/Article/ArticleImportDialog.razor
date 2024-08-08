@@ -2,6 +2,7 @@
 @using DeVesen.Bazaar.Client.Components.Common.Buttons
 @using DeVesen.Bazaar.Client.Models
 @using DeVesen.Bazaar.Client.Services
+@using DeVesen.Bazaar.Shared.Services
 
 @inject ArticleService ArticleService
 @inject SystemClock SystemClock
@@ -21,14 +22,10 @@
                 }
 
             </MudItem>
-            
-            <MudItem>
-                @_loadedData
-            </MudItem>
         </MudGrid>
     </DialogContent>
     <DialogActions>
-        <DvButtonCancel OnClick="Cancel" />
+        <DvButtonClose OnClick="OnCloseAsync" />
     </DialogActions>
 </MudDialog>
 
@@ -38,9 +35,8 @@
     [Parameter] public required string VendorId { get; set; }
 
     private bool _isLoadingData = false;
-    private string _loadedData = string.Empty;
 
-    private void Cancel() => MudDialog.Cancel();
+    private void OnCloseAsync() => MudDialog.Close();
 
     private async Task OnFilesChangedAsync(InputFileChangeEventArgs file)
     {

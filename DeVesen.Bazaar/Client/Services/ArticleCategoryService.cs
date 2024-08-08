@@ -3,7 +3,6 @@ using System.Net.Http.Json;
 using DeVesen.Bazaar.Client.Domain;
 using DeVesen.Bazaar.Client.Extensions;
 using DeVesen.Bazaar.Client.Models;
-using DeVesen.Bazaar.Shared;
 
 namespace DeVesen.Bazaar.Client.Services;
 
@@ -29,19 +28,13 @@ public class ArticleCategoryService
 
     public async Task<IEnumerable<ArticleCategory>> GetAllAsync()
     {
-        var dtoList = await _httpClient.GetFromJsonAsync<IEnumerable<ArticleCategoryDto>>("");
-
-        return dtoList!.Select(p => new ArticleCategory
-        {
-            Id = p.Id,
-            Name = p.Name
-        });
+        return await _httpClient.GetFromJsonAsync<IEnumerable<ArticleCategory>>("") ?? Enumerable.Empty<ArticleCategory>();
     }
 
     public async Task<Response> CreateAsync(ArticleCategory element)
     {
         var requestUri = _httpClient.BaseAddress;
-        var createDto = new ArticleCategoryCreateDto(element.Name);
+        var createDto = element.ToCreateDto();
 
         var response = await _httpClient.PostAsJsonAsync(requestUri, createDto);
 
@@ -58,7 +51,7 @@ public class ArticleCategoryService
     public async Task<Response> UpdateAsync(ArticleCategory element)
     {
         var requestUri = _httpClient.BaseAddress + $"/{element.Id}";
-        var updateDto = new ArticleCategoryUpdateDto(element.Name);
+        var updateDto = element.ToUpdateDto();
 
         var response = await _httpClient.PutAsJsonAsync(requestUri, updateDto);
 
@@ -90,12 +83,7 @@ public class ArticleCategoryService
 
     public bool FilterFunc(ArticleCategory dto, string filterString)
     {
-        if (string.IsNullOrWhiteSpace(filterString))
-            return true;
-
-        if (dto.Name.Contains(filterString, StringComparison.OrdinalIgnoreCase))
-            return true;
-
-        return false;
+        return string.IsNullOrWhiteSpace(filterString)
+            || dto.Name.Contains(filterString, StringComparison.OrdinalIgnoreCase);
     }
 }

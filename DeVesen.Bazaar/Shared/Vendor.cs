@@ -3,6 +3,13 @@
 namespace DeVesen.Bazaar.Shared;
 
 [ExcludeFromCodeCoverage]
+public record VendorFilterDto
+{
+    public string? Id { get; init; } = null;
+    public string? SearchText { get; init; } = null;
+}
+
+[ExcludeFromCodeCoverage]
 public record VendorDto
 {
     public required string Id { get; init; }

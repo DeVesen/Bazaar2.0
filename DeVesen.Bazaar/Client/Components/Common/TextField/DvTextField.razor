@@ -4,7 +4,8 @@
 
 <div style="@OuterStyle" class="@OuterClass">
     <CascadingValue Value="false" Name="SubscribeToParentForm" IsFixed>
-        <MudTextField T="T"
+        <MudTextField @ref="_textField"
+                      T="T"
                       ShrinkLabel="@ShrinkLabel"
                       Margin="@Margin"
                       Variant="@Variant"
@@ -75,6 +76,8 @@
     [Parameter]
     public string? OuterClass { get; set; }
 
+    private MudTextField<T> _textField = null!;
+
     private async Task OnTextChanged(string newText)
     {
         await SetTextAsync(newText);
@@ -92,5 +95,34 @@
         Console.WriteLine($"ErrorText=>{ErrorText}");
 
         ForceRender(true);
+    }
+    
+    public new Task Clear()
+    {
+        return _textField.Clear();
+    }
+
+    /// <inheritdoc />
+    public override ValueTask FocusAsync()
+    {
+        return _textField.FocusAsync();
+    }
+
+    /// <inheritdoc />
+    public override ValueTask BlurAsync()
+    {
+        return _textField.BlurAsync();
+    }
+
+    /// <inheritdoc />
+    public override ValueTask SelectAsync()
+    {
+        return _textField.SelectAsync();
+    }
+
+    /// <inheritdoc />
+    public override ValueTask SelectRangeAsync(int pos1, int pos2)
+    {
+        return _textField.SelectRangeAsync(pos1, pos2);
     }
 }

@@ -3,6 +3,7 @@ using DeVesen.Bazaar.Client.Extensions;
 using DeVesen.Bazaar.Client.Services;
 using DeVesen.Bazaar.Client.State.ArticleOverview;
 using DeVesen.Bazaar.Client.Validator;
+using DeVesen.Bazaar.Shared.Services;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor.Services;

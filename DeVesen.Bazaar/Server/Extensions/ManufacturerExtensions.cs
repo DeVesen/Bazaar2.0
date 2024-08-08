@@ -37,7 +37,11 @@ public static class ManufacturerExtensions
         };
 
     public static ManufacturerDto ToDto(this Manufacturer data)
-        => new(data.Id, data.Name);
+        => new()
+        {
+            Id = data.Id,
+            Name = data.Name
+        };
 
     private static string ToShortHash(this ManufacturerCreateDto dto)
     {

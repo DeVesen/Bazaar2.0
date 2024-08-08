@@ -2,7 +2,6 @@
 using DeVesen.Bazaar.Client.Domain;
 using DeVesen.Bazaar.Client.Extensions;
 using DeVesen.Bazaar.Client.Models;
-using DeVesen.Bazaar.Shared;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
 namespace DeVesen.Bazaar.Client.Services;
@@ -30,19 +29,13 @@ public class ManufacturerService
 
     public async Task<IEnumerable<Manufacturer>> GetAllAsync()
     {
-        var dtoList = await _httpClient.GetFromJsonAsync<IEnumerable<ManufacturerDto>>("");
-
-        return dtoList!.Select(p => new Manufacturer
-        {
-            Id = p.Id,
-            Name = p.Name
-        });
+        return await _httpClient.GetFromJsonAsync<IEnumerable<Manufacturer>>("") ?? Enumerable.Empty<Manufacturer>();
     }
 
     public async Task<Response> CreateAsync(Manufacturer element)
     {
         var requestUri = _httpClient.BaseAddress;
-        var createDto = new ManufacturerCreateDto(element.Name);
+        var createDto = element.ToCreateDto();
 
         var response = await _httpClient.PostAsJsonAsync(requestUri, createDto);
 
@@ -59,7 +52,7 @@ public class ManufacturerService
     public async Task<Response> UpdateAsync(Manufacturer element)
     {
         var requestUri = _httpClient.BaseAddress + $"/{element.Id}";
-        var updateDto = new ManufacturerUpdateDto(element.Name);
+        var updateDto = element.ToCreateDto();
 
         var response = await _httpClient.PutAsJsonAsync(requestUri, updateDto);
 

@@ -26,9 +26,9 @@ public class VendorController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IEnumerable<VendorViewDto>> GetAllAsync()
+    public async Task<IEnumerable<VendorViewDto>> GetAllAsync([FromQuery] VendorFilter? parameters)
     {
-        var allVendors = (await _vendorStorage.GetAllAsync()).ToArray();
+        var allVendors = (await _vendorStorage.GetAllAsync(parameters ?? new VendorFilter())).ToArray();
         var allVendorArticleStats = (await _articleStorage.GetStatisticPerVendor()).ToArray();
 
         var groupedItems = from vendor in allVendors

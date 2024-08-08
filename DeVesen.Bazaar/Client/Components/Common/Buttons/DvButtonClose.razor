@@ -1,0 +1,20 @@
+﻿<MudButton StartIcon="@Icons.Material.Filled.Save"
+           Variant="Variant.Filled"
+           Color="Color.Surface"
+           Disabled="@(Enabled is false)"
+           OnClick="OnClick">Schließen</MudButton>
+
+@code {
+    /// <summary>
+    /// If true, the button will be enabled.
+    /// </summary>
+    [Parameter]
+    [Category(CategoryTypes.Button.Behavior)]
+    public bool Enabled { get; set; } = true;
+
+    /// <summary>
+    /// Button click event.
+    /// </summary>
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnClick { get; set; }
+}

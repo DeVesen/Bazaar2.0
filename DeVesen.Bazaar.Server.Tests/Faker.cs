@@ -160,12 +160,18 @@ public static class Faker
         public static ArticleCategoryCreateDto ArticleCategoryCreate01 => GetArticleCategoryCreate("ArticleCategory_1");
         public static ArticleCategoryCreateDto ArticleCategoryCreate02 => GetArticleCategoryCreate("ArticleCategory_2");
         public static ArticleCategoryCreateDto GetArticleCategoryCreate(string? name = null)
-            => new(name ?? $"AC_{Guid.NewGuid()}");
+            => new()
+            {
+                Name = name ?? $"AC_{Guid.NewGuid()}"
+            };
 
         public static ArticleCategoryUpdateDto ArticleCategoryUpdate01 => GetArticleCategoryUpdate("ArticleCategory_1");
         public static ArticleCategoryUpdateDto ArticleCategoryUpdate02 => GetArticleCategoryUpdate("ArticleCategory_2");
         public static ArticleCategoryUpdateDto GetArticleCategoryUpdate(string? name = null)
-            => new(name ?? $"AC_{Guid.NewGuid()}");
+            => new()
+            {
+                Name = name ?? $"AC_{Guid.NewGuid()}"
+            };
 
 
         public static ManufacturerEntity Manufacturer1 => GetManufacturerEntity("4", "Manufacturer_1");
@@ -180,12 +186,18 @@ public static class Faker
         public static ManufacturerCreateDto ManufacturerCreate01 => GetManufacturerCreate("Manufacturer_1");
         public static ManufacturerCreateDto ManufacturerCreate02 => GetManufacturerCreate("Manufacturer_2");
         public static ManufacturerCreateDto GetManufacturerCreate(string? name = null)
-            => new(name ?? $"AC_{Guid.NewGuid()}");
+            => new()
+            {
+                Name = name ?? $"AC_{Guid.NewGuid()}"
+            };
 
         public static ManufacturerUpdateDto ManufacturerUpdate01 => GetManufacturerUpdate("Manufacturer_1");
         public static ManufacturerUpdateDto ManufacturerUpdate02 => GetManufacturerUpdate("Manufacturer_2");
         public static ManufacturerUpdateDto GetManufacturerUpdate(string? name = null)
-            => new(name ?? $"AC_{Guid.NewGuid()}");
+            => new()
+            {
+                Name = name ?? $"AC_{Guid.NewGuid()}"
+            };
 
 
         public static ArticleCreateDto ArticleCreate01 => GetArticleCreate(number: 1, title: "Article_1", vendorId: "61eb9e6e");

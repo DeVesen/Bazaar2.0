@@ -113,16 +113,6 @@ public static class ArticleExtensions
             Turnover = data.Turnover
         };
 
-    public static ArticleFilter ToDomain(this ArticleFilterDto? dto)
-        => dto != null
-            ? new()
-            {
-                VendorId = dto.VendorId,
-                Number = dto.Number,
-                SearchText = dto.SearchText
-            }
-            : new ArticleFilter();
-
     private static string ToShortHash(this ArticleCreateDto dto)
     {
         var builder = new StringBuilder();

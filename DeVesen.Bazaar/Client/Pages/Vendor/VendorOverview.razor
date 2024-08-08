@@ -33,7 +33,8 @@
                 <VendorCard VendorItem="@element"
                             OnEdit="x => ModifyElementAsync(x.Item)"
                             OnArticle="OnArticleAsync"
-                            OnImportArticle="OnImportArticleAsync" />
+                            OnImportArticles="OnImportArticlesAsync"
+                            OnApproveArticles="OnApproveArticlesAsync" />
             </MudItem>
         }
     </MudGrid>
@@ -100,7 +101,7 @@
         await Task.CompletedTask;
     }
 
-    private async Task OnImportArticleAsync(VendorView args)
+    private async Task OnImportArticlesAsync(VendorView args)
     {
         var parameters = new DialogParameters<ArticleImportDialog> { { x => x.VendorId, args.Item.Id } };
 
@@ -114,6 +115,21 @@
                            .WaitForResult();
         
         await ReloadElementsAsync();
+    }
+
+    private async Task OnApproveArticlesAsync(VendorView args)
+    {
+        var parameters = new DialogParameters<ArticleApprovalDialog> { { x => x.VendorId, args.Item.Id } };
+
+        var options = new DialogOptions
+        {
+            CloseOnEscapeKey = true,
+            BackdropClick = false
+        };
+
+        await DialogService.ShowAsync<ArticleApprovalDialog>("Artikel freigeben", parameters, options);
+
+        StateHasChanged();
     }
 
     private async Task OnSearchChangedAsync(string newValue)
@@ -132,22 +148,14 @@
 
     private async Task ReloadElementsAsync()
     {
-        _elements = await VendorService.GetAllAsync();
+        var salutation = _genderType != ToolBarGenederSelect.GenderType.All
+                            ? _genderType.ToString()
+                            : null;
 
-        _elements = _elements.Where(p => p.Contains(_searchText));
+        _elements = await VendorService.GetAllAsync(salutation: salutation, searchText: _searchText);
 
         _elements = _elements.OrderBy(p => p.Item.LastName)
                              .ThenBy(p => p.Item.FirstName)
                              .ThenBy(p => p.Item.Salutation);
-
-        switch (_genderType)
-        {
-            case ToolBarGenederSelect.GenderType.Male:
-                _elements = _elements.Where(p => p.Item.Salutation == "Male");
-                break;
-            case ToolBarGenederSelect.GenderType.Female:
-                _elements = _elements.Where(p => p.Item.Salutation == "Female");
-                break;
-        }
     }
 }

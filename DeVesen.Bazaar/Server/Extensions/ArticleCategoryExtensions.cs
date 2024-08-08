@@ -37,7 +37,11 @@ public static class ArticleCategoryExtensions
         };
 
     public static ArticleCategoryDto ToDto(this ArticleCategory data)
-        => new(data.Id, data.Name);
+        => new()
+        {
+            Id = data.Id,
+            Name = data.Name
+        };
 
     private static string ToShortHash(this ArticleCategoryCreateDto dto)
     {

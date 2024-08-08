@@ -12,8 +12,8 @@ public record Article
     public required double Price01 { get; init; }
     public double? Price02 { get; init; }
     public string? Description { get; init; }
-    public DateTime? ApprovedForSale { get; init; } = null;
-    public DateTime? Sold { get; init; } = null;
-    public double? SoldAt { get; init; } = null;
-    public DateTime? Settled { get; init; } = null;
+    public DateTime? ApprovedForSale { get; set; } = null;
+    public DateTime? Sold { get; set; } = null;
+    public double? SoldAt { get; set; } = null;
+    public DateTime? Settled { get; set; } = null;
 }
