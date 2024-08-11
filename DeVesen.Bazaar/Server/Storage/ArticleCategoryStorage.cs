@@ -43,7 +43,7 @@ namespace DeVesen.Bazaar.Server.Storage
         {
             if (await ExistByNameAsync(name) is false)
             {
-                throw new InvalidDataException($"Name '{name}' not found!");
+                throw new InvalidDataException($"SearchText '{name}' not found!");
             }
 
             var element = await _articleCategoryRepository.GetByNameAsync(name);
@@ -64,7 +64,7 @@ namespace DeVesen.Bazaar.Server.Storage
             }
             if (await ExistByNameAsync(element.Name))
             {
-                throw new InvalidDataException($"Name '{element.Name}' already exist!");
+                throw new InvalidDataException($"SearchText '{element.Name}' already exist!");
             }
 
             await _articleCategoryRepository.CreateAsync(element.ToEntity());
@@ -82,7 +82,7 @@ namespace DeVesen.Bazaar.Server.Storage
 
                 if (entity != null && entity.Id != element.Id)
                 {
-                    throw new InvalidDataException($"Name '{element.Name}' already exist!");
+                    throw new InvalidDataException($"SearchText '{element.Name}' already exist!");
                 }
             }
 

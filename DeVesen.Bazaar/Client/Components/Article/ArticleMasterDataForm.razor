@@ -3,10 +3,11 @@
 @using DeVesen.Bazaar.Client.Validator
 @using DeVesen.Bazaar.Client.Components.Common.Autocomplete
 @using DeVesen.Bazaar.Client.Components.Common.TextField
+@using DeVesen.Bazaar.Client.State.Manufacturer
 
 @inject ArticleValidator ArticleValidator
 @inject ArticleCategoryService ArticleCategoryService
-@inject ManufacturerService ManufacturerService
+@inject ManufacturerFacade ManufacturerFacade
 
 <MudForm IsValid="IsValid"
          IsValidChanged="OnIsValidChanged"
@@ -38,7 +39,7 @@
                             Label="Kategorie"
                             @bind-Value="ArticleItem.ArticleCategory"
                             For="@(() => ArticleItem.ArticleCategory)"
-                            SearchFunc="@CategoryAutoCompleteSearch" />
+                            SearchFunc="@CategoryAutoCompleteSearchAsync" />
         </MudItem>
         <MudItem xs="12" sm="6">
             <DvAutocomplete T="string"
@@ -46,7 +47,7 @@
                             Label="Hersteller"
                             @bind-Value="ArticleItem.Manufacturer"
                             For="@(() => ArticleItem.Manufacturer)"
-                            SearchFunc="@ManufacturerAutoCompleteSearch" />
+                            SearchFunc="@ManufacturerAutoCompleteSearchAsync" />
         </MudItem>
         <MudItem xs="12" sm="6">
             <DvTextField T="double"
@@ -113,7 +114,7 @@
         await ArticleItemChanged.InvokeAsync(ArticleItem);
     }
 
-    private async Task<IEnumerable<string>> CategoryAutoCompleteSearch(string value, CancellationToken token)
+    private async Task<IEnumerable<string>> CategoryAutoCompleteSearchAsync(string value, CancellationToken token)
     {
         var elements = await ArticleCategoryService.GetAllAsync();
         return elements.Where(Compare)
@@ -125,11 +126,13 @@
         }
     }
 
-    private async Task<IEnumerable<string>> ManufacturerAutoCompleteSearch(string value, CancellationToken token)
+    private async Task<IEnumerable<string>> ManufacturerAutoCompleteSearchAsync(string value, CancellationToken token)
     {
-        var elements = await ManufacturerService.GetAllAsync();
-        return elements.Where(Compare)
-                       .Select(p => p.Name);
+        var elements = ManufacturerFacade.GetManufacturer()
+                                         .Where(Compare)
+                                         .Select(p => p.Name);
+
+        return await Task.FromResult(elements);
 
         bool Compare(Manufacturer category)
         {

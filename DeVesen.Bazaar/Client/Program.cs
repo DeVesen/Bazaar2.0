@@ -2,6 +2,7 @@ using DeVesen.Bazaar.Client;
 using DeVesen.Bazaar.Client.Extensions;
 using DeVesen.Bazaar.Client.Services;
 using DeVesen.Bazaar.Client.State.ArticleOverview;
+using DeVesen.Bazaar.Client.State.Manufacturer;
 using DeVesen.Bazaar.Client.State.VendorOverview;
 using DeVesen.Bazaar.Client.Validator;
 using DeVesen.Bazaar.Shared.Services;
@@ -19,6 +20,7 @@ builder.Services.AddMudServices()
 
 builder.Services.AddTransient<ArticleOverviewFacade>();
 builder.Services.AddTransient<VendorOverviewFacade>();
+builder.Services.AddTransient<ManufacturerFacade>();
 
 builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 

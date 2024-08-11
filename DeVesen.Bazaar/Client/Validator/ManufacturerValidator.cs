@@ -15,7 +15,7 @@ public class ManufacturerValidator : BaseValidator<Manufacturer>
             .NotNull().WithMessage("'Bezeichnung' darf nicht leer sein!")
             .NotEmpty().WithMessage("'Bezeichnung' darf nicht leer sein!")
             .MaximumLength(20).WithMessage("'Bezeichnung' darf nicht lönger 20 Zeichen sein!")
-            .MustAsync(BeUniqueNameAsync).WithMessage("Name ist bereits vergeben!");
+            .MustAsync(BeUniqueNameAsync).WithMessage("SearchText ist bereits vergeben!");
     }
 
     private async Task<bool> BeUniqueNameAsync(Manufacturer dto, string name, CancellationToken _)

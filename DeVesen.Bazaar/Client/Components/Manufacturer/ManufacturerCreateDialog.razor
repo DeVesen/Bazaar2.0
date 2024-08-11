@@ -37,8 +37,10 @@
     {
         await ArticleCategoryService.CreateAsync(_item);
 
-        MudDialog.Close(DialogResult.Ok(ForceNext));
+        MudDialog.Close(DialogResult.Ok(new OkResult(ForceNext)));
     }
 
     private void Cancel() => MudDialog.Cancel();
+
+    public record OkResult(bool ForceNext);
 }

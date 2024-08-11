@@ -103,7 +103,7 @@ public class ManufacturerStorageTests
         var act = () => storage.GetByNameAsync(Faker.Entity.Manufacturer1.Name);
 
         // Assert
-        (await act.Should().ThrowAsync<InvalidDataException>()).WithMessage($"Name '{Faker.Entity.Manufacturer1.Name}' not found!");
+        (await act.Should().ThrowAsync<InvalidDataException>()).WithMessage($"SearchText '{Faker.Entity.Manufacturer1.Name}' not found!");
     }
 
     [Fact]
@@ -117,7 +117,7 @@ public class ManufacturerStorageTests
         var act = () => storage.GetByNameAsync(Faker.Entity.Manufacturer1.Name);
 
         // Assert
-        (await act.Should().ThrowAsync<InvalidDataException>()).WithMessage($"Name '{Faker.Entity.Manufacturer1.Name}' not found!");
+        (await act.Should().ThrowAsync<InvalidDataException>()).WithMessage($"SearchText '{Faker.Entity.Manufacturer1.Name}' not found!");
     }
 
     [Fact]
@@ -220,7 +220,7 @@ public class ManufacturerStorageTests
         var act = () => storage.CreateAsync(Faker.Domain.GetManufacturer(entityId, Faker.Entity.Manufacturer1.Name));
 
         // Assert
-        (await act.Should().ThrowAsync<InvalidDataException>()).WithMessage($"Name '{Faker.Entity.Manufacturer1.Name}' already exist!");
+        (await act.Should().ThrowAsync<InvalidDataException>()).WithMessage($"SearchText '{Faker.Entity.Manufacturer1.Name}' already exist!");
     }
 
 
@@ -263,7 +263,7 @@ public class ManufacturerStorageTests
         var act = () => storage.UpdateAsync(Faker.Domain.GetManufacturer(Faker.Entity.Manufacturer2.Id, Faker.Entity.Manufacturer1.Name));
 
         // Assert
-        (await act.Should().ThrowAsync<InvalidDataException>()).WithMessage($"Name '{Faker.Entity.Manufacturer1.Name}' already exist!");
+        (await act.Should().ThrowAsync<InvalidDataException>()).WithMessage($"SearchText '{Faker.Entity.Manufacturer1.Name}' already exist!");
     }
 
     [Fact]

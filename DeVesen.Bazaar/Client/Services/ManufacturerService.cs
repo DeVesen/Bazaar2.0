@@ -23,13 +23,23 @@ public class ManufacturerService
 
     public async Task<bool> ExistsAsync(string value)
     {
-        var elements = await GetAllAsync();
-        return elements.Any(p => p.Name.Equals(value, StringComparison.OrdinalIgnoreCase));
+        var filter = new ManufacturerFilter
+        {
+            Name = value
+        };
+
+        return (await GetAllAsync(filter)).Any();
     }
 
-    public async Task<IEnumerable<Manufacturer>> GetAllAsync()
+    public async Task<IEnumerable<Manufacturer>> GetAllAsync(ManufacturerFilter filter)
     {
-        return await _httpClient.GetFromJsonAsync<IEnumerable<Manufacturer>>("") ?? Enumerable.Empty<Manufacturer>();
+        var queryBuilder = new ApiQueryBuilder
+        {
+            ["Name"] = filter.Name,
+            ["SearchText"] = filter.SearchText
+        };
+
+        return await _httpClient.GetFromJsonAsync<IEnumerable<Manufacturer>>(queryBuilder.BuildFinal()) ?? Enumerable.Empty<Manufacturer>();
     }
 
     public async Task<Response> CreateAsync(Manufacturer element)

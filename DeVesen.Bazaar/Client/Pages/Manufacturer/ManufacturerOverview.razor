@@ -1,42 +1,27 @@
-﻿@using DeVesen.Bazaar.Client.Services
-@using DeVesen.Bazaar.Client.Components.Manufacturer
+﻿@using DeVesen.Bazaar.Client.Components.Manufacturer
+@using DeVesen.Bazaar.Client.Extensions
 @using DeVesen.Bazaar.Client.Models
+@using DeVesen.Bazaar.Client.State.Manufacturer
+@using Fluxor
 
 @page "/article-manufacturer"
 
-@inject ManufacturerService ManufacturerService;
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+
+@inject ManufacturerFacade ManufacturerFacade
+@inject IState<ManufacturerState> ManufacturerState
 @inject IDialogService DialogService
+
+<ManufacturerOverviewToolbar @bind-SearchText="@_searchText"
+                             @bind-SearchText:after="@ReloadElements"
+                             OnCreateBtnClick="@CreateManufacturerAsync" />
 
 <MudTable T="Manufacturer"
           FixedHeader
           Hover
-          Items="@_elements"
+          Items="@ManufacturerState.Value.Vendors"
           SortLabel="Sort By"
-          OnRowClick="OnTableRowClickedAsync"
-          Filter="e => ManufacturerService.FilterFunc(e, _articleCategorySearch)">
-    <ToolBarContent>
-        <MudGrid Spacing="0">
-            <MudItem xs="0" sm="6" />
-            <MudItem xs="10" sm="5">
-                <MudTextField Placeholder="Suche"
-                              DebounceInterval="700"
-                              Adornment="Adornment.Start"
-                              AdornmentIcon="@Icons.Material.Filled.Search"
-                              IconSize="Size.Medium"
-                              @bind-Value="_articleCategorySearch"
-                              Class="mt-0"></MudTextField>
-            </MudItem>
-            <MudItem xs="2" sm="1"
-                     Class="d-flex justify-center">
-                <MudIconButton Color="Color.Primary"
-                               Icon="@Icons.Material.Filled.Add"
-                               Variant="Variant.Filled"
-                               Size="Size.Small"
-                               Class="align-self-end"
-                               OnClick="CreateManufacturerAsync"/>
-            </MudItem>
-        </MudGrid>
-    </ToolBarContent>
+          OnRowClick="OnTableRowClickedAsync">
     <HeaderContent>
         <MudTh><MudTableSortLabel SortBy="new Func<Manufacturer, object>(x => x.Name)">Bezeichnung</MudTableSortLabel></MudTh>
     </HeaderContent>
@@ -47,13 +32,12 @@
 
 @code {
 
-    private string _articleCategorySearch = string.Empty;
-    private IEnumerable<Manufacturer> _elements = Enumerable.Empty<Manufacturer>();
+    private string? _searchText;
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        await ReloadElementsAsync();
+        ReloadElements();
     }
 
     private async Task CreateManufacturerAsync()
@@ -70,25 +54,29 @@
         {
             var parameters = new DialogParameters<ManufacturerCreateDialog> { { x => x.ForceNext, forceNext } };
 
-            var dlg = await DialogService.ShowAsync<ManufacturerCreateDialog>("Artikel-Kategorie anlegen", parameters, options);
-            var result = await dlg.Result;
+            var result = await DialogService.ShowAsync<ManufacturerCreateDialog>("Artikel-Kategorie anlegen", parameters, options)
+                                            .WaitForResult<ManufacturerCreateDialog.OkResult>();
 
-            forceNext = result!.Canceled is false && (bool)result.Data!;
+            if (result.Canceled is false)
+            {
+                forceNext = result.Data.ForceNext;
+            }
 
-            await ReloadElementsAsync();
-
-            StateHasChanged();
+            ReloadElements();
         } while (forceNext);
     }
 
-    private async Task ReloadElementsAsync()
+    private void ReloadElements()
     {
-        _elements = await ManufacturerService.GetAllAsync();
+        ManufacturerFacade.FetchManufacturers();
     }
 
     private async Task OnTableRowClickedAsync(TableRowClickEventArgs<Manufacturer> args)
     {
-        var parameters = new DialogParameters<ManufacturerEditDialog> { { x => x.Item, args.Item } };
+        var parameters = new DialogParameters<ManufacturerEditDialog>
+        {
+            { x => x.Item, args.Item }
+        };
 
         var options = new DialogOptions
         {
@@ -96,12 +84,9 @@
             BackdropClick = false
         };
 
-        var dlg = await DialogService.ShowAsync<ManufacturerEditDialog>("Artikel-Kategorie ändern", parameters, options);
-        var result = await dlg.Result;
-
-        if (result!.Canceled is false)
-        {
-            await ReloadElementsAsync();
-        }
+        await DialogService.ShowAsync<ManufacturerEditDialog>("Artikel-Kategorie ändern", parameters, options)
+                           .WaitForResult();
+        
+        ReloadElements();
     }
 }

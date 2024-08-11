@@ -103,7 +103,7 @@ namespace DeVesen.Bazaar.Server.Tests.Storage
             var act = () => storage.GetByNameAsync(Faker.Entity.ArticleCategory1.Name);
 
             // Assert
-            (await act.Should().ThrowAsync<InvalidDataException>()).WithMessage($"Name '{Faker.Entity.ArticleCategory1.Name}' not found!");
+            (await act.Should().ThrowAsync<InvalidDataException>()).WithMessage($"SearchText '{Faker.Entity.ArticleCategory1.Name}' not found!");
         }
 
         [Fact]
@@ -117,7 +117,7 @@ namespace DeVesen.Bazaar.Server.Tests.Storage
             var act = () => storage.GetByNameAsync(Faker.Entity.ArticleCategory1.Name);
 
             // Assert
-            (await act.Should().ThrowAsync<InvalidDataException>()).WithMessage($"Name '{Faker.Entity.ArticleCategory1.Name}' not found!");
+            (await act.Should().ThrowAsync<InvalidDataException>()).WithMessage($"SearchText '{Faker.Entity.ArticleCategory1.Name}' not found!");
         }
 
         [Fact]
@@ -220,7 +220,7 @@ namespace DeVesen.Bazaar.Server.Tests.Storage
             var act = () => storage.CreateAsync(Faker.Domain.GetArticleCategory(entityId, Faker.Entity.ArticleCategory1.Name));
 
             // Assert
-            (await act.Should().ThrowAsync<InvalidDataException>()).WithMessage($"Name '{Faker.Entity.ArticleCategory1.Name}' already exist!");
+            (await act.Should().ThrowAsync<InvalidDataException>()).WithMessage($"SearchText '{Faker.Entity.ArticleCategory1.Name}' already exist!");
         }
 
 
@@ -263,7 +263,7 @@ namespace DeVesen.Bazaar.Server.Tests.Storage
             var act = () => storage.UpdateAsync(Faker.Domain.GetArticleCategory(Faker.Entity.ArticleCategory2.Id, Faker.Entity.ArticleCategory1.Name));
 
             // Assert
-            (await act.Should().ThrowAsync<InvalidDataException>()).WithMessage($"Name '{Faker.Entity.ArticleCategory1.Name}' already exist!");
+            (await act.Should().ThrowAsync<InvalidDataException>()).WithMessage($"SearchText '{Faker.Entity.ArticleCategory1.Name}' already exist!");
         }
 
         [Fact]

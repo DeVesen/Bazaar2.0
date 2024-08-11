@@ -104,7 +104,7 @@ public class ArticleStorage
 
         if (await ExistByNumberAsync(element.Number))
         {
-            throw new InvalidDataException($"Name '{element.Number}' already exist!");
+            throw new InvalidDataException($"SearchText '{element.Number}' already exist!");
         }
             
         if (await _vendorRepository.ExistByIdAsync(element.VendorId) is false)
@@ -128,7 +128,7 @@ public class ArticleStorage
 
             if (entity != null && entity.Id != element.Id)
             {
-                throw new InvalidDataException($"Name '{element.Number}' already exist!");
+                throw new InvalidDataException($"SearchText '{element.Number}' already exist!");
             }
         }
 

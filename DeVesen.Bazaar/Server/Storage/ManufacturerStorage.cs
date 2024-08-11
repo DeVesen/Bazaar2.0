@@ -43,7 +43,7 @@ public class ManufacturerStorage
     {
         if (await _manufacturerRepository.ExistByNameAsync(name) is false)
         {
-            throw new InvalidDataException($"Name '{name}' not found!");
+            throw new InvalidDataException($"SearchText '{name}' not found!");
         }
 
         var element = await _manufacturerRepository.GetByNameAsync(name);
@@ -64,7 +64,7 @@ public class ManufacturerStorage
         }
         if (await _manufacturerRepository.ExistByNameAsync(element.Name))
         {
-            throw new InvalidDataException($"Name '{element.Name}' already exist!");
+            throw new InvalidDataException($"SearchText '{element.Name}' already exist!");
         }
 
         await _manufacturerRepository.CreateAsync(element.ToEntity());
@@ -82,7 +82,7 @@ public class ManufacturerStorage
 
             if (entity != null && entity.Id != element.Id)
             {
-                throw new InvalidDataException($"Name '{element.Name}' already exist!");
+                throw new InvalidDataException($"SearchText '{element.Name}' already exist!");
             }
         }
 
