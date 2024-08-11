@@ -6,4 +6,5 @@ namespace DeVesen.Bazaar.Client.Models;
 public record ArticleCategoryFilter
 {
     public string? Name { get; init; } = null;
+    public string? SearchText { get; init; } = null;
 }

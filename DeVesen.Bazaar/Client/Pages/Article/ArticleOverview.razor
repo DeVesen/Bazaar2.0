@@ -1,8 +1,8 @@
-﻿@using DeVesen.Bazaar.Client.Services
-@using DeVesen.Bazaar.Client.Components.Article
+﻿@using DeVesen.Bazaar.Client.Components.Article
 @using DeVesen.Bazaar.Client.Extensions
 @using DeVesen.Bazaar.Client.Models
-@using DeVesen.Bazaar.Client.State.ArticleOverview
+@using DeVesen.Bazaar.Client.State
+@using DeVesen.Bazaar.Client.State.Article
 @using Fluxor
 
 @page "/articles"
@@ -10,10 +10,9 @@
 
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 
-@inject ArticleOverviewFacade ArticleFacade
-@inject IState<ArticleOverviewState> ArticleState
+@inject StateFacade StateFacade
+@inject IState<ArticleState> ArticleState
 
-@inject VendorService VendorService;
 @inject IDialogService DialogService;
 
 <div class="d-flex flex-column gap-4 px-1">
@@ -24,6 +23,7 @@
                             @bind-Vendor:after="@OnArticleFilterChange"
                             @bind-Number:after="@OnArticleFilterChange"
                             @bind-SearchText:after="@OnArticleFilterChange"
+                            DisableVendorSelection="@_pageSelect"
                             DisableCreateArticleBtn="@(_vendor == null)"
                             OnCreateArticleBtnClick="@CreateElementAsync"
                             OnImportArticleBtnClick="@ImportArticleAsync" />
@@ -56,8 +56,17 @@
 @code {
 
     [Parameter]
-    public string? VendorId { get; set; }
-    
+    public string? VendorId
+    {
+        get => _vendor?.Id;
+        set
+        {
+            _vendor = StateFacade.Vendor.GetById(value ?? string.Empty);
+            _pageSelect = string.IsNullOrWhiteSpace(value) is false;
+        }
+    }
+
+    private bool _pageSelect = false;
     private Vendor? _vendor;
     private string? _number;
     private string? _searchText;
@@ -66,9 +75,7 @@
     {
         await base.OnInitializedAsync();
 
-        _vendor = await VendorService.GetAsync(VendorId ?? string.Empty);
-
-        ArticleFacade.FetchArticles();
+        FetchArticleList();
     }
 
     private void OnArticleFilterChange()
@@ -149,12 +156,12 @@
     {
         var articleFilter = new ArticleFilter
             {
-                VendorId = _vendor?.Id,
+                VendorId = VendorId,
                 Number = _number,
                 SearchText = _searchText
             };
 
-        ArticleFacade.FetchArticles(articleFilter);
+        StateFacade.Article.Fetch(articleFilter);
     }
 
     private static string GetStatus(Article article)

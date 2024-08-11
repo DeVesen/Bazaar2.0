@@ -22,13 +22,23 @@ public class ArticleCategoryService
 
     public async Task<bool> ExistsAsync(string value)
     {
-        var elements = await GetAllAsync();
-        return elements.Any(p => p.Name.Equals(value, StringComparison.OrdinalIgnoreCase));
+        var filter = new ArticleCategoryFilter
+        {
+            Name = value
+        };
+
+        return (await GetAllAsync(filter)).Any();
     }
 
-    public async Task<IEnumerable<ArticleCategory>> GetAllAsync()
+    public async Task<IEnumerable<ArticleCategory>> GetAllAsync(ArticleCategoryFilter filter)
     {
-        return await _httpClient.GetFromJsonAsync<IEnumerable<ArticleCategory>>("") ?? Enumerable.Empty<ArticleCategory>();
+        var queryBuilder = new ApiQueryBuilder
+        {
+            ["Name"] = filter.Name,
+            ["SearchText"] = filter.SearchText
+        };
+
+        return await _httpClient.GetFromJsonAsync<IEnumerable<ArticleCategory>>(queryBuilder.BuildFinal()) ?? Enumerable.Empty<ArticleCategory>();
     }
 
     public async Task<Response> CreateAsync(ArticleCategory element)

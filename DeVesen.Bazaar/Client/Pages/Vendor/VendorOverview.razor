@@ -5,15 +5,16 @@
 @using DeVesen.Bazaar.Client.Models
 @using DeVesen.Bazaar.Client.Components.Article
 @using DeVesen.Bazaar.Client.Extensions
-@using DeVesen.Bazaar.Client.State.VendorOverview
+@using DeVesen.Bazaar.Client.State
+@using DeVesen.Bazaar.Client.State.Vendor
 @using Fluxor
 
 @page "/vendors"
 
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 
-@inject VendorOverviewFacade VendorFacade
-@inject IState<VendorOverviewState> VendorState
+@inject StateFacade StateFacade
+@inject IState<VendorState> VendorState
 
 @inject NavigationService NavigationService
 @inject IDialogService DialogService
@@ -54,12 +55,6 @@
     
     private string _searchText = string.Empty;
     private ToolBarGenederSelect.GenderType _genderType = ToolBarGenederSelect.GenderType.All;
-
-    protected override async Task OnInitializedAsync()
-    {
-        await base.OnInitializedAsync();
-        VendorFacade.FetchVendors();
-    }
 
     private async Task CreateElementAsync()
     {
@@ -162,6 +157,6 @@
             SearchText = _searchText
         };
 
-        VendorFacade.FetchVendors(filter);
+        StateFacade.Vendor.Fetch(filter);
     }
 }

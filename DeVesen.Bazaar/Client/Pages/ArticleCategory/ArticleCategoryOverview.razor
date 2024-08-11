@@ -1,42 +1,26 @@
-﻿@using DeVesen.Bazaar.Client.Services
+﻿@using DeVesen.Bazaar.Client.Extensions
 @using DeVesen.Bazaar.Client.Components.ArticleCategory
 @using DeVesen.Bazaar.Client.Models
+@using DeVesen.Bazaar.Client.State
+@using DeVesen.Bazaar.Client.State.ArticleCategory
+@using Fluxor
 
 @page "/article-category"
 
-@inject ArticleCategoryService ArticleCategoryService;
+@inject StateFacade StateFacade
+@inject IState<ArticleCategoryState> ArticleCategoryState
 @inject IDialogService DialogService
+
+<ArticleCategoryOverviewToolbar @bind-SearchText="@_searchText"
+                                @bind-SearchText:after="@ReloadElements"
+                                OnCreateBtnClick="@CreateArticleCategoryAsync" />
 
 <MudTable T="ArticleCategory"
           FixedHeader
           Hover
-          Items="@_elements"
+          Items="@ArticleCategoryState.Value.Items"
           SortLabel="Sort By"
-          OnRowClick="OnTableRowClickedAsync"
-          Filter="e => ArticleCategoryService.FilterFunc(e, _articleCategorySearch)">
-    <ToolBarContent>
-        <MudGrid Spacing="0">
-            <MudItem xs="0" sm="6" />
-            <MudItem xs="10" sm="5">
-                <MudTextField Placeholder="Suche"
-                              DebounceInterval="700"
-                              Adornment="Adornment.Start"
-                              AdornmentIcon="@Icons.Material.Filled.Search"
-                              IconSize="Size.Medium"
-                              @bind-Value="_articleCategorySearch"
-                              Class="mt-0"></MudTextField>
-            </MudItem>
-            <MudItem xs="2" sm="1"
-                     Class="d-flex justify-center">
-                <MudIconButton Color="Color.Primary"
-                               Icon="@Icons.Material.Filled.Add"
-                               Variant="Variant.Filled"
-                               Size="Size.Small"
-                               Class="align-self-end"
-                               OnClick="CreateArticleCategoryAsync"/>
-            </MudItem>
-        </MudGrid>
-    </ToolBarContent>
+          OnRowClick="OnTableRowClickedAsync">
     <HeaderContent>
         <MudTh><MudTableSortLabel SortBy="new Func<ArticleCategory, object>(x => x.Name)">Bezeichnung</MudTableSortLabel></MudTh>
     </HeaderContent>
@@ -47,14 +31,7 @@
 
 @code {
 
-    private string _articleCategorySearch = string.Empty;
-    private IEnumerable<ArticleCategory> _elements = Enumerable.Empty<ArticleCategory>();
-
-    protected override async Task OnInitializedAsync()
-    {
-        await base.OnInitializedAsync();
-        await ReloadElementsAsync();
-    }
+    private string? _searchText;
 
     private async Task CreateArticleCategoryAsync()
     {
@@ -74,16 +51,16 @@
             var result = await dlg.Result;
 
             forceNext = result!.Canceled is false && (bool)result.Data!;
-
-            await ReloadElementsAsync();
+            
+            ReloadElements();
 
             StateHasChanged();
         } while (forceNext);
     }
 
-    private async Task ReloadElementsAsync()
+    private void ReloadElements()
     {
-        _elements = await ArticleCategoryService.GetAllAsync();
+        StateFacade.Manufacturer.Fetch();
     }
 
     private async Task OnTableRowClickedAsync(TableRowClickEventArgs<ArticleCategory> args)
@@ -96,12 +73,9 @@
             BackdropClick = false
         };
 
-        var dlg = await DialogService.ShowAsync<ArticleCategoryEditDialog>("Artikel-Kategorie ändern", parameters, options);
-        var result = await dlg.Result;
+        await DialogService.ShowAsync<ArticleCategoryEditDialog>("Artikel-Kategorie ändern", parameters, options)
+                           .WaitForResult();
 
-        if (result!.Canceled is false)
-        {
-            await ReloadElementsAsync();
-        }
+        ReloadElements();
     }
 }

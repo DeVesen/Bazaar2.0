@@ -1,8 +1,8 @@
 ﻿using DeVesen.Bazaar.Client.Models;
 
-namespace DeVesen.Bazaar.Client.State.VendorOverview;
+namespace DeVesen.Bazaar.Client.State.Vendor;
 
-public class VendorOverviewActions
+public class VendorActions
 {
     public record FetchVendors(VendorFilter Filter);
 

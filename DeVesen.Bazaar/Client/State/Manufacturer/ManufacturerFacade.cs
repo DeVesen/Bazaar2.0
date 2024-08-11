@@ -16,7 +16,7 @@ public class ManufacturerFacade
 
     public IEnumerable<Models.Manufacturer> GetManufacturer() => _manufacturerState.Vendors;
 
-    public void FetchManufacturers() => FetchManufacturers(new ManufacturerFilter());
+    public void Fetch() => Fetch(new ManufacturerFilter());
 
-    public void FetchManufacturers(ManufacturerFilter filter) => _dispatcher.Dispatch(new ManufacturerActions.FetchManufacturers(filter));
+    public void Fetch(ManufacturerFilter filter) => _dispatcher.Dispatch(new ManufacturerActions.FetchManufacturers(filter));
 }

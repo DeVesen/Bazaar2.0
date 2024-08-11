@@ -1,6 +1,7 @@
 ﻿@using DeVesen.Bazaar.Client.Components.Manufacturer
 @using DeVesen.Bazaar.Client.Extensions
 @using DeVesen.Bazaar.Client.Models
+@using DeVesen.Bazaar.Client.State
 @using DeVesen.Bazaar.Client.State.Manufacturer
 @using Fluxor
 
@@ -8,7 +9,7 @@
 
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 
-@inject ManufacturerFacade ManufacturerFacade
+@inject StateFacade StateFacade
 @inject IState<ManufacturerState> ManufacturerState
 @inject IDialogService DialogService
 
@@ -33,12 +34,6 @@
 @code {
 
     private string? _searchText;
-
-    protected override async Task OnInitializedAsync()
-    {
-        await base.OnInitializedAsync();
-        ReloadElements();
-    }
 
     private async Task CreateManufacturerAsync()
     {
@@ -68,7 +63,7 @@
 
     private void ReloadElements()
     {
-        ManufacturerFacade.FetchManufacturers();
+        StateFacade.Manufacturer.Fetch();
     }
 
     private async Task OnTableRowClickedAsync(TableRowClickEventArgs<Manufacturer> args)

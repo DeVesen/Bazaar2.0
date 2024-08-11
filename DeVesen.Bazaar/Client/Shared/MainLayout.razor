@@ -1,10 +1,8 @@
-﻿@using Fluxor
-@using DeVesen.Bazaar.Client.State.ArticleOverview
+﻿@using DeVesen.Bazaar.Client.State
 
 @inherits LayoutComponentBase
 
-@inject ArticleOverviewFacade MenuFacade
-@inject IState<ArticleOverviewState> MenuState
+@inject StateFacade StateFacade
 
 @* Required *@
 <MudThemeProvider />
@@ -26,3 +24,15 @@
         </article>
     </main>
 </div>
+
+
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        StateFacade.FetchAll();
+    }
+
+}

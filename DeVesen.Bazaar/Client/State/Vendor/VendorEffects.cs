@@ -1,19 +1,19 @@
 ﻿using DeVesen.Bazaar.Client.Services;
 using Fluxor;
 
-namespace DeVesen.Bazaar.Client.State.VendorOverview;
+namespace DeVesen.Bazaar.Client.State.Vendor;
 
-public class VendorOverviewEffects
+public class VendorEffects
 {
     private readonly VendorService _vendorService;
 
-    public VendorOverviewEffects(VendorService vendorService)
+    public VendorEffects(VendorService vendorService)
     {
         _vendorService = vendorService;
     }
 
     [EffectMethod]
-    public async Task FetchVendors(VendorOverviewActions.FetchVendors action, IDispatcher dispatcher)
+    public async Task FetchVendors(VendorActions.FetchVendors action, IDispatcher dispatcher)
     {
         var elements = await _vendorService.GetAllAsync(action.Filter.Id, action.Filter.Salutation, action.Filter.SearchText);
 
@@ -21,6 +21,6 @@ public class VendorOverviewEffects
                            .ThenBy(p => p.Item.FirstName)
                            .ThenBy(p => p.Item.Salutation);
 
-        dispatcher.Dispatch(new VendorOverviewActions.VendorsFetched(elements));
+        dispatcher.Dispatch(new VendorActions.VendorsFetched(elements));
     }
 }

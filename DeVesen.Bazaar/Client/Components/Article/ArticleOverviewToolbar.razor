@@ -12,13 +12,14 @@
 
             <MudItem xs="12">
                 <VendorSelector Item="Vendor"
-                                ItemChanged="VendorChanged"/>
+                                ItemChanged="@VendorChanged"
+                                Disabled="@DisableVendorSelection" />
             </MudItem>
 
             <MudItem xs="3">
                 <DvNumericTextField T="string"
                                     Value="@Number"
-                                    ValueChanged="NumberChanged"
+                                    ValueChanged="@NumberChanged"
                                     Label="Nummer" />
             </MudItem>
 
@@ -58,6 +59,9 @@
 
     [Parameter]
     public string? SearchText { get; set; }
+
+    [Parameter]
+    public bool DisableVendorSelection { get; set; }
 
     [Parameter]
     public bool DisableCreateArticleBtn { get; set; }

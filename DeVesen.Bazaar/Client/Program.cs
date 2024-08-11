@@ -1,9 +1,11 @@
 using DeVesen.Bazaar.Client;
 using DeVesen.Bazaar.Client.Extensions;
 using DeVesen.Bazaar.Client.Services;
-using DeVesen.Bazaar.Client.State.ArticleOverview;
+using DeVesen.Bazaar.Client.State;
+using DeVesen.Bazaar.Client.State.Article;
+using DeVesen.Bazaar.Client.State.ArticleCategory;
 using DeVesen.Bazaar.Client.State.Manufacturer;
-using DeVesen.Bazaar.Client.State.VendorOverview;
+using DeVesen.Bazaar.Client.State.Vendor;
 using DeVesen.Bazaar.Client.Validator;
 using DeVesen.Bazaar.Shared.Services;
 using Microsoft.AspNetCore.Components.Web;
@@ -18,9 +20,11 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddMudServices()
                 .ConfigureFluxor();
 
-builder.Services.AddTransient<ArticleOverviewFacade>();
-builder.Services.AddTransient<VendorOverviewFacade>();
+builder.Services.AddTransient<StateFacade>();
+builder.Services.AddTransient<ArticleFacade>();
+builder.Services.AddTransient<VendorFacade>();
 builder.Services.AddTransient<ManufacturerFacade>();
+builder.Services.AddTransient<ArticleCategoryFacade>();
 
 builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
