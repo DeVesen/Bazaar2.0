@@ -1,8 +1,8 @@
 ﻿@using DeVesen.Bazaar.Client.Components.Common.TextField
 @using DeVesen.Bazaar.Client.Components.Common.Buttons
-@using DeVesen.Bazaar.Client.Services
+@using DeVesen.Bazaar.Client.State
 
-@inject ArticleService ArticleService
+@inject StateFacade StateFacade
 
 <MudDialog>
     <DialogContent>
@@ -12,7 +12,7 @@
                              @ref="_articleNumberRef"
                              @bind-Value="@_articleNumber"
                              AutoFocus
-                             OnKeyUp="ÔnArticleNumberKeyUpAsync" />
+                             OnKeyUp="OnArticleNumberKeyUpAsync" />
             </MudItem>
             <MudItem xs="12">
                 <MudAlert Severity="@_releaseSeverityStatus">@_releaseSeverityText</MudAlert>
@@ -48,9 +48,9 @@
         _releaseSeverityText = text;
     }
 
-    private async Task ÔnArticleNumberKeyUpAsync(KeyboardEventArgs obj)
+    private async Task OnArticleNumberKeyUpAsync(KeyboardEventArgs obj)
     {
-        if (obj.Code == "Enter")
+        if (obj.Key == "Enter")
         {
             if (_articleNumber.HasValue)
             {
@@ -63,7 +63,7 @@
 
     private async Task ApproveArticleAsync(long articleNumber)
     {
-        var result = await ArticleService.ApproveAsync(articleNumber);
+        var result = await StateFacade.Article.ApproveArticleAsync(articleNumber);
 
         if (result.IsValid)
         {
@@ -74,7 +74,8 @@
             SetReleaseError(result.ErrorMessage);
         }
 
-        await Task.CompletedTask;
+        StateFacade.Article.Fetch();
+        StateFacade.Vendor.Fetch();
     }
 
     private async Task SelectArticleNumberInput()

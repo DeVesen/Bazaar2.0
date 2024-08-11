@@ -43,7 +43,8 @@
                                 OnEdit="x => ModifyElementAsync(x.Item)"
                                 OnArticle="OnArticleAsync"
                                 OnImportArticles="OnImportArticlesAsync"
-                                OnApproveArticles="OnApproveArticlesAsync"/>
+                                OnApproveArticles="OnApproveArticlesAsync"
+                                OnSettlement="OnSettlementVendorAsync" />
                 </MudItem>
             }
         }
@@ -129,6 +130,21 @@
         };
 
         await DialogService.ShowAsync<ArticleApprovalDialog>("Artikel freigeben", parameters, options);
+
+        FetchVendorList();
+    }
+
+    private async Task OnSettlementVendorAsync(VendorView args)
+    {
+        var parameters = new DialogParameters<VendorSettlementDialog> { { x => x.VendorId, args.Item.Id } };
+
+        var options = new DialogOptions
+        {
+            CloseOnEscapeKey = true,
+            BackdropClick = false
+        };
+
+        await DialogService.ShowAsync<VendorSettlementDialog>("Händler abrechnen", parameters, options);
 
         FetchVendorList();
     }

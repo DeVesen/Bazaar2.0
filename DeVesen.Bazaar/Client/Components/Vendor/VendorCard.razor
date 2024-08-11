@@ -29,7 +29,7 @@
             <div class="d-flex">
                 <MudIconButton Icon="@Icons.Material.TwoTone.Downloading" Color="Color.Default" OnClick="DoImportArticles" />
                 <MudIconButton Icon="@Icons.Material.TwoTone.DownloadDone" Color="Color.Default" OnClick="DoApproveArticles" />
-                <MudIconButton Icon="@Icons.Material.TwoTone.Euro" Color="Color.Default" />
+                <MudIconButton Icon="@Icons.Material.TwoTone.Euro" Color="Color.Default" OnClick="DoSettlement" />
             </div>
         </div>
     </MudCardActions>
@@ -52,6 +52,9 @@
     [Parameter]
     public EventCallback<VendorView> OnApproveArticles { get; set; }
 
+    [Parameter]
+    public EventCallback<VendorView> OnSettlement { get; set; }
+
     private async Task DoEdit()
     {
         await OnEdit.InvokeAsync(VendorItem);
@@ -70,6 +73,11 @@
     private async Task DoApproveArticles()
     {
         await OnApproveArticles.InvokeAsync(VendorItem);
+    }
+
+    private async Task DoSettlement()
+    {
+        await OnSettlement.InvokeAsync(VendorItem);
     }
 
 }

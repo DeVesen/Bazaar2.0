@@ -1,0 +1,18 @@
+﻿@using DeVesen.Bazaar.Client.Components.Common.Buttons
+
+<MudDialog>
+    <DialogContent>
+        <MudItem> Das kommt bald ... </MudItem>
+    </DialogContent>
+    <DialogActions>
+        <DvButtonClose OnClick="OnCloseAsync" />
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
+
+    [Parameter] public required string VendorId { get; set; }
+
+    private void OnCloseAsync() => MudDialog.Close();
+}
