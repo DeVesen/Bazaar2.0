@@ -6,11 +6,11 @@ public static class ArticleOverviewReducer
 {
     [ReducerMethod(typeof(ArticleOverviewActions.FetchArticles))]
     public static ArticleOverviewState FetchArticles(ArticleOverviewState state)
-        => state with { Articles = Enumerable.Empty<Models.Article>(), FilterData = state.FilterData, IsLoaded = true };
+        => state with { Articles = Enumerable.Empty<Models.Article>(), FilterData = state.FilterData, IsLoaded = false };
 
     [ReducerMethod]
     public static ArticleOverviewState ArticlesFetched(ArticleOverviewState state, ArticleOverviewActions.ArticlesFetched action)
     {
-        return new(action.Articles, state.FilterData, false);
+        return new(action.Articles, state.FilterData, true);
     }
 }

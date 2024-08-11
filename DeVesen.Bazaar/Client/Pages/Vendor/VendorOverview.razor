@@ -5,11 +5,17 @@
 @using DeVesen.Bazaar.Client.Models
 @using DeVesen.Bazaar.Client.Components.Article
 @using DeVesen.Bazaar.Client.Extensions
+@using DeVesen.Bazaar.Client.State.VendorOverview
+@using Fluxor
 
 @page "/vendors"
 
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+
+@inject VendorOverviewFacade VendorFacade
+@inject IState<VendorOverviewState> VendorState
+
 @inject NavigationService NavigationService
-@inject VendorService VendorService
 @inject IDialogService DialogService
 
 <div class="d-flex flex-column gap-4 px-1">
@@ -21,21 +27,24 @@
                      OuterStyle="max-width: 200px"
                      OuterClass="pl-2"
                      Value="@_searchText"
-                     ValueChanged="OnSearchChangedAsync" />
+                     ValueChanged="@OnSearchChanged" />
         <ToolBarGenederSelect Value="@_genderType"
-                              ValueChanged="OnGenderChangedAsync" />
+                              ValueChanged="@OnGenderChanged" />
     </MudToolBar>
 
     <MudGrid Spacing="1">
-        @foreach (var element in @_elements)
+        @if (VendorState.Value.IsLoaded)
         {
-            <MudItem xs="12" md="4" lg="3">
-                <VendorCard VendorItem="@element"
-                            OnEdit="x => ModifyElementAsync(x.Item)"
-                            OnArticle="OnArticleAsync"
-                            OnImportArticles="OnImportArticlesAsync"
-                            OnApproveArticles="OnApproveArticlesAsync" />
-            </MudItem>
+            @foreach (var element in @VendorState.Value.Vendors)
+            {
+                <MudItem xs="12" md="4" lg="3">
+                    <VendorCard VendorItem="@element"
+                                OnEdit="x => ModifyElementAsync(x.Item)"
+                                OnArticle="OnArticleAsync"
+                                OnImportArticles="OnImportArticlesAsync"
+                                OnApproveArticles="OnApproveArticlesAsync"/>
+                </MudItem>
+            }
         }
     </MudGrid>
 </div>
@@ -43,14 +52,13 @@
 
 @code {
     
-    private IEnumerable<VendorView> _elements = Enumerable.Empty<VendorView>();
     private string _searchText = string.Empty;
     private ToolBarGenederSelect.GenderType _genderType = ToolBarGenederSelect.GenderType.All;
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        await ReloadElementsAsync();
+        VendorFacade.FetchVendors();
     }
 
     private async Task CreateElementAsync()
@@ -72,10 +80,8 @@
             {
                 forceNext = result.Data.ForceNext;
             }
-
-            await ReloadElementsAsync();
-
-            StateHasChanged();
+            
+            FetchVendorList();
         } while (forceNext);
     }
 
@@ -91,8 +97,8 @@
 
         await DialogService.ShowAsync<VendorEditDialog>("Verkäufer ändern", parameters, options)
                            .WaitForResult();
-        
-        await ReloadElementsAsync();
+
+        FetchVendorList();
     }
 
     private async Task OnArticleAsync(VendorView args)
@@ -114,7 +120,7 @@
         await DialogService.ShowAsync<ArticleImportDialog>("Artikel importieren", parameters, options)
                            .WaitForResult();
         
-        await ReloadElementsAsync();
+        FetchVendorList();
     }
 
     private async Task OnApproveArticlesAsync(VendorView args)
@@ -129,33 +135,33 @@
 
         await DialogService.ShowAsync<ArticleApprovalDialog>("Artikel freigeben", parameters, options);
 
-        StateHasChanged();
+        FetchVendorList();
     }
 
-    private async Task OnSearchChangedAsync(string newValue)
+    private void OnSearchChanged(string newValue)
     {
         _searchText = newValue;
 
-        await ReloadElementsAsync();
+        FetchVendorList();
     }
 
-    private async Task OnGenderChangedAsync(ToolBarGenederSelect.GenderType newGenderType)
+    private void OnGenderChanged(ToolBarGenederSelect.GenderType newGenderType)
     {
         _genderType = newGenderType;
 
-        await ReloadElementsAsync();
+        FetchVendorList();
     }
 
-    private async Task ReloadElementsAsync()
+    private void FetchVendorList()
     {
-        var salutation = _genderType != ToolBarGenederSelect.GenderType.All
-                            ? _genderType.ToString()
-                            : null;
+        var filter = new VendorFilter
+        {
+            Salutation = _genderType != ToolBarGenederSelect.GenderType.All
+                ? _genderType.ToString()
+                : null,
+            SearchText = _searchText
+        };
 
-        _elements = await VendorService.GetAllAsync(salutation: salutation, searchText: _searchText);
-
-        _elements = _elements.OrderBy(p => p.Item.LastName)
-                             .ThenBy(p => p.Item.FirstName)
-                             .ThenBy(p => p.Item.Salutation);
+        VendorFacade.FetchVendors(filter);
     }
 }

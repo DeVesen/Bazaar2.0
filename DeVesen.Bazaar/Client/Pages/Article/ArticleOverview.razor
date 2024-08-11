@@ -21,12 +21,12 @@
     <ArticleOverviewToolbar @bind-Vendor="@_vendor"
                             @bind-Number="@_number"
                             @bind-SearchText="@_searchText"
-                            @bind-Vendor:after="OnArticleFilterChange"
-                            @bind-Number:after="OnArticleFilterChange"
-                            @bind-SearchText:after="OnArticleFilterChange"
+                            @bind-Vendor:after="@OnArticleFilterChange"
+                            @bind-Number:after="@OnArticleFilterChange"
+                            @bind-SearchText:after="@OnArticleFilterChange"
                             DisableCreateArticleBtn="@(_vendor == null)"
-                            OnCreateArticleBtnClick="CreateElementAsync"
-                            OnImportArticleBtnClick="ImportArticleAsync" />
+                            OnCreateArticleBtnClick="@CreateElementAsync"
+                            OnImportArticleBtnClick="@ImportArticleAsync" />
 
     <MudTable T="Article"
               FixedHeader
