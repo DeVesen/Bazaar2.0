@@ -15,9 +15,11 @@ public class VendorLiteDbRepository : IVendorRepository
         _dbCollection = dbEngine.GetCollection<VendorEntity>(nameof(VendorEntity));
     }
 
+    private IEnumerable<VendorEntity> GetAllEntities() => _dbCollection.FindAll().ToArray();
+
     public async Task<bool> ExistByIdAsync(string id)
     {
-        var element = _dbCollection.FindOne(x => x.Id == id);
+        var element = GetAllEntities().FirstOrDefault(x => x.Id == id);
         return await Task.FromResult(element != null);
     }
 

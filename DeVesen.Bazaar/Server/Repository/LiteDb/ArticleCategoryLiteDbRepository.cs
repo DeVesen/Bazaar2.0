@@ -15,9 +15,11 @@ public class ArticleCategoryLiteDbRepository : IArticleCategoryRepository
         _dbCollection = dbEngine.GetCollection<ArticleCategoryEntity>(nameof(ArticleCategoryEntity));
     }
 
+    private IEnumerable<ArticleCategoryEntity> GetAllEntities() => _dbCollection.FindAll().ToArray();
+
     public async Task<bool> ExistByIdAsync(string id)
     {
-        var element = _dbCollection.FindOne(x => x.Id == id);
+        var element = GetAllEntities().FirstOrDefault(x => x.Id == id);
         return await Task.FromResult(element != null);
     }
 
@@ -26,19 +28,19 @@ public class ArticleCategoryLiteDbRepository : IArticleCategoryRepository
 
     public async Task<bool> ExistByNameAsync(string name, string? allowedId)
     {
-        var element = _dbCollection.FindOne(x => x.Name == name && x.Id != allowedId);
+        var element = GetAllEntities().FirstOrDefault(x => x.Name == name && x.Id != allowedId);
         return await Task.FromResult(element != null);
     }
 
     public async Task<ArticleCategoryEntity> GetByIdAsync(string id)
     {
-        var element = _dbCollection.FindOne(x => x.Id == id);
+        var element = GetAllEntities().FirstOrDefault(x => x.Id == id);
         return await Task.FromResult(element!);
     }
 
     public async Task<ArticleCategoryEntity> GetByNameAsync(string name)
     {
-        var element = _dbCollection.FindOne(x => x.Name == name);
+        var element = GetAllEntities().FirstOrDefault(x => x.Name == name);
         return await Task.FromResult(element!);
     }
 

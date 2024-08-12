@@ -15,9 +15,11 @@ public class ManufacturerLiteDbRepository : IManufacturerRepository
         _dbCollection = dbEngine.GetCollection<ManufacturerEntity>(nameof(ManufacturerEntity));
     }
 
+    private IEnumerable<ManufacturerEntity> GetAllEntities() => _dbCollection.FindAll().ToArray();
+
     public async Task<bool> ExistByIdAsync(string id)
     {
-        var element = _dbCollection.FindOne(x => x.Id == id);
+        var element = GetAllEntities().FirstOrDefault(x => x.Id == id);
         return await Task.FromResult(element != null);
     }
 
@@ -26,19 +28,19 @@ public class ManufacturerLiteDbRepository : IManufacturerRepository
 
     public async Task<bool> ExistByNameAsync(string name, string? id)
     {
-        var element = _dbCollection.FindOne(x => x.Name == name && x.Id != id);
+        var element = GetAllEntities().FirstOrDefault(x => x.Name == name && x.Id != id);
         return await Task.FromResult(element != null);
     }
 
     public async Task<ManufacturerEntity> GetByIdAsync(string id)
     {
-        var element = _dbCollection.FindOne(x => x.Id == id);
+        var element = GetAllEntities().FirstOrDefault(x => x.Id == id);
         return await Task.FromResult(element!);
     }
 
     public async Task<ManufacturerEntity> GetByNameAsync(string name)
     {
-        var element = _dbCollection.FindOne(x => x.Name == name);
+        var element = GetAllEntities().FirstOrDefault(x => x.Name == name);
         return await Task.FromResult(element!);
     }
 

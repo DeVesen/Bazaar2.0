@@ -15,9 +15,11 @@ public class ArticleLiteDbRepository : IArticleRepository
         _dbCollection = dbEngine.GetCollection<ArticleEntity>(nameof(ArticleEntity));
     }
 
+    private IEnumerable<ArticleEntity> GetAllEntities() => _dbCollection.FindAll().ToArray();
+
     public async Task<bool> ExistByIdAsync(string id)
     {
-        var element = _dbCollection.FindOne(x => x.Id == id);
+        var element = GetAllEntities().FirstOrDefault(x => x.Id == id);
         return await Task.FromResult(element != null);
     }
 
@@ -26,25 +28,25 @@ public class ArticleLiteDbRepository : IArticleRepository
 
     public async Task<bool> ExistByNumberAsync(long number, string? allowedId)
     {
-        var element = _dbCollection.FindOne(x => x.Number == number && x.Id != allowedId);
+        var element = GetAllEntities().FirstOrDefault(x => x.Number == number && x.Id != allowedId);
         return await Task.FromResult(element != null);
     }
 
     public async Task<(bool Exist, ArticleEntity? Entity)> TryGetByIdAsync(string id)
     {
-        var element = _dbCollection.FindOne(x => x.Id == id);
+        var element = GetAllEntities().FirstOrDefault(x => x.Id == id);
         return await Task.FromResult((element != null, element));
     }
 
     public async Task<(bool Exist, ArticleEntity? Entity)> TryGetByNumberAsync(long number)
     {
-        var element = _dbCollection.FindOne(x => x.Number == number);
+        var element = GetAllEntities().FirstOrDefault(x => x.Number == number);
         return await Task.FromResult((element != null, element));
     }
 
     public async Task<IEnumerable<ArticleEntity>> GetAllAsync()
     {
-        var element = _dbCollection.FindAll();
+        var element = GetAllEntities();
         return await Task.FromResult(element);
     }
 
