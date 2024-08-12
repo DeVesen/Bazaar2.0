@@ -1,4 +1,5 @@
 ﻿using System.Net.Http.Json;
+using System.Text.Json;
 using DeVesen.Bazaar.Client.Domain;
 using DeVesen.Bazaar.Client.Extensions;
 using DeVesen.Bazaar.Client.Models;
@@ -32,7 +33,7 @@ public class ArticleService
         return await _httpClient.GetFromJsonAsync<IEnumerable<Article>>(queryBuilder.BuildFinal()) ?? Enumerable.Empty<Article>();
     }
 
-    public async Task<Response> CreateAsync(Article element)
+    public async Task<Response> CreateAsync(Article element, bool showResultSnackBar = true)
     {
         var requestUri = _httpClient.BaseAddress;
         var createDto = element.ToCreateDto();
@@ -41,14 +42,24 @@ public class ArticleService
 
         if (response.IsSuccessStatusCode)
         {
-            _snackBarService.AddInfo($"Artikel '{element.Number}' - '{element.Title}' erfolgreich angelegt ...");
+            if (showResultSnackBar)
+            {
+                _snackBarService.AddInfo($"Artikel '{element.Number}' - '{element.Title}' erfolgreich angelegt ...");
+            }
             return Response.Valid();
         }
 
+        var messageStr = await response.Content.ReadAsStringAsync();
+        var messageObj = JsonSerializer.Deserialize<FailedRequestMessage>(messageStr);
+
         var message = await response.Content.ReadFromJsonAsync<FailedRequestMessage>();
 
-        _snackBarService.AddError($"Ausnahmefehler {response.StatusCode}{Environment.NewLine}{message!.Message}");
-        return Response.Invalid();
+        if (showResultSnackBar)
+        {
+            _snackBarService.AddError($"Ausnahmefehler {response.StatusCode}{Environment.NewLine}{message!.Message}");
+        }
+
+        return Response.Invalid(message!.Message);
     }
 
     public async Task<Response> UpdateAsync(Article element)
@@ -63,6 +74,9 @@ public class ArticleService
             _snackBarService.AddInfo($"Artikel '{element.Number}' - '{element.Title}' erfolgreich geändert ...");
             return Response.Valid();
         }
+
+        var messageStr = await response.Content.ReadAsStringAsync();
+        var messageObj = JsonSerializer.Deserialize<FailedRequestMessage>(messageStr);
 
         var message = await response.Content.ReadFromJsonAsync<FailedRequestMessage>();
 
@@ -82,6 +96,9 @@ public class ArticleService
             return Response.Valid();
         }
 
+        var messageStr = await response.Content.ReadAsStringAsync();
+        var messageObj = JsonSerializer.Deserialize<FailedRequestMessage>(messageStr);
+
         var message = await response.Content.ReadFromJsonAsync<FailedRequestMessage>();
 
         _snackBarService.AddError($"Ausnahmefehler {response.StatusCode}{Environment.NewLine}{message!.Message}");
@@ -97,6 +114,9 @@ public class ArticleService
         {
             return Response.Valid();
         }
+
+        var messageStr = await response.Content.ReadAsStringAsync();
+        var messageObj = JsonSerializer.Deserialize<FailedRequestMessage>(messageStr);
 
         var message = await response.Content.ReadFromJsonAsync<FailedRequestMessage>();
 

@@ -1,8 +1,11 @@
-﻿<MudButton StartIcon="@Icons.Material.Filled.Save"
-           Variant="Variant.Filled"
-           Color="Color.Primary"
-           Disabled="@(Enabled is false)"
-           OnClick="OnClick">Speichern</MudButton>
+﻿@if (Hide is false)
+{
+    <MudButton StartIcon="@Icons.Material.Filled.Save"
+               Variant="Variant.Filled"
+               Color="Color.Primary"
+               Disabled="@(Enabled is false)"
+               OnClick="OnClick">Speichern</MudButton>
+}
 
 @code {
     /// <summary>
@@ -11,6 +14,10 @@
     [Parameter]
     [Category(CategoryTypes.Button.Behavior)]
     public bool Enabled { get; set; } = true;
+
+    [Parameter]
+    [Category(CategoryTypes.Button.Behavior)]
+    public bool Hide { get; set; }
 
     /// <summary>
     /// Button click event.

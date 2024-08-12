@@ -1,5 +1,6 @@
 ﻿using DeVesen.Bazaar.Client.State.Article;
 using DeVesen.Bazaar.Client.State.ArticleCategory;
+using DeVesen.Bazaar.Client.State.Import;
 using DeVesen.Bazaar.Client.State.Manufacturer;
 using DeVesen.Bazaar.Client.State.Vendor;
 

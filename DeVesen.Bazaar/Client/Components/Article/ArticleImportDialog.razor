@@ -1,31 +1,55 @@
 ﻿@using DeVesen.Bazaar.Client.Components.Common
 @using DeVesen.Bazaar.Client.Components.Common.Buttons
-@using DeVesen.Bazaar.Client.Models
-@using DeVesen.Bazaar.Client.Services
-@using DeVesen.Bazaar.Shared.Services
+@using DeVesen.Bazaar.Client.State.Import
+@using Fluxor
 
-@inject ArticleService ArticleService
-@inject SystemClock SystemClock
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+
+@inject ImportFacade ImportFacade
+@inject IState<ImportState> ImportState
 
 <MudDialog>
     <DialogContent>
-        <MudGrid Spacing="1">
-            <MudItem xs="12">
+        @if (HaveAnyItem is false)
+        {
+            <MudGrid Spacing="1">
+                <MudItem xs="12">
 
-                @if (_isLoadingData)
-                {
-                    <MudProgressLinear Color="Color.Secondary" Indeterminate Class="my-7" />
-                }
-                else
-                {
-                    <DvFileUpload OnFilesChanged="OnFilesChangedAsync" />
-                }
+                    @if (_isLoadingData)
+                    {
+                        <MudProgressLinear Color="Color.Secondary" Indeterminate Class="my-7"/>
+                    }
+                    else
+                    {
+                        <DvFileUpload OnFilesChanged="OnFilesChangedAsync"/>
+                    }
 
-            </MudItem>
-        </MudGrid>
+                </MudItem>
+            </MudGrid>
+        }
+        else if (EverythingImported is false)
+        {
+            
+            <MudList T="string">
+                @foreach (var item in @ImportInfoItems)
+                {
+                    <MudListItem Dense="true"
+                                 Gutters="true"
+                                 IconColor="@GetListColor(item)"
+                                 Icon="@Icons.Material.TwoTone.PlayArrow"
+                                 Text="@GetListText(item)"
+                                 SecondaryText="@GetListSecondaryText(item)"/>
+                }
+            </MudList>
+        }
+        else
+        {
+            <MudText> Alle Artikel wurden erfolgreich importiert !</MudText>
+        }
     </DialogContent>
     <DialogActions>
-        <DvButtonClose OnClick="OnCloseAsync" />
+        <DvButtonSave Hide="@HideSaveBtn" Enabled="@EnableSaveBtn" OnClick="OnSave" />
+        <DvButtonClose OnClick="OnClose"/>
     </DialogActions>
 </MudDialog>
 
@@ -34,9 +58,34 @@
 
     [Parameter] public required string VendorId { get; set; }
 
-    private bool _isLoadingData = false;
+    private bool HideSaveBtn => ImportState.Value.Items.Any() is false || _importTried;
 
-    private void OnCloseAsync() => MudDialog.Close();
+    private bool EnableSaveBtn => ImportState.Value.Items.Any() && ImportState.Value.Items.All(p => p.Validated is true);
+
+    private bool EverythingImported => ImportState.Value.Items.Any() && ImportState.Value.Items.All(p => p.Imported is true);
+
+    private bool HaveAnyItem => ImportState.Value.Items.Any();
+
+    private IEnumerable<ImportInfo> ImportInfoItems => ImportState.Value.Items.Where(p => p.Imported is false or null);
+
+    private bool _isLoadingData;
+    private bool _importTried = false;
+
+    private void OnSave()
+    {
+        _importTried = true;
+
+        foreach (var article in ImportState.Value.Items.ToArray())
+        {
+            ImportFacade.ImportDataLine(article.LineIndex, article.Article!);
+        }
+    }
+
+    private void OnClose()
+    {
+        ImportFacade.ClearBuffer();
+        MudDialog.Close();
+    }
 
     private async Task OnFilesChangedAsync(InputFileChangeEventArgs file)
     {
@@ -46,45 +95,64 @@
         var reader = new StreamReader(fileStream);
 
         var line = await reader.ReadLineAsync();
+        var lineCount = 1;
 
         while (line != null)
         {
-            if (TryMapToArticle(line, out var article))
-            {
-                await ArticleService.CreateAsync(article);
-            }
+            ImportFacade.AnalyzeDataLine(VendorId, lineCount, line);
 
             line = await reader.ReadLineAsync();
+            lineCount++;
         }
 
         _isLoadingData = false;
-
-        MudDialog.Close(DialogResult.Ok(true));
     }
 
-    private bool TryMapToArticle(string line, out Article value)
+    private static Color GetListColor(ImportInfo line)
     {
-        var lineParts = line.Split(new[] { ";" }, StringSplitOptions.None);
-
-        if (lineParts.Length != 7)
+        if (line.Split is false || line.Validated is false || line.Imported is false)
         {
-            value = null!;
-            return false;
+            return Color.Error;
         }
 
-        value = new Article
+        return line.Imported is true
+            ? Color.Success
+            : line.Validated is true
+                ? Color.Info
+                : line.Split is true
+                    ? Color.Default
+                    : Color.Error;
+    }
+
+    private static string GetListText(ImportInfo line)
+    {
+        return line.Article == null
+            ? $"{line.LineIndex:D5}: {line.Line}"
+            : $"{line.LineIndex:D5}: {line.Article.Number} - {line.Article.Title}";
+    }
+
+    private static string GetListSecondaryText(ImportInfo line)
+    {
+        if (line.ErrorMessages.Any())
         {
-            VendorId = VendorId,
-            Number = int.Parse(lineParts[0]),
-            Title = lineParts[1],
-            ArticleCategory = lineParts[2],
-            Manufacturer = lineParts[3],
-            Created = SystemClock.GetNow(),
-            Price01 = double.Parse(lineParts[4]),
-            Price02 = double.TryParse(lineParts[5], out var price02Val) ? price02Val : null,
-            Description = lineParts[6]
-        };
-        
-        return true;
+            return line.ErrorMessages.First();
+        }
+
+        if (line.Split is false)
+        {
+            return "Fehlerhafte Importzeile!";
+        }
+
+        if (line.Validated is false)
+        {
+            return "Fehlerhafter Artikel!";
+        }
+
+        if (line.Imported.HasValue)
+        {
+            return line.Imported.Value ? "Importiert" : "Fehler bei dem Import!";
+        }
+
+        return string.Empty;
     }
 }
