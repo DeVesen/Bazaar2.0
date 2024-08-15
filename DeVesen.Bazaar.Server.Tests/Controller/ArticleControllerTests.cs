@@ -29,7 +29,7 @@ public class ArticleControllerTests
         // Arrange
         var vendorRepository = new VendorRepositoryFake();
         var articleRepository = new ArticleRepositoryFake();
-        var articleStorage = new ArticleStorage(vendorRepository, articleRepository);
+        var articleStorage = new ArticleStorage(vendorRepository, articleRepository, _systemClock);
         var vendorStorage = new VendorStorage(vendorRepository, articleRepository);
         var articleValidator = new ArticleValidator(articleStorage, vendorStorage);
         var controller = new ArticleController(_systemClock, articleStorage, articleValidator);
@@ -47,7 +47,7 @@ public class ArticleControllerTests
         // Arrange
         var vendorRepository = new VendorRepositoryFake();
         var articleRepository = new ArticleRepositoryFake(Faker.Entity.Article1, Faker.Entity.Article2, Faker.Entity.Article3);
-        var articleStorage = new ArticleStorage(vendorRepository, articleRepository);
+        var articleStorage = new ArticleStorage(vendorRepository, articleRepository, _systemClock);
         var vendorStorage = new VendorStorage(vendorRepository, articleRepository);
         var articleValidator = new ArticleValidator(articleStorage, vendorStorage);
         var controller = new ArticleController(_systemClock, articleStorage, articleValidator);
@@ -67,7 +67,7 @@ public class ArticleControllerTests
         // Arrange
         var vendorRepository = new VendorRepositoryFake(Faker.Entity.Vendor2);
         var articleRepository = new ArticleRepositoryFake();
-        var articleStorage = new ArticleStorage(vendorRepository, articleRepository);
+        var articleStorage = new ArticleStorage(vendorRepository, articleRepository, _systemClock);
         var vendorStorage = new VendorStorage(vendorRepository, articleRepository);
         var articleValidator = new ArticleValidator(articleStorage, vendorStorage);
         var controller = new ArticleController(_systemClock, articleStorage, articleValidator);
@@ -87,7 +87,7 @@ public class ArticleControllerTests
         // Arrange
         var vendorRepository = new VendorRepositoryFake(Faker.Entity.Vendor2);
         var articleRepository = new ArticleRepositoryFake(Faker.Entity.Article1);
-        var articleStorage = new ArticleStorage(vendorRepository, articleRepository);
+        var articleStorage = new ArticleStorage(vendorRepository, articleRepository, _systemClock);
         var vendorStorage = new VendorStorage(vendorRepository, articleRepository);
         var articleValidator = new ArticleValidator(articleStorage, vendorStorage);
         var controller = new ArticleController(_systemClock, articleStorage, articleValidator);
@@ -107,7 +107,7 @@ public class ArticleControllerTests
         // Arrange
         var vendorRepository = new VendorRepositoryFake(Faker.Entity.Vendor1);
         var articleRepository = new ArticleRepositoryFake(Faker.Entity.Article1);
-        var articleStorage = new ArticleStorage(vendorRepository, articleRepository);
+        var articleStorage = new ArticleStorage(vendorRepository, articleRepository, _systemClock);
         var vendorStorage = new VendorStorage(vendorRepository, articleRepository);
         var articleValidator = new ArticleValidator(articleStorage, vendorStorage);
         var controller = new ArticleController(_systemClock, articleStorage, articleValidator);
@@ -127,7 +127,7 @@ public class ArticleControllerTests
         // Arrange
         var vendorRepository = new VendorRepositoryFake(Faker.Entity.Vendor1);
         var articleRepository = new ArticleRepositoryFake();
-        var articleStorage = new ArticleStorage(vendorRepository, articleRepository);
+        var articleStorage = new ArticleStorage(vendorRepository, articleRepository, _systemClock);
         var vendorStorage = new VendorStorage(vendorRepository, articleRepository);
         var articleValidator = new ArticleValidator(articleStorage, vendorStorage);
         var controller = new ArticleController(_systemClock, articleStorage, articleValidator);
@@ -146,7 +146,7 @@ public class ArticleControllerTests
         // Arrange
         var vendorRepository = new VendorRepositoryFake(Faker.Entity.Vendor1);
         var articleRepository = new ArticleRepositoryFake(Faker.Entity.Article1);
-        var articleStorage = new ArticleStorage(vendorRepository, articleRepository);
+        var articleStorage = new ArticleStorage(vendorRepository, articleRepository, _systemClock);
         var vendorStorage = new VendorStorage(vendorRepository, articleRepository);
         var articleValidator = new ArticleValidator(articleStorage, vendorStorage);
         var controller = new ArticleController(_systemClock, articleStorage, articleValidator);
@@ -165,7 +165,7 @@ public class ArticleControllerTests
         // Arrange
         var vendorRepository = new VendorRepositoryFake(Faker.Entity.Vendor1);
         var articleRepository = new ArticleRepositoryFake(Faker.Entity.Article1);
-        var articleStorage = new ArticleStorage(vendorRepository, articleRepository);
+        var articleStorage = new ArticleStorage(vendorRepository, articleRepository, _systemClock);
         var vendorStorage = new VendorStorage(vendorRepository, articleRepository);
         var articleValidator = new ArticleValidator(articleStorage, vendorStorage);
         var controller = new ArticleController(_systemClock, articleStorage, articleValidator);
@@ -188,7 +188,7 @@ public class ArticleControllerTests
         // Arrange
         var vendorRepository = new VendorRepositoryFake();
         var articleRepository = new ArticleRepositoryFake();
-        var articleStorage = new ArticleStorage(vendorRepository, articleRepository);
+        var articleStorage = new ArticleStorage(vendorRepository, articleRepository, _systemClock);
         var vendorStorage = new VendorStorage(vendorRepository, articleRepository);
         var articleValidator = new ArticleValidator(articleStorage, vendorStorage);
         var controller = new ArticleController(_systemClock, articleStorage, articleValidator);
@@ -207,7 +207,7 @@ public class ArticleControllerTests
         // Arrange
         var vendorRepository = new VendorRepositoryFake();
         var articleRepository = new ArticleRepositoryFake(Faker.Entity.Article1);
-        var articleStorage = new ArticleStorage(vendorRepository, articleRepository);
+        var articleStorage = new ArticleStorage(vendorRepository, articleRepository, _systemClock);
         var vendorStorage = new VendorStorage(vendorRepository, articleRepository);
         var articleValidator = new ArticleValidator(articleStorage, vendorStorage);
         var controller = new ArticleController(_systemClock, articleStorage, articleValidator);
@@ -226,7 +226,7 @@ public class ArticleControllerTests
         // Arrange
         var vendorRepository = new VendorRepositoryFake();
         var articleRepository = new ArticleRepositoryFake(Faker.Entity.Article1);
-        var articleStorage = new ArticleStorage(vendorRepository, articleRepository);
+        var articleStorage = new ArticleStorage(vendorRepository, articleRepository, _systemClock);
         var vendorStorage = new VendorStorage(vendorRepository, articleRepository);
         var articleValidator = new ArticleValidator(articleStorage, vendorStorage);
         var controller = new ArticleController(_systemClock, articleStorage, articleValidator);

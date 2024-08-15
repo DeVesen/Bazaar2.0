@@ -1,18 +1,31 @@
 ﻿using DeVesen.Bazaar.Server.Storage;
 using DeVesen.Bazaar.Server.Tests.Fake.Repository;
+using DeVesen.Bazaar.Shared.Services;
 using FluentAssertions;
+using Moq;
 
 namespace DeVesen.Bazaar.Server.Tests.Storage;
 
 public class ArticleStorageTests
 {
+    private readonly SystemClock _systemClock;
+
+    public ArticleStorageTests()
+    {
+        _systemClock = Mock.Of<SystemClock>();
+
+        Mock.Get(_systemClock)
+            .Setup(x => x.GetNow())
+            .Returns(new DateTime(2024, 8, 1, 1, 1, 1));
+    }
+
     [Fact]
     public async Task ExistByIdAsync_EmptyRepository_ExpectFalse()
     {
         // Arrange
         var vendorRepository = new VendorRepositoryFake();
         var articleRepository = new ArticleRepositoryFake();
-        var storage = new ArticleStorage(vendorRepository, articleRepository);
+        var storage = new ArticleStorage(vendorRepository, articleRepository, _systemClock);
 
         // Act
         var result = await storage.ExistByIdAsync(Faker.Entity.Article1.Id);
@@ -27,7 +40,7 @@ public class ArticleStorageTests
         // Arrange
         var vendorRepository = new VendorRepositoryFake();
         var articleRepository = new ArticleRepositoryFake(Faker.Entity.Article2);
-        var storage = new ArticleStorage(vendorRepository, articleRepository);
+        var storage = new ArticleStorage(vendorRepository, articleRepository, _systemClock);
 
         // Act
         var result = await storage.ExistByIdAsync(Faker.Entity.Article1.Id);
@@ -42,7 +55,7 @@ public class ArticleStorageTests
         // Arrange
         var vendorRepository = new VendorRepositoryFake();
         var articleRepository = new ArticleRepositoryFake(Faker.Entity.Article1);
-        var storage = new ArticleStorage(vendorRepository, articleRepository);
+        var storage = new ArticleStorage(vendorRepository, articleRepository, _systemClock);
 
         // Act
         var result = await storage.ExistByIdAsync(Faker.Entity.Article1.Id);
@@ -58,7 +71,7 @@ public class ArticleStorageTests
         // Arrange
         var vendorRepository = new VendorRepositoryFake();
         var articleRepository = new ArticleRepositoryFake();
-        var storage = new ArticleStorage(vendorRepository, articleRepository);
+        var storage = new ArticleStorage(vendorRepository, articleRepository, _systemClock);
 
         // Act
         var result = await storage.GetAllAsync();
@@ -73,7 +86,7 @@ public class ArticleStorageTests
         // Arrange
         var vendorRepository = new VendorRepositoryFake();
         var articleRepository = new ArticleRepositoryFake(Faker.Entity.Article1, Faker.Entity.Article2, Faker.Entity.Article3);
-        var storage = new ArticleStorage(vendorRepository, articleRepository);
+        var storage = new ArticleStorage(vendorRepository, articleRepository, _systemClock);
         var expected = new[] { Faker.Entity.Article1, Faker.Entity.Article2, Faker.Entity.Article3 };
 
         // Act
@@ -90,7 +103,7 @@ public class ArticleStorageTests
         // Arrange
         var vendorRepository = new VendorRepositoryFake(Faker.Entity.Vendor2);
         var articleRepository = new ArticleRepositoryFake();
-        var storage = new ArticleStorage(vendorRepository, articleRepository);
+        var storage = new ArticleStorage(vendorRepository, articleRepository, _systemClock);
 
         // Act
         await storage.CreateAsync(Faker.Domain.Article2);
@@ -105,7 +118,7 @@ public class ArticleStorageTests
         // Arrange
         var vendorRepository = new VendorRepositoryFake(Faker.Entity.Vendor2);
         var articleRepository = new ArticleRepositoryFake(Faker.Entity.Article1);
-        var storage = new ArticleStorage(vendorRepository, articleRepository);
+        var storage = new ArticleStorage(vendorRepository, articleRepository, _systemClock);
 
         // Act
         await storage.CreateAsync(Faker.Domain.Article2);
@@ -120,7 +133,7 @@ public class ArticleStorageTests
         // Arrange
         var vendorRepository = new VendorRepositoryFake();
         var articleRepository = new ArticleRepositoryFake(Faker.Entity.Article1);
-        var storage = new ArticleStorage(vendorRepository, articleRepository);
+        var storage = new ArticleStorage(vendorRepository, articleRepository, _systemClock);
         var article = Faker.Domain.GetArticle(Faker.Entity.Article1.Id);
 
         // Act
@@ -137,7 +150,7 @@ public class ArticleStorageTests
         // Arrange
         var vendorRepository = new VendorRepositoryFake();
         var articleRepository = new ArticleRepositoryFake();
-        var storage = new ArticleStorage(vendorRepository, articleRepository);
+        var storage = new ArticleStorage(vendorRepository, articleRepository, _systemClock);
 
         // Act
         var act = () => storage.UpdateAsync(Faker.Domain.Article2);
@@ -152,7 +165,7 @@ public class ArticleStorageTests
         // Arrange
         var vendorRepository = new VendorRepositoryFake();
         var articleRepository = new ArticleRepositoryFake(Faker.Entity.Article1);
-        var storage = new ArticleStorage(vendorRepository, articleRepository);
+        var storage = new ArticleStorage(vendorRepository, articleRepository, _systemClock);
 
         // Act
         var act = () => storage.UpdateAsync(Faker.Domain.Article2);
@@ -167,7 +180,7 @@ public class ArticleStorageTests
         // Arrange
         var vendorRepository = new VendorRepositoryFake(Faker.Entity.Vendor1);
         var articleRepository = new ArticleRepositoryFake(Faker.Entity.Article1);
-        var storage = new ArticleStorage(vendorRepository, articleRepository);
+        var storage = new ArticleStorage(vendorRepository, articleRepository, _systemClock);
         var article = Faker.Domain.GetArticle(vendorId: Faker.Entity.Vendor1.Id,
             id: Faker.Entity.Article1.Id,
             title: "Hello Article");
@@ -187,7 +200,7 @@ public class ArticleStorageTests
         // Arrange
         var vendorRepository = new VendorRepositoryFake();
         var articleRepository = new ArticleRepositoryFake();
-        var storage = new ArticleStorage(vendorRepository, articleRepository);
+        var storage = new ArticleStorage(vendorRepository, articleRepository, _systemClock);
 
         // Act
         var act = () => storage.DeleteByIdAsync(Faker.Domain.Article2.Id);
@@ -202,7 +215,7 @@ public class ArticleStorageTests
         // Arrange
         var vendorRepository = new VendorRepositoryFake();
         var articleRepository = new ArticleRepositoryFake(Faker.Entity.Article1);
-        var storage = new ArticleStorage(vendorRepository, articleRepository);
+        var storage = new ArticleStorage(vendorRepository, articleRepository, _systemClock);
 
         // Act
         var act = () => storage.DeleteByIdAsync(Faker.Domain.Article2.Id);
@@ -217,7 +230,7 @@ public class ArticleStorageTests
         // Arrange
         var vendorRepository = new VendorRepositoryFake();
         var articleRepository = new ArticleRepositoryFake(Faker.Entity.Article1);
-        var storage = new ArticleStorage(vendorRepository, articleRepository);
+        var storage = new ArticleStorage(vendorRepository, articleRepository, _systemClock);
 
         // Act
         await storage.DeleteByIdAsync(Faker.Domain.Article1.Id);
@@ -232,7 +245,7 @@ public class ArticleStorageTests
         // Arrange
         var vendorRepository = new VendorRepositoryFake();
         var articleRepository = new ArticleRepositoryFake();
-        var storage = new ArticleStorage(vendorRepository, articleRepository);
+        var storage = new ArticleStorage(vendorRepository, articleRepository, _systemClock);
 
         // Act
         var act = () => storage.DeleteByNumberAsync(Faker.Domain.Article2.Number);
@@ -247,7 +260,7 @@ public class ArticleStorageTests
         // Arrange
         var vendorRepository = new VendorRepositoryFake();
         var articleRepository = new ArticleRepositoryFake(Faker.Entity.Article1);
-        var storage = new ArticleStorage(vendorRepository, articleRepository);
+        var storage = new ArticleStorage(vendorRepository, articleRepository, _systemClock);
 
         // Act
         var act = () => storage.DeleteByNumberAsync(Faker.Domain.Article2.Number);
@@ -262,7 +275,7 @@ public class ArticleStorageTests
         // Arrange
         var vendorRepository = new VendorRepositoryFake();
         var articleRepository = new ArticleRepositoryFake(Faker.Entity.Article1);
-        var storage = new ArticleStorage(vendorRepository, articleRepository);
+        var storage = new ArticleStorage(vendorRepository, articleRepository, _systemClock);
 
         // Act
         await storage.DeleteByNumberAsync(Faker.Domain.Article1.Number);
