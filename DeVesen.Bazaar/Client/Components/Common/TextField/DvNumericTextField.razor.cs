@@ -9,7 +9,7 @@ public partial class DvNumericTextField<T> : MudNumericField<T>
         ShrinkLabel = true;
         Margin = Margin.Dense;
         Variant = Variant.Outlined;
-        DebounceInterval = 600;
+        DebounceInterval = 750;
         HideSpinButtons = true;
     }
 }

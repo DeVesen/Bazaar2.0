@@ -23,6 +23,29 @@ namespace DeVesen.Bazaar.Client.Services
             _mudSnackBar = mudSnackBar;
         }
 
+        public void AddSuccess(string message)
+        {
+            AddSuccess(message, Guid.NewGuid().ToString());
+        }
+
+        public void AddSuccess(string message, string key)
+        {
+            AddSuccess(message, key, Defaults.Classes.Position.BottomRight);
+        }
+
+        public void AddSuccess(string message, string key, string position)
+        {
+            _mudSnackBar.Configuration.PositionClass = position;
+            _mudSnackBar.Add(
+                message,
+                Severity.Success,
+                config =>
+                {
+                    config.VisibleStateDuration = 2500;
+                },
+                key);
+        }
+
         public void AddInfo(string message)
         {
             AddInfo(message, Guid.NewGuid().ToString());
@@ -32,7 +55,6 @@ namespace DeVesen.Bazaar.Client.Services
         {
             AddInfo(message, key, Defaults.Classes.Position.BottomRight);
         }
-
 
         public void AddInfo(string message, string key, string position)
         {
@@ -46,6 +68,7 @@ namespace DeVesen.Bazaar.Client.Services
                 },
                 key);
         }
+
 
         public void AddError(string message)
         {

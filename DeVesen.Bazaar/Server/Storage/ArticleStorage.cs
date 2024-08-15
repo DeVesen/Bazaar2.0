@@ -1,6 +1,7 @@
 ﻿using DeVesen.Bazaar.Server.Contracts;
 using DeVesen.Bazaar.Server.Domain;
 using DeVesen.Bazaar.Server.Extensions;
+using DeVesen.Bazaar.Shared.Services;
 
 namespace DeVesen.Bazaar.Server.Storage;
 
@@ -8,11 +9,13 @@ public class ArticleStorage
 {
     private readonly IVendorRepository _vendorRepository;
     private readonly IArticleRepository _articleRepository;
+    private readonly SystemClock _systemClock;
 
-    public ArticleStorage(IVendorRepository vendorRepository, IArticleRepository articleRepository)
+    public ArticleStorage(IVendorRepository vendorRepository, IArticleRepository articleRepository, SystemClock systemClock)
     {
         _vendorRepository = vendorRepository;
         _articleRepository = articleRepository;
+        _systemClock = systemClock;
     }
 
     public async Task<bool> ExistByIdAsync(string id)
@@ -160,5 +163,20 @@ public class ArticleStorage
         }
 
         await _articleRepository.DeleteAsync(element.Entity!.Id);
+    }
+
+    public async Task BookOrderAsync(IEnumerable<SalesOrder.Position> positions)
+    {
+        var soldTime = _systemClock.GetNow();
+
+        foreach (var item in positions)
+        {
+            var element = await GetByNumberAsync(item.Number);
+
+            element.Sold = soldTime;
+            element.SoldAt = item.Price;
+
+            await _articleRepository.UpdateAsync(element.ToEntity());
+        }
     }
 }

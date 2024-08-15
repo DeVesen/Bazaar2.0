@@ -113,6 +113,9 @@ public static class ArticleExtensions
             Turnover = data.Turnover
         };
 
+    public static SalesOrder.Position ToDomain(this SalesOrderDto.Position dto)
+        => new(dto.Number, dto.Price);
+
     private static string ToShortHash(this ArticleCreateDto dto)
     {
         var builder = new StringBuilder();

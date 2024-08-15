@@ -13,11 +13,11 @@
 
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 
+@inject IDialogService DialogService
+@inject NavigationService NavigationService
+
 @inject StateFacade StateFacade
 @inject IState<VendorState> VendorState
-
-@inject NavigationService NavigationService
-@inject IDialogService DialogService
 
 <div class="d-flex flex-column gap-4 px-1">
     <MudToolBar WrapContent Dense Gutters="false">

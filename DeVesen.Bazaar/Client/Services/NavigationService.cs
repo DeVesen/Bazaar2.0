@@ -11,33 +11,23 @@ public class NavigationService
         _navigationManager = navigationManager;
     }
 
+    public SalesNavigationService Sales => new(_navigationManager);
     public VendorNavigationService Vendor => new(_navigationManager);
-    public ArticleNavigationService Article => new(_navigationManager);
-    public ArticleCategoryNavigationService ArticleCategory => new(_navigationManager);
 
 
-    public class ArticleCategoryNavigationService : ChildNavigationService
+    public class SalesNavigationService : ChildNavigationService
     {
-        public ArticleCategoryNavigationService(NavigationManager navigationManager) : base(navigationManager)
-        {
-        }
+        public SalesNavigationService(NavigationManager navigationManager) : base(navigationManager) { }
 
-        public void ToOverview()
+        public void ToTheSale()
         {
-            NavigationManager.NavigateTo("article-category");
+            NavigationManager.NavigateTo("Sales");
         }
     }
 
     public class VendorNavigationService : ChildNavigationService
     {
-        public VendorNavigationService(NavigationManager navigationManager) : base(navigationManager)
-        {
-        }
-
-        public void ToOverview()
-        {
-            NavigationManager.NavigateTo("vendors");
-        }
+        public VendorNavigationService(NavigationManager navigationManager) : base(navigationManager) { }
 
         public void ToArticle(string vendorId)
         {
@@ -45,23 +35,11 @@ public class NavigationService
         }
     }
 
-    public class ArticleNavigationService : ChildNavigationService
-    {
-        public ArticleNavigationService(NavigationManager navigationManager) : base(navigationManager)
-        {
-        }
-
-        public void ToOverview()
-        {
-            NavigationManager.NavigateTo("articles");
-        }
-    }
-
-    public class ChildNavigationService
+    public abstract class ChildNavigationService
     {
         protected readonly NavigationManager NavigationManager;
 
-        public ChildNavigationService(NavigationManager navigationManager)
+        protected ChildNavigationService(NavigationManager navigationManager)
         {
             NavigationManager = navigationManager;
         }

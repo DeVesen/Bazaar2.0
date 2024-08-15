@@ -1,0 +1,107 @@
+﻿
+<div style="@OuterStyle" class="@OuterClass">
+    <CascadingValue Value="false" Name="SubscribeToParentForm" IsFixed>
+        <MudButton StartIcon="@StartIcon"
+                   EndIcon="@EndIcon"
+                   IconColor="@IconColor"
+                   IconSize="@IconSize"
+                   IconClass="@IconClass"
+                   Color="@Color"
+                   Size="@Size"
+                   Variant="@Variant"
+                   FullWidth="@FullWidth"
+                   Disabled="@Disabled"
+                   HtmlTag="@HtmlTag"
+                   ButtonType="@ButtonType"
+                   Href="@Href"
+                   Target="@Target"
+                   Rel="@Rel"
+                   ClickPropagation="@ClickPropagation"
+                   DropShadow="@DropShadow"
+                   Ripple="@Ripple"
+                   OnClick="@OnClick"
+                   Class="@Class"
+                   Style="@Style"
+                   Tag="@Tag">@ChildContent</MudButton>
+    </CascadingValue>
+</div>
+
+@code {
+    [Parameter]
+    public string? OuterStyle { get; set; }
+
+    [Parameter]
+    public string? OuterClass { get; set; }
+
+
+    [Parameter]
+    public string? StartIcon { get; set; }
+
+    [Parameter]
+    public string? EndIcon { get; set; }
+
+    [Parameter]
+    public Color IconColor { get; set; } = Color.Inherit;
+
+    [Parameter]
+    public Size? IconSize { get; set; }
+
+    [Parameter]
+    public string? IconClass { get; set; }
+
+    [Parameter]
+    public Color Color { get; set; } = Color.Default;
+
+    [Parameter]
+    public Size Size { get; set; } = Size.Medium;
+
+    [Parameter]
+    public Variant Variant { get; set; } = Variant.Filled;
+
+    [Parameter]
+    public bool FullWidth { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+
+    [Parameter]
+    public string HtmlTag { get; set; } = "button";
+
+    [Parameter]
+    public ButtonType ButtonType { get; set; }
+
+    [Parameter]
+    public string? Href { get; set; }
+
+    [Parameter]
+    public string? Target { get; set; }
+
+    [Parameter]
+    public string? Rel { get; set; }
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    [Parameter]
+    public bool ClickPropagation { get; set; }
+
+    [Parameter]
+    public bool DropShadow { get; set; } = true;
+
+    [Parameter]
+    public bool Ripple { get; set; } = true;
+
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnClick { get; set; }
+    
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public string? Style { get; set; }
+
+    [Parameter]
+    public object? Tag { get; set; }
+}

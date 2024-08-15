@@ -4,7 +4,8 @@
 
 <div style="@OuterStyle" class="@OuterClass">
     <CascadingValue Value="false" Name="SubscribeToParentForm" IsFixed>
-        <MudNumericField T="T"
+        <MudNumericField @ref="_numericField"
+                         T="T"
                       ShrinkLabel="@ShrinkLabel"
                       Margin="@Margin"
                       Variant="@Variant"
@@ -75,6 +76,8 @@
     [Parameter]
     public string? OuterClass { get; set; }
 
+    private MudNumericField<T> _numericField = null!;
+
     private async Task OnTextChanged(string newText)
     {
         await SetTextAsync(newText);
@@ -87,10 +90,30 @@
 
     public void ReRender()
     {
-        Console.WriteLine($"ReRender");
-        Console.WriteLine($"Error=>{Error}");
-        Console.WriteLine($"ErrorText=>{ErrorText}");
-
         ForceRender(true);
+    }
+
+    /// <inheritdoc />
+    public override ValueTask FocusAsync()
+    {
+        return _numericField.FocusAsync();
+    }
+
+    /// <inheritdoc />
+    public override ValueTask BlurAsync()
+    {
+        return _numericField.BlurAsync();
+    }
+
+    /// <inheritdoc />
+    public override ValueTask SelectAsync()
+    {
+        return _numericField.SelectAsync();
+    }
+
+    /// <inheritdoc />
+    public override ValueTask SelectRangeAsync(int pos1, int pos2)
+    {
+        return _numericField.SelectRangeAsync(pos1, pos2);
     }
 }

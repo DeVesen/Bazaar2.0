@@ -1,5 +1,4 @@
 ﻿using System.Net.Http.Json;
-using System.Text.Json;
 using DeVesen.Bazaar.Client.Domain;
 using DeVesen.Bazaar.Client.Extensions;
 using DeVesen.Bazaar.Client.Models;
@@ -21,7 +20,17 @@ public class ArticleService
         _httpClient.BaseAddress = hostEnvironment.GetApiEndpointUrl("api/v1/Article");
     }
 
-    public async Task<IEnumerable<Article>> GetAllAsync(string? vendorId = null, string? number = null, string? searchText = null)
+    public async Task<Article?> GetByNumber(long number)
+    {
+        var possibleElements = (await GetAllAsync(number: number.ToString()))
+            .Where(p => p.Number == number)
+            .ToArray();
+
+        return possibleElements.Length == 1 ? possibleElements.FirstOrDefault() : null;
+    }
+
+    public async Task<IEnumerable<Article>> GetAllAsync(string? vendorId = null, string? number = null,
+        string? searchText = null)
     {
         var queryBuilder = new ApiQueryBuilder
         {
@@ -30,7 +39,8 @@ public class ArticleService
             ["SearchText"] = searchText
         };
 
-        return await _httpClient.GetFromJsonAsync<IEnumerable<Article>>(queryBuilder.BuildFinal()) ?? Enumerable.Empty<Article>();
+        return await _httpClient.GetFromJsonAsync<IEnumerable<Article>>(queryBuilder.BuildFinal()) ??
+               Enumerable.Empty<Article>();
     }
 
     public async Task<Response> CreateAsync(Article element, bool showResultSnackBar = true)
@@ -46,11 +56,9 @@ public class ArticleService
             {
                 _snackBarService.AddInfo($"Artikel '{element.Number}' - '{element.Title}' erfolgreich angelegt ...");
             }
+
             return Response.Valid();
         }
-
-        var messageStr = await response.Content.ReadAsStringAsync();
-        var messageObj = JsonSerializer.Deserialize<FailedRequestMessage>(messageStr);
 
         var message = await response.Content.ReadFromJsonAsync<FailedRequestMessage>();
 
@@ -75,9 +83,6 @@ public class ArticleService
             return Response.Valid();
         }
 
-        var messageStr = await response.Content.ReadAsStringAsync();
-        var messageObj = JsonSerializer.Deserialize<FailedRequestMessage>(messageStr);
-
         var message = await response.Content.ReadFromJsonAsync<FailedRequestMessage>();
 
         _snackBarService.AddError($"Ausnahmefehler {response.StatusCode}{Environment.NewLine}{message!.Message}");
@@ -96,9 +101,6 @@ public class ArticleService
             return Response.Valid();
         }
 
-        var messageStr = await response.Content.ReadAsStringAsync();
-        var messageObj = JsonSerializer.Deserialize<FailedRequestMessage>(messageStr);
-
         var message = await response.Content.ReadFromJsonAsync<FailedRequestMessage>();
 
         _snackBarService.AddError($"Ausnahmefehler {response.StatusCode}{Environment.NewLine}{message!.Message}");
@@ -115,8 +117,25 @@ public class ArticleService
             return Response.Valid();
         }
 
-        var messageStr = await response.Content.ReadAsStringAsync();
-        var messageObj = JsonSerializer.Deserialize<FailedRequestMessage>(messageStr);
+        var message = await response.Content.ReadFromJsonAsync<FailedRequestMessage>();
+
+        return Response.Invalid(message!.Message);
+    }
+
+    public async Task<Response> BookOrderAsync(IEnumerable<SalesOrderDto.Position> soldItems)
+    {
+        var soldItemArray = soldItems.ToArray();
+        var requestUri = _httpClient.BaseAddress + "/book-sale";
+        var response = await _httpClient.PostAsJsonAsync(requestUri, new SalesOrderDto(soldItemArray));
+
+        if (response.IsSuccessStatusCode)
+        {
+            var itemsCount = soldItemArray.Length;
+            var itemsTotal = soldItemArray.Sum(p => p.Price);
+
+            _snackBarService.AddInfo($"{itemsCount} Artikel für {itemsTotal} € erfolgreich verkauft.");
+            return Response.Valid();
+        }
 
         var message = await response.Content.ReadFromJsonAsync<FailedRequestMessage>();
 

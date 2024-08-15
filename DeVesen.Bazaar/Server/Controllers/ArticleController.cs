@@ -56,6 +56,18 @@ public class ArticleController : ControllerBase
         return Ok();
     }
 
+    [HttpPost("book-sale")]
+    public async Task<ActionResult> BookOrderAsync([FromBody] SalesOrderDto dto)
+    {
+        var orderArticles = dto.Positions
+            .Select(p => p.ToDomain())
+            .ToArray();
+
+        await _articleStorage.BookOrderAsync(orderArticles);
+
+        return Ok();
+    }
+
     [HttpPost]
     public async Task<ActionResult> CreateAsync([FromBody] ArticleCreateDto dto)
     {

@@ -1,0 +1,303 @@
+﻿@using DeVesen.Bazaar.Client.Components.Common
+@using DeVesen.Bazaar.Client.Components.Common.Buttons
+@using DeVesen.Bazaar.Client.Components.Common.TextField
+@using DeVesen.Bazaar.Client.Components.Sales
+@using DeVesen.Bazaar.Client.Models
+@using DeVesen.Bazaar.Client.Services
+@using DeVesen.Bazaar.Client.State.SalesCart
+@using Fluxor
+
+@page "/Sales"
+
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+
+@inject ArticleService ArticleService;
+@inject SalesCartFacade SalesCartFacade;
+@inject IState<SalesCartState> SalesCartState;
+@inject SnackBarService SnackBarService;
+
+<div class="d-flex flex-column gap-4 px-1">
+    <MudGrid>
+        <MudItem xs="12" md="6">
+            <MudGrid Spacing="2">
+                <MudItem xs="12" sm="6">
+                    <DvNumericTextField @ref="_articleNumberRef"
+                                        T="long?"
+                                        Label="Artickelnummer"
+                                        Margin="Margin.None"
+                                        Adornment="@ArticleNumberAdornment"
+                                        AdornmentIcon="@Icons.Material.TwoTone.Add"
+                                        @bind-Value="_articleNumber"
+                                        OnKeyUp="@OnArticleSearchKeyUpAsync"
+                                        OnAdornmentClick="@OnArticleSearchAsync" />
+                </MudItem>
+                <MudItem xs="6" sm="3">
+                    <DvButtonSalesPrice Disabled="@Price01BtnDisabled"
+                                        Value="_article?.Price01"
+                                        Style="min-height: 62px; font-size: 26px"
+                                        Color="Color.Primary"
+                                        OnClick="() => OnArticlePriceClickAsync(_article!, _article!.Price01)" />
+                </MudItem>
+                <MudItem xs="6" sm="3">
+                    <DvButtonSalesPrice Disabled="@Price02BtnDisabled"
+                                        Value="_article?.Price02"
+                                        Style="min-height: 62px; font-size: 20px"
+                                        Color="Color.Secondary"
+                                        OnClick="() => OnArticlePriceClickAsync(_article!, _article!.Price02!.Value)"/>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudAlert Dense
+                              Square
+                              NoIcon="@_articleAlertNoIcon"
+                              Variant="@_articleAlertVariant"
+                              Severity="@_articleAlertSeverity"
+                              ContentAlignment="HorizontalAlignment.Center">@_articleAlertText</MudAlert>
+                </MudItem>
+            </MudGrid>
+        </MudItem>
+        <MudItem xs="12" md="6">
+            <MudGrid Spacing="2">
+                
+                @if (HasItemsInCart)
+                {
+                    <MudItem xs="12">
+                        <MudStack>
+                            @foreach (var item in ItemsInCart)
+                            {
+                                <ArticleInCartItem Item="item" OnRemoveClick="x => SalesCartFacade.RemoveItemFromCart(x)"/>
+                            }
+                        </MudStack>
+                    </MudItem>
+                }
+
+                <MudItem xs="4">
+                    <MudField Label="Summe" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.TwoTone.Euro" Variant="Variant.Filled">@ValueOfGoods</MudField>
+                </MudItem>
+                <MudSpacer/>
+                <MudItem xs="4" Class="d-flex justify-end gap-2">
+                    <MudIconButton Disabled="@(HasItemsInCart is false)"
+                                   Icon="@Icons.Material.TwoTone.Delete"
+                                   Variant="Variant.Filled"
+                                   Color="Color.Primary"
+                                   Size="Size.Large"
+                                   OnClick="@OnClearCartClicked"
+                                   Class="p-3"/>
+                    <MudIconButton Disabled="@(HasItemsInCart is false)"
+                                   Icon="@Icons.Material.TwoTone.Euro"
+                                   Variant="Variant.Filled"
+                                   Color="Color.Primary"
+                                   Size="Size.Large"
+                                   OnClick="@OnCompleteSaleClicked"
+                                   Class="p-3" />
+                </MudItem>
+            </MudGrid>
+        </MudItem>
+    </MudGrid>
+</div>
+
+<DispatchedAction Callback="DispatchedActionCallback" />
+
+@code {
+    [Inject] private IDialogService DialogService { get; set; }
+
+    private bool ArticleValidForSale => _article != null &&
+                                        _article.IsValidForSale() &&
+                                        ArticleAlreadyInCart(_article.Number) is false;
+    private bool Price01BtnDisabled => ArticleValidForSale is false;
+    private bool Price02BtnDisabled => _article == null || _article!.Price02.HasValue is false;
+
+    private Adornment ArticleNumberAdornment => _articleNumber > 0 ? Adornment.End : Adornment.None;
+
+    private bool HasItemsInCart => ItemsInCart.Any();
+    private IEnumerable<PurchaseItem> ItemsInCart => SalesCartState.Value.PurchaseItems.OrderBy(p => p.ArticleNumber);
+    private double ValueOfGoods => ItemsInCart.Sum(p => p.SalesAmount);
+
+    private DvNumericTextField<long?>? _articleNumberRef;
+
+    private long? _articleNumber;
+    private Article? _article;
+    private bool _articleAlertNoIcon = true;
+    private Severity _articleAlertSeverity = Severity.Normal;
+    private Variant _articleAlertVariant = Variant.Text;
+    private string _articleAlertText = "Bitte Artikelnummer eingeben ...";
+
+    private async Task OnArticleSearchKeyUpAsync(KeyboardEventArgs args)
+    {
+        if (args.Key == "Enter")
+        {
+            await OnArticleSearchAsync();
+            
+            await SelectArticleNumberInput();
+        }
+    }
+
+    private async Task OnArticleSearchAsync()
+    {
+        if (_articleNumber.HasValue is false)
+        {
+            _article = null;
+            return;
+        }
+        
+        _article = await ArticleService.GetByNumber(_articleNumber.Value);
+
+        if (_article == null)
+        {
+            ShowErrorArticleSelectionMessage($"Artikel {_articleNumber} nicht gefunden!");
+
+            await SelectArticleNumberInput();
+        }
+        else if (_article.IsApprovedForSale() is false)
+        {
+            ShowErrorArticleSelectionMessage($"Artikel {_articleNumber} nicht für den Verkauf frei gegeben!");
+
+            await SelectArticleNumberInput();
+        }
+        else if (_article.IsSettled() && _article.IsSold())
+        {
+            var settledMessage = _article.IsSold() ?
+                $"Artikel {_articleNumber} ist bereits abgerechnet!"
+                : $"Artikel {_articleNumber} ist bereits zurückgegeben!";
+
+            ShowErrorArticleSelectionMessage(settledMessage);
+
+            await SelectArticleNumberInput();
+        }
+        else if (_article.IsSettled() is false && _article.IsSold())
+        {
+            ShowErrorArticleSelectionMessage($"Artikel {_articleNumber} ist bereits verkauft!");
+                
+            await SelectArticleNumberInput();
+        }
+        else if (ArticleAlreadyInCart(_articleNumber.Value))
+        {
+            ShowNeutralArticleSelectionMessage($"Artikel {_articleNumber} bereits im Warenkorb!");
+                
+            await SelectArticleNumberInput();
+        }
+        else
+        {
+            ShowSuccessArticleSelectionMessage($"Artikel {_articleNumber} bereit, bitte Preis wählen...", Variant.Text);
+        }
+    }
+
+    public async Task OnArticlePriceClickAsync(Article article, double price)
+    {
+        await Task.CompletedTask;
+
+        SalesCartFacade.RequestItemToCart(article, price);
+
+        await SelectArticleNumberInput();
+    }
+
+    private async Task DispatchedActionCallback(object action)
+    {
+        if (action is SalesCartActions.AddItemToCart or SalesCartActions.ClearCart or SalesCartActions.RemoveItemFromCart or SalesCartActions.SaleCompleted)
+        {
+            if (action is SalesCartActions.AddItemToCart toCart)
+            {
+                ShowSuccessArticleSelectionMessage($"Artikel {toCart.ArticleNumber} mit {toCart.SalesAmount} € aufgenommen.", Variant.Filled);
+            }
+
+            _articleNumber = null;
+            _article = null;
+            
+            await SelectArticleNumberInput();
+        }
+
+        if (action is SalesCartActions.AddItemToCartFailed failedInfo)
+        {
+            ShowErrorArticleSelectionMessage(failedInfo.Message);
+            
+            await SelectArticleNumberInput();
+        }
+    }
+
+    private bool ArticleAlreadyInCart(long number)
+        => SalesCartState.Value.PurchaseItems.Any(p => p.ArticleNumber == number);
+
+    private void ShowSuccessArticleSelectionMessage(string message, Variant variant)
+    {
+        _articleAlertSeverity = Severity.Success;
+        _articleAlertVariant = variant;
+        _articleAlertText = message;
+        _articleAlertNoIcon = variant != Variant.Filled;
+    }
+
+    private void ShowErrorArticleSelectionMessage(string message)
+    {
+        _articleAlertSeverity = Severity.Error;
+        _articleAlertVariant = Variant.Filled;
+        _articleAlertText = message;
+        _articleAlertNoIcon = false;
+    }
+
+    private void ShowNeutralArticleSelectionMessage(string message)
+    {
+        _articleAlertSeverity = Severity.Normal;
+        _articleAlertVariant = Variant.Text;
+        _articleAlertText = message;
+        _articleAlertNoIcon = true;
+    }
+
+    private async Task SelectArticleNumberInput()
+    {
+        if (_articleNumberRef == null)
+        {
+            return;
+        }
+
+        await _articleNumberRef.FocusAsync();
+        await _articleNumberRef.SelectAsync();
+    }
+
+
+    private async Task OnClearCartClicked()
+    {
+        var msgOptions = new DialogOptions
+        {
+            BackdropClick = true,
+            CloseOnEscapeKey = true,
+            Position = DialogPosition.Center
+        };
+        var result = await DialogService.ShowMessageBox("ACHTUNG",
+                                                        "Einkaufsliste wirklich verwerfen?",
+                                                        yesText: "Löschen", cancelText: "Abbruch",
+                                                        options: msgOptions);
+
+        if (result.HasValue && result.Value)
+        {
+            SalesCartFacade.ClearCart();
+        }
+        
+        _articleNumber = null;
+        _article = null;
+            
+        await SelectArticleNumberInput();
+    }
+
+    private async Task OnCompleteSaleClicked()
+    {
+        var msgOptions = new DialogOptions
+        {
+            BackdropClick = true,
+            CloseOnEscapeKey = true,
+            Position = DialogPosition.Center
+        };
+        var result = await DialogService.ShowMessageBox("Verkauf abschließen",
+                                                        $"Den Verkauf von {ItemsInCart.Count()} Artikel für {ValueOfGoods} € abschließen?",
+                                                        yesText: "Buchen", cancelText: "Abbruch",
+                                                        options: msgOptions);
+
+        if (result.HasValue && result.Value)
+        {
+            SalesCartFacade.CompleteSale();
+        }
+        
+        _articleNumber = null;
+        _article = null;
+            
+        await SelectArticleNumberInput();
+    }
+
+}

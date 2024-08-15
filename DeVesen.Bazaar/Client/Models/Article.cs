@@ -25,13 +25,11 @@ public record Article
         VendorId = vendorId
     };
 
-    public bool Contains(string text)
-    {
-        text = text.Trim().ToLower();
+    public bool IsValidForSale() => IsApprovedForSale() &&
+                                    IsSold() is false &&
+                                    IsSettled() is false;
 
-        return VendorId.ToLower().Contains(text) ||
-               Title.ToLower().Contains(text) ||
-               ArticleCategory.ToLower().Contains(text) ||
-               Manufacturer.ToLower().Contains(text);
-    }
+    public bool IsApprovedForSale() => ApprovedForSale.HasValue;
+    public bool IsSold() => Sold.HasValue;
+    public bool IsSettled() => Settled.HasValue;
 }

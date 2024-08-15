@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using static DeVesen.Bazaar.Shared.SalesOrderDto;
 
 namespace DeVesen.Bazaar.Shared;
 
@@ -65,4 +66,10 @@ public record ArticleUpdateDto
 public record ArticleCreatedDto
 {
     public required string Id { get; init; }
+}
+
+[ExcludeFromCodeCoverage]
+public record SalesOrderDto(IEnumerable<Position> Positions)
+{
+    public record Position(long Number, double Price);
 }
