@@ -1,12 +1,16 @@
 ﻿@using DeVesen.Bazaar.Client.Extensions
-@using DeVesen.Bazaar.Client.Components.ArticleCategory
 @using DeVesen.Bazaar.Client.Models
+@using DeVesen.Bazaar.Client.Pages.ArticleCategory.Components
 @using DeVesen.Bazaar.Client.State
 @using DeVesen.Bazaar.Client.State.ArticleCategory
+@using DeVesen.Bazaar.Client.State.Title
 @using Fluxor
 
 @page "/article-category"
 
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+
+@inject TitleFacade TitleFacade
 @inject StateFacade StateFacade
 @inject IState<ArticleCategoryState> ArticleCategoryState
 @inject IDialogService DialogService
@@ -33,6 +37,13 @@
 
     private string? _searchText;
 
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        TitleFacade.SetCaption("Kategorien");
+    }
+
     private async Task CreateArticleCategoryAsync()
     {
         var options = new DialogOptions
@@ -51,16 +62,15 @@
             var result = await dlg.Result;
 
             forceNext = result!.Canceled is false && (bool)result.Data!;
-            
-            ReloadElements();
-
-            StateHasChanged();
         } while (forceNext);
+        
+        ReloadElements();
     }
 
     private void ReloadElements()
     {
-        StateFacade.Manufacturer.Fetch();
+        StateFacade.ArticleCategory.Fetch();
+        StateHasChanged();
     }
 
     private async Task OnTableRowClickedAsync(TableRowClickEventArgs<ArticleCategory> args)

@@ -18,26 +18,37 @@ public class VendorService
         _httpClient.BaseAddress = hostEnvironment.GetApiEndpointUrl("api/v1/Vendor");
     }
 
-    public async Task<Vendor?> GetAsync(string id)
+    public async Task<VendorView?> GetAsync(string id)
     {
-        return (await GetAllAsync(id)).FirstOrDefault()?.Item;
+        var requestUri = new UriBuilder(_httpClient.BaseAddress)
+                                .AddUriPart(id)
+                                .Build();
+
+        if (string.IsNullOrWhiteSpace(id))
+        {
+            return null;
+        }
+
+        var result = await _httpClient.GetFromJsonAsync<VendorView?>(requestUri);
+
+        return result;
     }
 
     public async Task<IEnumerable<VendorView>> GetAllAsync(string? id = null, string? salutation = null, string? searchText = null)
     {
-        var queryBuilder = new ApiQueryBuilder
-        {
-            ["Id"] = id,
-            ["Salutation"] = salutation,
-            ["SearchText"] = searchText
-        };
+        var requestUri = new UriBuilder(_httpClient.BaseAddress)
+                                .SetQueryItem("Id", id)
+                                .SetQueryItem("Salutation", salutation)
+                                .SetQueryItem("SearchText", searchText)
+                                .Build();
 
-        return await _httpClient.GetFromJsonAsync<IEnumerable<VendorView>>(queryBuilder.BuildFinal()) ?? Enumerable.Empty<VendorView>();
+        return await _httpClient.GetFromJsonAsync<IEnumerable<VendorView>>(requestUri) ?? [];
     }
 
     public async Task<Response<Vendor>> CreateAsync(Vendor element)
     {
-        var requestUri = _httpClient.BaseAddress;
+        var requestUri = new UriBuilder(_httpClient.BaseAddress)
+                                .Build();
         var createDto = element.ToCreateDto();
 
         var response = await _httpClient.PostAsJsonAsync(requestUri, createDto);
@@ -47,7 +58,7 @@ public class VendorService
             var vendor = await response.Content.ReadFromJsonAsync<Vendor>();
 
             _snackBarService.AddInfo("Erfolgreich angelegt ...");
-            return Response<Vendor>.Valid(vendor);
+            return Response<Vendor>.Valid(vendor!);
         }
 
         _snackBarService.AddError($"Ausnahmefehler {response.StatusCode}");
@@ -56,7 +67,9 @@ public class VendorService
 
     public async Task<Response> UpdateAsync(Vendor element)
     {
-        var requestUri = _httpClient.BaseAddress + $"/{element.Id}";
+        var requestUri = new UriBuilder(_httpClient.BaseAddress)
+                                .AddUriPart(element.Id)
+                                .Build();
         var updateDto = element.ToUpdateDto();
 
         var response = await _httpClient.PutAsJsonAsync(requestUri, updateDto);
@@ -73,7 +86,9 @@ public class VendorService
 
     public async Task<Response> DeleteAsync(Vendor element)
     {
-        var requestUri = _httpClient.BaseAddress + $"/{element.Id}";
+        var requestUri = new UriBuilder(_httpClient.BaseAddress)
+                                .AddUriPart(element.Id)
+                                .Build();
 
         var response = await _httpClient.DeleteAsync(requestUri);
 

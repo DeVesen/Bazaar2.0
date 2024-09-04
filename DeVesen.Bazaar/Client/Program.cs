@@ -7,6 +7,7 @@ using DeVesen.Bazaar.Client.State.ArticleCategory;
 using DeVesen.Bazaar.Client.State.Import;
 using DeVesen.Bazaar.Client.State.Manufacturer;
 using DeVesen.Bazaar.Client.State.SalesCart;
+using DeVesen.Bazaar.Client.State.Title;
 using DeVesen.Bazaar.Client.State.Vendor;
 using DeVesen.Bazaar.Client.Validator;
 using DeVesen.Bazaar.Shared.Services;
@@ -30,6 +31,7 @@ builder.Services.AddTransient<ArticleCategoryFacade>();
 
 builder.Services.AddTransient<ImportFacade>();
 builder.Services.AddTransient<SalesCartFacade>();
+builder.Services.AddTransient<TitleFacade>();
 
 builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 

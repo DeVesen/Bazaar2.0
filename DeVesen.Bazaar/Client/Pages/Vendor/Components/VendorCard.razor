@@ -1,0 +1,82 @@
+﻿@using DeVesen.Bazaar.Client.Components.ListingElement
+@using DeVesen.Bazaar.Client.Models
+
+<MudCard Elevation="2">
+    <MudCardHeader>
+        <CardHeaderAvatar>
+            <MudAvatar Color="Color.Primary">
+                <MudIcon Icon="@Icons.Material.TwoTone.Person2" />
+            </MudAvatar>
+        </CardHeaderAvatar>
+        <CardHeaderContent>
+            <MudText Typo="Typo.body1">@VendorItem.Item.GetTotalName()</MudText>
+            <MudText Typo="Typo.body2">@VendorItem.Item.Id</MudText>
+        </CardHeaderContent>
+        <CardHeaderActions>
+        </CardHeaderActions>
+    </MudCardHeader>
+    <MudCardContent>
+        <ListingElementText Icon="@Icons.Material.TwoTone.AreaChart" Value="@VendorItem.Statistic.ToString()" />
+        <ListingElementText Icon="@Icons.Material.TwoTone.Info" Value="@VendorItem.Item.Note" />
+    </MudCardContent>
+    <MudCardActions>
+        <div class="w-100 d-flex justify-space-between">
+            <div class="d-flex">
+                <MudIconButton Icon="@Icons.Material.TwoTone.Settings" Color="Color.Default" OnClick="DoEdit" />
+                <MudIconButton Icon="@Icons.Material.TwoTone.Article" Color="Color.Default" OnClick="GoToArticles" />
+            </div>
+            <div class="d-flex">
+                <MudIconButton Icon="@Icons.Material.TwoTone.Downloading" Color="Color.Default" OnClick="DoImportArticles" />
+                <MudIconButton Icon="@Icons.Material.TwoTone.DownloadDone" Color="Color.Default" OnClick="DoApproveArticles" />
+                <MudIconButton Icon="@Icons.Material.TwoTone.Euro" Color="Color.Default" OnClick="DoSettlement" />
+            </div>
+        </div>
+    </MudCardActions>
+</MudCard>
+
+@code {
+
+    [Parameter]
+    public required VendorView VendorItem { get; set; }
+
+    [Parameter]
+    public EventCallback<VendorView> OnEdit { get; set; }
+
+    [Parameter]
+    public EventCallback<VendorView> OnArticle { get; set; }
+
+    [Parameter]
+    public EventCallback<VendorView> OnImportArticles { get; set; }
+
+    [Parameter]
+    public EventCallback<VendorView> OnApproveArticles { get; set; }
+
+    [Parameter]
+    public EventCallback<VendorView> OnSettlement { get; set; }
+
+    private async Task DoEdit()
+    {
+        await OnEdit.InvokeAsync(VendorItem);
+    }
+
+    private async Task GoToArticles()
+    {
+        await OnArticle.InvokeAsync(VendorItem);
+    }
+
+    private async Task DoImportArticles()
+    {
+        await OnImportArticles.InvokeAsync(VendorItem);
+    }
+
+    private async Task DoApproveArticles()
+    {
+        await OnApproveArticles.InvokeAsync(VendorItem);
+    }
+
+    private async Task DoSettlement()
+    {
+        await OnSettlement.InvokeAsync(VendorItem);
+    }
+
+}

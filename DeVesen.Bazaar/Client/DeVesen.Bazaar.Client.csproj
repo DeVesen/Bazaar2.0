@@ -21,16 +21,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Update="Components\Article\ArticleApprovalDialog.razor">
+    <Content Update="Pages\Article\Components\ArticleApprovalDialog.razor">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
     </Content>
-    <Content Update="Components\Manufacturer\ManufacturerCreateDialog.razor">
+    <Content Update="Pages\Manufacturer\Components\ManufacturerCreateDialog.razor">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
     </Content>
-    <Content Update="Components\Manufacturer\ManufacturerEditDialog.razor">
+    <Content Update="Pages\Manufacturer\Components\ManufacturerEditDialog.razor">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
     </Content>
-    <Content Update="Components\Manufacturer\ManufacturerForm.razor">
+    <Content Update="Pages\Manufacturer\Components\ManufacturerForm.razor">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
     </Content>
   </ItemGroup>

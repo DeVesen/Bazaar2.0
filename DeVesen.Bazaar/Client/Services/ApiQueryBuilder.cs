@@ -28,3 +28,68 @@ public class ApiQueryBuilder
     private IEnumerable<string> GetQueryParts()
         => _innerDict.Where(p => p.Value != null).Select(item => $"{item.Key}={item.Value}");
 }
+
+public class UriBuilder
+{
+    private readonly List<string> _uriParts = [];
+    private readonly Dictionary<string, string?> _queryItems = new();
+
+    public UriBuilder()
+    {
+        
+    }
+
+    public UriBuilder(string baseUri)
+    {
+        AddUriPart(baseUri);
+    }
+
+    public UriBuilder(Uri? baseUri)
+    {
+        if (baseUri != null)
+        {
+            AddUriPart(baseUri.ToString());
+        }
+    }
+
+    public UriBuilder SetQueryItem(string key, string? value)
+    {
+        _queryItems[key] = value;
+
+        return this;
+    }
+
+    public UriBuilder AddUriPart(string part)
+    {
+        if (string.IsNullOrWhiteSpace(part))
+        {
+            part = string.Empty;
+        }
+
+        _uriParts.Add(part.Trim('/'));
+
+        return this;
+    }
+
+    public string Build()
+        => BuildUri() + BuildQuery();
+
+    private IEnumerable<string> GetQueryParts()
+        => _queryItems.Where(p => p.Value != null).Select(item => $"{item.Key}={item.Value}");
+
+    private string BuildUri()
+    {
+        var parts = _uriParts.Where(p => string.IsNullOrWhiteSpace(p) is false)
+                             .Select(p => p.Trim().Trim('/'));
+        return string.Join("/", parts);
+    }
+
+    private string BuildQuery()
+    {
+        var queryParts = GetQueryParts().ToArray();
+
+        return queryParts.Length != 0
+            ? "?" + string.Join("&", queryParts)
+            : string.Empty;
+    }
+}

@@ -1,8 +1,9 @@
-﻿@using DeVesen.Bazaar.Client.Components.Article
-@using DeVesen.Bazaar.Client.Extensions
+﻿@using DeVesen.Bazaar.Client.Extensions
 @using DeVesen.Bazaar.Client.Models
+@using DeVesen.Bazaar.Client.Pages.Article.Components
 @using DeVesen.Bazaar.Client.State
 @using DeVesen.Bazaar.Client.State.Article
+@using DeVesen.Bazaar.Client.State.Title
 @using Fluxor
 
 @page "/articles"
@@ -10,6 +11,7 @@
 
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 
+@inject TitleFacade TitleFacade
 @inject StateFacade StateFacade
 @inject IState<ArticleState> ArticleState
 
@@ -56,17 +58,9 @@
 @code {
 
     [Parameter]
-    public string? VendorId
-    {
-        get => _vendor?.Id;
-        set
-        {
-            _vendor = StateFacade.Vendor.GetById(value ?? string.Empty);
-            _pageSelect = string.IsNullOrWhiteSpace(value) is false;
-        }
-    }
+    public string VendorId { get; set; } = string.Empty;
 
-    private bool _pageSelect = false;
+    private bool _pageSelect;
     private Vendor? _vendor;
     private string? _number;
     private string? _searchText;
@@ -75,7 +69,11 @@
     {
         await base.OnInitializedAsync();
 
+        _vendor = await StateFacade.Vendor.GetById(VendorId);
+
         FetchArticleList();
+        
+        TitleFacade.SetCaption("Artikelliste");
     }
 
     private void OnArticleFilterChange()

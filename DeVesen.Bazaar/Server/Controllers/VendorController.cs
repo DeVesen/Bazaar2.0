@@ -25,6 +25,16 @@ public class VendorController : ControllerBase
         _vendorValidator = vendorValidator;
     }
 
+    [HttpGet("{id}")]
+    public async Task<VendorViewDto?> GetByIdAsync(string id)
+    {
+        var filter = new VendorFilter { Id = id };
+        var items = await GetAllAsync(filter);
+        var item = items.FirstOrDefault();
+
+        return item;
+    }
+
     [HttpGet]
     public async Task<IEnumerable<VendorViewDto>> GetAllAsync([FromQuery] VendorFilter? parameters)
     {

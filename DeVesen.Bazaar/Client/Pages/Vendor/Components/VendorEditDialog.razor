@@ -1,0 +1,47 @@
+﻿@using DeVesen.Bazaar.Client.Components.Buttons
+@using DeVesen.Bazaar.Client.Models
+@using DeVesen.Bazaar.Client.Services
+@using DeVesen.Bazaar.Client.Validator
+
+@inject VendorService VendorService
+@inject VendorValidator VendorValidator
+
+<MudDialog>
+    <DialogContent>
+        <VendorForm @bind-IsValid="_isValid"
+                    @bind-IsTouched="_isTouched"
+                    @bind-Item="Item"
+                    Validation="@(VendorValidator.ValidateAsync)"
+                    RequestSave="SubmitAsync"/>
+    </DialogContent>
+    <DialogActions>
+        <DvButtonSave Enabled="@(_isValid && _isTouched)" OnClick="SubmitAsync" />
+        <DvButtonDelete OnClick="DeleteAsync" />
+        <DvButtonCancel OnClick="Cancel" />
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
+
+    [Parameter] public Vendor Item { get; set; } = null!;
+
+    private bool _isValid;
+    private bool _isTouched;
+
+    private async Task SubmitAsync()
+    {
+        await VendorService.UpdateAsync(Item);
+
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+
+    private async Task DeleteAsync()
+    {
+        await VendorService.DeleteAsync(Item);
+
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+}

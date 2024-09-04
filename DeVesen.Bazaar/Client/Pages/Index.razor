@@ -1,7 +1,10 @@
 ﻿
 @page "/"
 
+@using DeVesen.Bazaar.Client.State.Title
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
+
+@inject TitleFacade TitleFacade
 
 <PageTitle>Index</PageTitle>
 
@@ -13,4 +16,10 @@ Welcome to your new app.
 
 @code {
 
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        TitleFacade.SetCaption("Startseite");
+    }
 }

@@ -17,7 +17,8 @@ public class ManufacturerEffects
     {
         var elements = await _manufacturerService.GetAllAsync(action.Filter);
 
-        elements = elements.OrderBy(p => p.Name);
+        elements = elements.OrderBy(p => p.Name)
+                           .ToArray();
 
         dispatcher.Dispatch(new ManufacturerActions.ManufacturersFetched(elements));
     }

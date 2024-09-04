@@ -17,7 +17,8 @@ public class ArticleCategoryEffects
     {
         var elements = await _articleCategoryService.GetAllAsync(action.Filter);
 
-        elements = elements.OrderBy(p => p.Name);
+        elements = elements.OrderBy(p => p.Name)
+                           .ToArray();
 
         dispatcher.Dispatch(new ArticleCategoryActions.ArticleCategoriesFetched(elements));
     }

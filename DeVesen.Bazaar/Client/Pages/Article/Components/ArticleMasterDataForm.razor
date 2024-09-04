@@ -1,0 +1,156 @@
+﻿@using DeVesen.Bazaar.Client.Services
+@using DeVesen.Bazaar.Client.Models
+@using DeVesen.Bazaar.Client.Validator
+@using DeVesen.Bazaar.Client.Components.Autocomplete
+@using DeVesen.Bazaar.Client.Components.TextField
+@using DeVesen.Bazaar.Client.State
+
+@inject ArticleValidator ArticleValidator
+@inject ArticleCategoryService ArticleCategoryService
+@inject StateFacade StateFacade
+
+<MudForm IsValid="IsValid"
+         IsValidChanged="OnIsValidChanged"
+         IsTouched="IsTouched"
+         IsTouchedChanged="OnIsTouchedChanged"
+         FieldChanged="OnFormFieldChangedAsync"
+         Model="ArticleItem"
+         Validation="@(ArticleValidator.ValidateAsync)"
+         Style="margin-bottom: 20px; min-width: 370px">
+    <MudGrid Spacing="2">
+        <MudItem xs="12" sm="3">
+            <DvTextField T="long"
+                         Required
+                         Label="Nummer"
+                         Disabled="@DisableNumber"
+                         @bind-Value="ArticleItem.Number"
+                         For="@(() => ArticleItem.Number)" />
+        </MudItem>
+        <MudItem xs="12" sm="9">
+            <DvTextField T="string"
+                         Required
+                         Label="Title"
+                         @bind-Value="ArticleItem.Title"
+                         For="@(() => ArticleItem.Title)" />
+        </MudItem>
+        <MudItem xs="12" sm="6">
+            <DvAutocomplete T="string"
+                            Required
+                            Label="Kategorie"
+                            @bind-Value="ArticleItem.ArticleCategory"
+                            For="@(() => ArticleItem.ArticleCategory)"
+                            MaxItems="@autocompleteMaxItems"
+                            SearchFunc="@CategoryAutoCompleteSearchAsync" />
+        </MudItem>
+        <MudItem xs="12" sm="6">
+            <DvAutocomplete T="string"
+                            Required
+                            Label="Hersteller"
+                            @bind-Value="ArticleItem.Manufacturer"
+                            For="@(() => ArticleItem.Manufacturer)"
+                            MaxItems="@autocompleteMaxItems"
+                            SearchFunc="@ManufacturerAutoCompleteSearchAsync" />
+        </MudItem>
+        <MudItem xs="12" sm="6">
+            <DvTextField T="double"
+                         Required
+                         Label="Preis"
+                         @bind-Value="ArticleItem.Price01"
+                         For="@(() => ArticleItem.Price01)" />
+        </MudItem>
+        <MudItem xs="12" sm="6">
+            <DvTextField T="double?"
+                         Label="Preis alternativ"
+                         @bind-Value="ArticleItem.Price02"
+                         For="@(() => ArticleItem.Price02)" />
+        </MudItem>
+        <MudItem xs="12" sm="12">
+            <DvTextField T="string"
+                         Label="Notize"
+                         Lines="4"
+                         @bind-Value="ArticleItem.Description"
+                         For="@(() => ArticleItem.Description)" />
+        </MudItem>
+    </MudGrid>
+    
+</MudForm>
+
+@code {
+    private const int autocompleteMaxItems = 25; // todo move to app-Config
+
+    [Parameter]
+    public required bool DisableNumber { get; set; }
+
+    [Parameter]
+    public required Article ArticleItem { get; set; }
+
+    [Parameter]
+    public required EventCallback<Article> ArticleItemChanged { get; set; }
+
+    [Parameter]
+    public bool IsValid { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> IsValidChanged { get; set; }
+
+    [Parameter]
+    public bool IsTouched { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> IsTouchedChanged { get; set; }
+
+    private async Task OnIsValidChanged(bool newValue)
+    {
+        IsValid = newValue;
+
+        await IsValidChanged.InvokeAsync(newValue);
+    }
+
+    private async Task OnIsTouchedChanged(bool newValue)
+    {
+        IsTouched = newValue;
+
+        await IsTouchedChanged.InvokeAsync(newValue);
+    }
+
+    private async Task OnFormFieldChangedAsync()
+    {
+        await ArticleItemChanged.InvokeAsync(ArticleItem);
+    }
+
+    private async Task<IEnumerable<string>> CategoryAutoCompleteSearchAsync(string value, CancellationToken token)
+    {
+        var articleCategoryQuery = StateFacade.ArticleCategory.GetArticleCategories();
+
+        if (string.IsNullOrWhiteSpace(value) is false)
+        {
+            articleCategoryQuery = articleCategoryQuery.Where(Compare);
+        }
+
+        return await Task.FromResult(articleCategoryQuery.Select(p => p.Name).ToArray());
+
+        bool Compare(ArticleCategory articleCategory)
+        {
+            return articleCategory.Name.ToLower().Contains(value)
+                   || value.Contains(articleCategory.Name.ToLower());
+        }
+    }
+
+    private async Task<IEnumerable<string>> ManufacturerAutoCompleteSearchAsync(string? value, CancellationToken token)
+    {
+        var manufacturerQuery = StateFacade.Manufacturer.GetManufacturer().ToArray();
+
+        if (string.IsNullOrWhiteSpace(value) is false)
+        {
+            manufacturerQuery = manufacturerQuery.Where(Compare).ToArray();
+        }
+
+        return await Task.FromResult(manufacturerQuery.Select(p => p.Name).ToArray());
+
+        bool Compare(Manufacturer category)
+        {
+            return category.Name.ToLower().Contains(value)
+                || value.Contains(category.Name.ToLower());
+        }
+    }
+}

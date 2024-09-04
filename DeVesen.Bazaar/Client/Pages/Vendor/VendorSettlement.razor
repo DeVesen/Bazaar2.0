@@ -1,0 +1,36 @@
+﻿@page "/vendors/{vendorId}/settlement"
+
+@using DeVesen.Bazaar.Client.Models
+@using DeVesen.Bazaar.Client.State
+@using DeVesen.Bazaar.Client.State.Title
+
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+
+@inject StateFacade StateFacade
+@inject TitleFacade TitleFacade
+
+@if (_vendor == null)
+{
+    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+}
+else
+{
+    <MudText Typo="Typo.h3">I am Caption</MudText>
+}
+
+@code {
+
+    [Parameter]
+    public string VendorId { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        TitleFacade.SetCaption("Rückgabe / Abrechnung");
+
+        _vendor = await StateFacade.Vendor.GetById(VendorId);
+    }
+
+    private Vendor? _vendor;
+}

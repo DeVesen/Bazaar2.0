@@ -1,0 +1,36 @@
+﻿@using DeVesen.Bazaar.Client.State.SalesCart
+
+<MudPaper Class="p-2">
+    <MudGrid Spacing="1">
+        <MudItem xs="1" Class="align-content-center">
+            <MudText Typo="Typo.h4" Align="Align.Center">@Item.ArticleNumber</MudText>
+        </MudItem>
+        <MudItem xs="6">
+            <MudGrid Spacing="1">
+                <MudItem xs="12">
+                    <MudText Inline Align="Align.Center">@Item.Article.Title</MudText>
+                </MudItem>
+                <MudItem xs="6">
+                    <MudText Inline Align="Align.Center">@Item.Article.ArticleCategory</MudText>
+                </MudItem>
+                <MudItem xs="6">
+                    <MudText Inline Align="Align.Center">@Item.Article.Manufacturer</MudText>
+                </MudItem>
+            </MudGrid>
+        </MudItem>
+        <MudItem xs="3" Class="align-content-center">
+            <MudText Typo="Typo.h4">@($"{Item.SalesAmount} €")</MudText>
+        </MudItem>
+        <MudItem xs="2" Class="d-flex justify-end">
+            <MudIconButton Icon="@Icons.Material.TwoTone.Delete" Color="Color.Error" OnClick="() => OnRemoveClick.InvokeAsync(Item.ArticleNumber)"></MudIconButton>
+        </MudItem>
+    </MudGrid>
+</MudPaper>
+
+@code {
+    [Parameter, EditorRequired]
+    public required PurchaseItem Item { get; set; }
+
+    [Parameter]
+    public EventCallback<long> OnRemoveClick { get; set; }
+}

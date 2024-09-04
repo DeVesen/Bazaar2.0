@@ -1,0 +1,53 @@
+﻿@using DeVesen.Bazaar.Client.Components.Buttons
+@using DeVesen.Bazaar.Client.Models
+@using DeVesen.Bazaar.Client.Services
+@using DeVesen.Bazaar.Shared.Services
+
+@inject ArticleService ArticleService
+@inject SystemClock SystemClock
+
+<MudDialog>
+    <DialogContent>
+        <ArticleMasterDataForm IsValid="@_isValid"
+                     IsTouched="@_isTouched"
+                     IsValidChanged="@(x => _isValid = x)"
+                     IsTouchedChanged="@(x => _isTouched = x)"
+                     @bind-ArticleItem="_item" />
+    </DialogContent>
+    <DialogActions>
+        <DvButtonSave Enabled="@EnabledSubmit" OnClick="SubmitAsync" />
+        <DvButtonCancel OnClick="Cancel" />
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
+
+    [Parameter] public bool ForceNext { get; set; }
+
+    [Parameter] public required string VendorId { get; set; }
+
+    private bool EnabledSubmit => _isValid && _isTouched;
+
+    private Article _item = null!;
+    private bool _isValid;
+    private bool _isTouched;
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        _item = Article.CreateNew(VendorId);
+    }
+
+    private async Task SubmitAsync()
+    {
+        _item.ApprovedForSale = SystemClock.GetNow();
+
+        await ArticleService.CreateAsync(_item);
+
+        MudDialog.Close(DialogResult.Ok(ForceNext));
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+}

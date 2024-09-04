@@ -1,0 +1,80 @@
+﻿@using DeVesen.Bazaar.Client.Models
+@using DeVesen.Bazaar.Client.Components.TextField
+
+<MudGrid Spacing="2">
+        
+    <MudItem xs="12" md="9" lg="8" xl="6">
+            
+        <MudGrid Spacing="2">
+
+            <MudItem xs="12">
+                <VendorSelector Item="Vendor"
+                                ItemChanged="@VendorChanged"
+                                Disabled="@DisableVendorSelection" />
+            </MudItem>
+
+            <MudItem xs="3">
+                <DvNumericTextField T="string"
+                                    Value="@Number"
+                                    ValueChanged="@NumberChanged"
+                                    Label="Nummer" />
+            </MudItem>
+
+            <MudItem xs="9">
+                <DvTextField T="string"
+                             Label="Captionsuche"
+                             Value="@SearchText"
+                             ValueChanged="@SearchTextChanged" />
+            </MudItem>
+
+        </MudGrid>
+
+    </MudItem>
+    
+    <MudItem xs="12" md="3" lg="4" xl="6"
+             Class="d-flex justify-end gap-1 pl-2">
+        <MudButton StartIcon="@Icons.Material.TwoTone.NoteAdd"
+                   Disabled="@DisableCreateArticleBtn"
+                   Color="Color.Primary"
+                   Variant="Variant.Filled"
+                   OnClick="OnCreateArticleBtnClick">Neu</MudButton>
+        <MudButton StartIcon="@Icons.Material.TwoTone.Downloading"
+                   Disabled="@DisableCreateArticleBtn"
+                   Color="Color.Primary"
+                   Variant="Variant.Filled"
+                   OnClick="OnImportArticleBtnClick">Import</MudButton>
+    </MudItem>
+        
+</MudGrid>
+
+@code {
+    [Parameter]
+    public Vendor? Vendor { get; set; }
+
+    [Parameter]
+    public string? Number { get; set; }
+
+    [Parameter]
+    public string? SearchText { get; set; }
+
+    [Parameter]
+    public bool DisableVendorSelection { get; set; }
+
+    [Parameter]
+    public bool DisableCreateArticleBtn { get; set; }
+
+    [Parameter]
+    public EventCallback<Vendor?> VendorChanged { get; set; }
+
+    [Parameter]
+    public EventCallback<string?> NumberChanged { get; set; }
+
+    [Parameter]
+    public EventCallback<string?> SearchTextChanged { get; set; }
+
+    [Parameter]
+    public EventCallback OnCreateArticleBtnClick { get; set; }
+
+    [Parameter]
+    public EventCallback OnImportArticleBtnClick { get; set; }
+}

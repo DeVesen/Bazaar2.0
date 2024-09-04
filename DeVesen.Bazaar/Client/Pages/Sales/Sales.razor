@@ -1,20 +1,21 @@
-﻿@using DeVesen.Bazaar.Client.Components.Common
-@using DeVesen.Bazaar.Client.Components.Common.Buttons
-@using DeVesen.Bazaar.Client.Components.Common.TextField
-@using DeVesen.Bazaar.Client.Components.Sales
+﻿@using DeVesen.Bazaar.Client.Components
+@using DeVesen.Bazaar.Client.Components.Buttons
+@using DeVesen.Bazaar.Client.Components.TextField
 @using DeVesen.Bazaar.Client.Models
 @using DeVesen.Bazaar.Client.Services
 @using DeVesen.Bazaar.Client.State.SalesCart
+@using DeVesen.Bazaar.Client.Pages.Sales.Components
+@using DeVesen.Bazaar.Client.State.Title
 @using Fluxor
 
 @page "/Sales"
 
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 
+@inject TitleFacade TitleFacade;
 @inject ArticleService ArticleService;
 @inject SalesCartFacade SalesCartFacade;
 @inject IState<SalesCartState> SalesCartState;
-@inject SnackBarService SnackBarService;
 
 <div class="d-flex flex-column gap-4 px-1">
     <MudGrid>
@@ -25,11 +26,9 @@
                                         T="long?"
                                         Label="Artickelnummer"
                                         Margin="Margin.None"
-                                        Adornment="@ArticleNumberAdornment"
-                                        AdornmentIcon="@Icons.Material.TwoTone.Add"
                                         @bind-Value="_articleNumber"
-                                        OnKeyUp="@OnArticleSearchKeyUpAsync"
-                                        OnAdornmentClick="@OnArticleSearchAsync" />
+                                        @bind-Value:after="@OnArticleSearchAsync"
+                                        OnKeyUp="@OnArticleSearchKeyUpAsync" />
                 </MudItem>
                 <MudItem xs="6" sm="3">
                     <DvButtonSalesPrice Disabled="@Price01BtnDisabled"
@@ -55,11 +54,11 @@
                 </MudItem>
             </MudGrid>
         </MudItem>
-        <MudItem xs="12" md="6">
-            <MudGrid Spacing="2">
-                
-                @if (HasItemsInCart)
-                {
+        
+        @if (HasItemsInCart)
+        {
+            <MudItem xs="12" md="6">
+                <MudGrid Spacing="2">
                     <MudItem xs="12">
                         <MudStack>
                             @foreach (var item in ItemsInCart)
@@ -68,37 +67,36 @@
                             }
                         </MudStack>
                     </MudItem>
-                }
-
-                <MudItem xs="4">
-                    <MudField Label="Summe" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.TwoTone.Euro" Variant="Variant.Filled">@ValueOfGoods</MudField>
-                </MudItem>
-                <MudSpacer/>
-                <MudItem xs="4" Class="d-flex justify-end gap-2">
-                    <MudIconButton Disabled="@(HasItemsInCart is false)"
-                                   Icon="@Icons.Material.TwoTone.Delete"
-                                   Variant="Variant.Filled"
-                                   Color="Color.Primary"
-                                   Size="Size.Large"
-                                   OnClick="@OnClearCartClicked"
-                                   Class="p-3"/>
-                    <MudIconButton Disabled="@(HasItemsInCart is false)"
-                                   Icon="@Icons.Material.TwoTone.Euro"
-                                   Variant="Variant.Filled"
-                                   Color="Color.Primary"
-                                   Size="Size.Large"
-                                   OnClick="@OnCompleteSaleClicked"
-                                   Class="p-3" />
-                </MudItem>
-            </MudGrid>
-        </MudItem>
+                    <MudItem xs="4">
+                        <MudField Label="Summe" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.TwoTone.Euro" Variant="Variant.Filled">@ValueOfGoods</MudField>
+                    </MudItem>
+                    <MudSpacer/>
+                    <MudItem xs="4" Class="d-flex justify-end gap-2">
+                        <MudIconButton Disabled="@(HasItemsInCart is false)"
+                                       Icon="@Icons.Material.TwoTone.Delete"
+                                       Variant="Variant.Filled"
+                                       Color="Color.Primary"
+                                       Size="Size.Large"
+                                       OnClick="@OnClearCartClicked"
+                                       Class="p-3"/>
+                        <MudIconButton Disabled="@(HasItemsInCart is false)"
+                                       Icon="@Icons.Material.TwoTone.Euro"
+                                       Variant="Variant.Filled"
+                                       Color="Color.Primary"
+                                       Size="Size.Large"
+                                       OnClick="@OnCompleteSaleClicked"
+                                       Class="p-3" />
+                    </MudItem>
+                </MudGrid>
+            </MudItem>
+        }
     </MudGrid>
 </div>
 
 <DispatchedAction Callback="DispatchedActionCallback" />
 
 @code {
-    [Inject] private IDialogService DialogService { get; set; }
+    [Inject] private IDialogService DialogService { get; set; } = null!;
 
     private bool ArticleValidForSale => _article != null &&
                                         _article.IsValidForSale() &&
@@ -120,6 +118,13 @@
     private Severity _articleAlertSeverity = Severity.Normal;
     private Variant _articleAlertVariant = Variant.Text;
     private string _articleAlertText = "Bitte Artikelnummer eingeben ...";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        TitleFacade.SetCaption("Verkauf");
+    }
 
     private async Task OnArticleSearchKeyUpAsync(KeyboardEventArgs args)
     {

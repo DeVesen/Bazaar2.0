@@ -19,7 +19,8 @@ public class VendorEffects
 
         elements = elements.OrderBy(p => p.Item.LastName)
                            .ThenBy(p => p.Item.FirstName)
-                           .ThenBy(p => p.Item.Salutation);
+                           .ThenBy(p => p.Item.Salutation)
+                           .ToArray();
 
         dispatcher.Dispatch(new VendorActions.VendorsFetched(elements));
     }

@@ -1,0 +1,19 @@
+﻿@using DeVesen.Bazaar.Client.State.Title
+@using Fluxor
+
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+
+@inject IState<TitleState> TitleState
+
+<div class="desktop-hidden">
+    <MudText Typo="Typo.h6" href="">DeVesen.Bazaar</MudText>
+    <MudText Typo="Typo.h4" href="">@Caption</MudText>
+</div>
+
+<div class="desktop-shown">
+    <MudText Align="Align.Center" Typo="Typo.h4" href="">DeVesen.Bazaar</MudText>
+</div>
+
+@code {
+    private string Caption => TitleState.Value.Caption;
+}

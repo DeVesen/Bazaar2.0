@@ -1,11 +1,12 @@
 ﻿@using DeVesen.Bazaar.Client.Services
-@using DeVesen.Bazaar.Client.Components.Common.ToolBar
-@using DeVesen.Bazaar.Client.Components.Common.TextField
-@using DeVesen.Bazaar.Client.Components.Vendor
+@using DeVesen.Bazaar.Client.Components.ToolBar
+@using DeVesen.Bazaar.Client.Components.TextField
 @using DeVesen.Bazaar.Client.Models
-@using DeVesen.Bazaar.Client.Components.Article
 @using DeVesen.Bazaar.Client.Extensions
+@using DeVesen.Bazaar.Client.Pages.Article.Components
+@using DeVesen.Bazaar.Client.Pages.Vendor.Components
 @using DeVesen.Bazaar.Client.State
+@using DeVesen.Bazaar.Client.State.Title
 @using DeVesen.Bazaar.Client.State.Vendor
 @using Fluxor
 
@@ -16,6 +17,7 @@
 @inject IDialogService DialogService
 @inject NavigationService NavigationService
 
+@inject TitleFacade TitleFacade
 @inject StateFacade StateFacade
 @inject IState<VendorState> VendorState
 
@@ -56,6 +58,13 @@
     
     private string _searchText = string.Empty;
     private ToolBarGenederSelect.GenderType _genderType = ToolBarGenederSelect.GenderType.All;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        TitleFacade.SetCaption("Verkäufer");
+    }
 
     private async Task CreateElementAsync()
     {
@@ -136,17 +145,6 @@
 
     private async Task OnSettlementVendorAsync(VendorView args)
     {
-        var parameters = new DialogParameters<VendorSettlementDialog> { { x => x.VendorId, args.Item.Id } };
-
-        var options = new DialogOptions
-        {
-            CloseOnEscapeKey = true,
-            BackdropClick = false
-        };
-
-        await DialogService.ShowAsync<VendorSettlementDialog>("Händler abrechnen", parameters, options);
-
-        FetchVendorList();
     }
 
     private void OnSearchChanged(string newValue)
