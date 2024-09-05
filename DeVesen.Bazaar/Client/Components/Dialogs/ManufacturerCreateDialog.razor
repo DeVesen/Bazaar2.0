@@ -2,19 +2,20 @@
 @using DeVesen.Bazaar.Client.Models
 @using DeVesen.Bazaar.Client.Services
 @using DeVesen.Bazaar.Client.Validator
+@using DeVesen.Bazaar.Client.Pages.Manufacturer.Components
 
-@inject ArticleCategoryService ArticleCategoryService
-@inject ArticleCategoryValidator ArticleCategoryValidator
+@inject ManufacturerService ArticleCategoryService
+@inject ManufacturerValidator ArticleCategoryValidator
 
 <MudDialog>
     <DialogContent>
-        <ArticleCategoryForm IsValid="@_isValid"
-                             IsTouched="@_isTouched"
-                             IsValidChanged="@(x => _isValid = x)"
-                             IsTouchedChanged="@(x => _isTouched = x)"
-                             @bind-Item="_item"
-                             Validation="@(ArticleCategoryValidator.ValidateAsync)"
-                             RequestSave="SubmitAsync" />
+        <ManufacturerForm IsValid="@_isValid"
+                          IsTouched="@_isTouched"
+                          IsValidChanged="@(x => _isValid = x)"
+                          IsTouchedChanged="@(x => _isTouched = x)"
+                          @bind-Item="_item"
+                          Validation="@(ArticleCategoryValidator.ValidateAsync)"
+                          RequestSave="SubmitAsync" />
         
         <MudCheckBox @bind-Value="@ForceNext" Label="weiterer"></MudCheckBox>
     </DialogContent>
@@ -29,7 +30,7 @@
 
     [Parameter] public bool ForceNext { get; set; }
 
-    private ArticleCategory _item = ArticleCategory.New;
+    private Manufacturer _item = Manufacturer.New;
     private bool _isValid;
     private bool _isTouched;
 
@@ -37,8 +38,10 @@
     {
         await ArticleCategoryService.CreateAsync(_item);
 
-        MudDialog.Close(DialogResult.Ok(ForceNext));
+        MudDialog.Close(DialogResult.Ok(new OkResult(ForceNext)));
     }
 
     private void Cancel() => MudDialog.Cancel();
+
+    public record OkResult(bool ForceNext);
 }

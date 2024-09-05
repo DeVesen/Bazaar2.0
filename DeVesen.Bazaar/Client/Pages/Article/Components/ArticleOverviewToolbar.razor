@@ -34,19 +34,11 @@
     </MudItem>
     
     <MudItem xs="12" md="3" lg="4" xl="6"
-             Class="d-flex justify-end gap-1 pl-2">
-        <DvButton StartIcon="@Icons.Material.TwoTone.NoteAdd"
-                  Disabled="@DisableCreateArticleBtn"
-                  Color="Color.Tertiary"
-                  Variant="Variant.Outlined"
-                  FullWidth="true"
-                  OnClick="OnCreateArticleBtnClick">Neu</DvButton>
-        <DvButton StartIcon="@Icons.Material.TwoTone.Downloading"
-                  Disabled="@DisableCreateArticleBtn"
-                  Color="Color.Default"
-                  Variant="Variant.Outlined"
-                  FullWidth="true"
-                  OnClick="OnImportArticleBtnClick">Import</DvButton>
+             Class="d-flex justify-end gap-3 m-10 p-10">
+        <DvButtonNeu Disabled="@DisableCreateArticleBtn"
+                     OnClick="OnCreateArticleBtnClick" />
+        <DvButtonImport Disabled="@DisableCreateArticleBtn"
+                        OnClick="OnImportArticleBtnClick" />
     </MudItem>
         
 </MudGrid>

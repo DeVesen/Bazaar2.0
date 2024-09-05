@@ -2,6 +2,7 @@
 @using DeVesen.Bazaar.Client.Models
 @using DeVesen.Bazaar.Client.Services
 @using DeVesen.Bazaar.Shared.Services
+@using DeVesen.Bazaar.Client.Pages.Article.Components
 
 @inject ArticleService ArticleService
 @inject SystemClock SystemClock
@@ -9,13 +10,13 @@
 <MudDialog>
     <DialogContent>
         <ArticleMasterDataForm IsValid="@_isValid"
-                     IsTouched="@_isTouched"
-                     IsValidChanged="@(x => _isValid = x)"
-                     IsTouchedChanged="@(x => _isTouched = x)"
-                     @bind-ArticleItem="_item" />
+                               IsTouched="@_isTouched"
+                               IsValidChanged="@(x => _isValid = x)"
+                               IsTouchedChanged="@(x => _isTouched = x)"
+                               @bind-ArticleItem="_item" />
     </DialogContent>
     <DialogActions>
-        <DvButtonSave Enabled="@EnabledSubmit" OnClick="SubmitAsync" />
+        <DvButtonSave Disabled="@Disable" OnClick="SubmitAsync" />
         <DvButtonCancel OnClick="Cancel" />
     </DialogActions>
 </MudDialog>
@@ -27,7 +28,7 @@
 
     [Parameter] public required string VendorId { get; set; }
 
-    private bool EnabledSubmit => _isValid && _isTouched;
+    private bool Disable => (_isValid && _isTouched) is false;
 
     private Article _item = null!;
     private bool _isValid;

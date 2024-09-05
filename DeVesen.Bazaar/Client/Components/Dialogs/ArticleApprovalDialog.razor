@@ -32,7 +32,7 @@
     [Parameter] public required string VendorId { get; set; }
 
     private DvTextField<long?>? _articleNumberRef;
-    private long? _articleNumber = null;
+    private long? _articleNumber;
     private Severity _releaseSeverityStatus = Severity.Normal;
     private string _releaseSeverityText = "Bitte Artickelnummer eingeben ...";
 

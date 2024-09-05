@@ -38,6 +38,7 @@ builder.Services.AddTransient<TitleFacade>();
 builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
 builder.Services.AddTransient<NavigationService>();
+builder.Services.AddTransient<DialogService>();
 builder.Services.AddTransient<SystemClock>();
 builder.Services.AddTransient<SnackBarService>();
 

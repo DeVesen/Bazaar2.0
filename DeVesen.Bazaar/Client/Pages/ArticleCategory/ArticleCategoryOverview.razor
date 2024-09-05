@@ -1,5 +1,4 @@
-﻿@using DeVesen.Bazaar.Client.Extensions
-@using DeVesen.Bazaar.Client.Models
+﻿@using DeVesen.Bazaar.Client.Models
 @using DeVesen.Bazaar.Client.Pages.ArticleCategory.Components
 @using DeVesen.Bazaar.Client.State
 @using DeVesen.Bazaar.Client.State.ArticleCategory
@@ -13,7 +12,7 @@
 @inject TitleFacade TitleFacade
 @inject StateFacade StateFacade
 @inject IState<ArticleCategoryState> ArticleCategoryState
-@inject IDialogService DialogService
+@inject Services.DialogService DialogService
 
 <ArticleCategoryOverviewToolbar @bind-SearchText="@_searchText"
                                 @bind-SearchText:after="@ReloadElements"
@@ -24,7 +23,7 @@
           Hover
           Items="@ArticleCategoryState.Value.Items"
           SortLabel="Sort By"
-          OnRowClick="OnTableRowClickedAsync">
+          OnRowClick="ModifyArticleCategoryAsync">
     <HeaderContent>
         <MudTh><MudTableSortLabel SortBy="new Func<ArticleCategory, object>(x => x.Name)">Bezeichnung</MudTableSortLabel></MudTh>
     </HeaderContent>
@@ -46,46 +45,22 @@
 
     private async Task CreateArticleCategoryAsync()
     {
-        var options = new DialogOptions
-        {
-            CloseOnEscapeKey = true,
-            BackdropClick = false
-        };
-
-        var forceNext = false;
-
-        do
-        {
-            var parameters = new DialogParameters<ArticleCategoryCreateDialog> { { x => x.ForceNext, forceNext } };
-
-            var dlg = await DialogService.ShowAsync<ArticleCategoryCreateDialog>("Artikel-Kategorie anlegen", parameters, options);
-            var result = await dlg.Result;
-
-            forceNext = result!.Canceled is false && (bool)result.Data!;
-        } while (forceNext);
+        await DialogService.CreateArticleCategoryAsync();
         
+        ReloadElements();
+    }
+
+    private async Task ModifyArticleCategoryAsync(TableRowClickEventArgs<ArticleCategory> args)
+    {
+        await DialogService.ModifyArticleCategoryAsync(args.Item!);
+
         ReloadElements();
     }
 
     private void ReloadElements()
     {
         StateFacade.ArticleCategory.Fetch();
+
         StateHasChanged();
-    }
-
-    private async Task OnTableRowClickedAsync(TableRowClickEventArgs<ArticleCategory> args)
-    {
-        var parameters = new DialogParameters<ArticleCategoryEditDialog> { { x => x.Item, args.Item } };
-
-        var options = new DialogOptions
-        {
-            CloseOnEscapeKey = true,
-            BackdropClick = false
-        };
-
-        await DialogService.ShowAsync<ArticleCategoryEditDialog>("Artikel-Kategorie ändern", parameters, options)
-                           .WaitForResult();
-
-        ReloadElements();
     }
 }

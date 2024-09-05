@@ -2,23 +2,25 @@
 @using DeVesen.Bazaar.Client.Models
 @using DeVesen.Bazaar.Client.Services
 @using DeVesen.Bazaar.Client.Validator
+@using DeVesen.Bazaar.Client.Pages.ArticleCategory.Components
 
-@inject ManufacturerService ArticleCategoryService
-@inject ManufacturerValidator ArticleCategoryValidator
+@inject ArticleCategoryService ArticleCategoryService
+@inject ArticleCategoryValidator ArticleCategoryValidator
 
 <MudDialog>
     <DialogContent>
-        <ManufacturerForm IsValid="@_isValid"
+        <ArticleCategoryForm IsValid="@_isValid"
                              IsTouched="@_isTouched"
                              IsValidChanged="@(x => _isValid = x)"
                              IsTouchedChanged="@(x => _isTouched = x)"
-                             @bind-Item="Item"
+                             @bind-Item="_item"
                              Validation="@(ArticleCategoryValidator.ValidateAsync)"
                              RequestSave="SubmitAsync" />
+        
+        <MudCheckBox @bind-Value="@ForceNext" Label="weiterer"></MudCheckBox>
     </DialogContent>
     <DialogActions>
         <DvButtonSave OnClick="SubmitAsync" />
-        <DvButtonDelete OnClick="DeleteAsync" />
         <DvButtonCancel OnClick="Cancel" />
     </DialogActions>
 </MudDialog>
@@ -26,23 +28,17 @@
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
 
-    [Parameter] public Manufacturer Item { get; set; } = null!;
+    [Parameter] public bool ForceNext { get; set; }
 
+    private ArticleCategory _item = ArticleCategory.New;
     private bool _isValid;
     private bool _isTouched;
 
     private async Task SubmitAsync()
     {
-        await ArticleCategoryService.UpdateAsync(Item);
+        await ArticleCategoryService.CreateAsync(_item);
 
-        MudDialog.Close(DialogResult.Ok(true));
-    }
-
-    private async Task DeleteAsync()
-    {
-        await ArticleCategoryService.DeleteAsync(Item);
-
-        MudDialog.Close(DialogResult.Ok(true));
+        MudDialog.Close(DialogResult.Ok(ForceNext));
     }
 
     private void Cancel() => MudDialog.Cancel();

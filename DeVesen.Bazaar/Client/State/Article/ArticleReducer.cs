@@ -1,5 +1,4 @@
-﻿using DeVesen.Bazaar.Client.State.Article;
-using Fluxor;
+﻿using Fluxor;
 
 namespace DeVesen.Bazaar.Client.State.Article;
 

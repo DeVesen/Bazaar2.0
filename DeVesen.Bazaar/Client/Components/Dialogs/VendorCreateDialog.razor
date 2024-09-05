@@ -2,6 +2,7 @@
 @using DeVesen.Bazaar.Client.Models
 @using DeVesen.Bazaar.Client.Services
 @using DeVesen.Bazaar.Client.Validator
+@using DeVesen.Bazaar.Client.Pages.Vendor.Components
 
 @inject VendorService VendorService
 @inject VendorValidator VendorValidator
@@ -17,7 +18,7 @@
                     RequestSave="SubmitAsync"/>
     </DialogContent>
     <DialogActions>
-        <DvButtonSave Enabled="@EnabledSubmit" OnClick="SubmitAsync" />
+        <DvButtonSave Disabled="@DisableSave" OnClick="SubmitAsync" />
         <DvButtonCancel OnClick="Cancel" />
     </DialogActions>
 </MudDialog>
@@ -31,7 +32,7 @@
 
     [Parameter] public string StartText { get; set; } = string.Empty;
 
-    private bool EnabledSubmit => _isValid && _isTouched;
+    private bool DisableSave => (_isValid && _isTouched) is false;
 
     private Vendor _item = Vendor.New;
     private bool _isValid;

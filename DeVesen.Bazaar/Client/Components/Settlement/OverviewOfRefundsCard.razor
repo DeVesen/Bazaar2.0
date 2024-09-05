@@ -1,5 +1,4 @@
-﻿@using DeVesen.Bazaar.Client.Components.Common.Buttons
-@using DeVesen.Bazaar.Client.Models
+﻿@using DeVesen.Bazaar.Client.Models
 
 <MudCard Outlined Elevation="4" Style="width: 350px;">
     <MudCardHeader>
@@ -16,7 +15,7 @@
                                 ArticleCommission="@ArticleCommission" />
     </MudCardContent>
     <MudCardActions>
-        <DvButtonPayOut  />
+        @CardActions
     </MudCardActions>
 </MudCard>
 
@@ -35,4 +34,7 @@
 
     [Parameter, EditorRequired]
     public double OfferUnitPrice { get; set; }
+
+    [Parameter]
+    public RenderFragment? CardActions { get; set; }
 }

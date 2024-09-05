@@ -2,8 +2,6 @@
 @using DeVesen.Bazaar.Client.Components.Common.ToolBar
 @using DeVesen.Bazaar.Client.Components.Common.TextField
 @using DeVesen.Bazaar.Client.Models
-@using DeVesen.Bazaar.Client.Extensions
-@using DeVesen.Bazaar.Client.Pages.Article.Components
 @using DeVesen.Bazaar.Client.Pages.Vendor.Components
 @using DeVesen.Bazaar.Client.State
 @using DeVesen.Bazaar.Client.State.Title
@@ -14,7 +12,7 @@
 
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 
-@inject IDialogService DialogService
+@inject Services.DialogService DialogService
 @inject NavigationService NavigationService
 
 @inject TitleFacade TitleFacade
@@ -42,11 +40,9 @@
             {
                 <MudItem xs="12" md="4" lg="3">
                     <VendorCard VendorItem="@element"
-                                OnEdit="x => ModifyElementAsync(x.Item)"
-                                OnArticle="OnArticleAsync"
-                                OnImportArticles="OnImportArticlesAsync"
-                                OnApproveArticles="OnApproveArticlesAsync"
-                                OnSettlement="OnSettlementVendorAsync" />
+                                OnEdit="x => ModifyVendorAsync(x.Item)"
+                                OnArticle="OnViewVendorArticleAsync"
+                                OnModify="OnViewVendorModifyAsync" />
                 </MudItem>
             }
         }
@@ -68,84 +64,27 @@
 
     private async Task CreateElementAsync()
     {
-        var options = new DialogOptions
-        {
-            CloseOnEscapeKey = true,
-            BackdropClick = false
-        };
-
-        var forceNext = false;
-
-        do
-        {
-            var result = await DialogService.ShowAsync<VendorCreateDialog>("Verkäufer anlegen", options)
-                                            .WaitForResult<VendorCreateDialog.OkResult>();
-
-            if (result.Canceled is false)
-            {
-                forceNext = result.Data.ForceNext;
-            }
-
-            FetchVendorList();
-        } while (forceNext);
-    }
-
-    private async Task ModifyElementAsync(Vendor vendor)
-    {
-        var parameters = new DialogParameters<VendorEditDialog> { { x => x.Item, vendor } };
-
-        var options = new DialogOptions
-        {
-            CloseOnEscapeKey = true,
-            BackdropClick = false
-        };
-
-        await DialogService.ShowAsync<VendorEditDialog>("Verkäufer ändern", parameters, options)
-                           .WaitForResult();
+        await DialogService.CreateVendorAsync();
 
         FetchVendorList();
     }
 
-    private async Task OnArticleAsync(VendorView args)
+    private async Task ModifyVendorAsync(Vendor vendor)
+    {
+        await DialogService.ModifyVendorAsync(vendor);
+
+        FetchVendorList();
+    }
+
+    private async Task OnViewVendorArticleAsync(VendorView args)
     {
         NavigationService.Vendor.ToArticle(args.Item.Id);
         await Task.CompletedTask;
     }
 
-    private async Task OnImportArticlesAsync(VendorView args)
+    private async Task OnViewVendorModifyAsync(VendorView args)
     {
-        var parameters = new DialogParameters<ArticleImportDialog> { { x => x.VendorId, args.Item.Id } };
-
-        var options = new DialogOptions
-        {
-            CloseOnEscapeKey = true,
-            BackdropClick = false
-        };
-
-        await DialogService.ShowAsync<ArticleImportDialog>("Artikel importieren", parameters, options)
-                           .WaitForResult();
-
-        FetchVendorList();
-    }
-
-    private async Task OnApproveArticlesAsync(VendorView args)
-    {
-        var parameters = new DialogParameters<ArticleApprovalDialog> { { x => x.VendorId, args.Item.Id } };
-
-        var options = new DialogOptions
-        {
-            CloseOnEscapeKey = true,
-            BackdropClick = false
-        };
-
-        await DialogService.ShowAsync<ArticleApprovalDialog>("Artikel freigeben", parameters, options);
-
-        FetchVendorList();
-    }
-
-    private async Task OnSettlementVendorAsync(VendorView args)
-    {
-        NavigationService.Vendor.ToSettlement(args.Item.Id);
+        NavigationService.Vendor.ToModify(args.Item.Id);
         await Task.CompletedTask;
     }
 

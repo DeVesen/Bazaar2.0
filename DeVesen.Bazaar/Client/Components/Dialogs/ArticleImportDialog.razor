@@ -48,7 +48,7 @@
         }
     </DialogContent>
     <DialogActions>
-        <DvButtonSave Hide="@HideSaveBtn" Enabled="@EnableSaveBtn" OnClick="OnSave" />
+        <DvButtonSave Disabled="@(HideSaveBtn || EnableSaveBtn is false)" OnClick="OnSave" />
         <DvButtonClose OnClick="OnClose"/>
     </DialogActions>
 </MudDialog>
@@ -69,7 +69,7 @@
     private IEnumerable<ImportInfo> ImportInfoItems => ImportState.Value.Items.Where(p => p.Imported is false or null);
 
     private bool _isLoadingData;
-    private bool _importTried = false;
+    private bool _importTried;
 
     private void OnSave()
     {
@@ -119,7 +119,7 @@
             ? Color.Success
             : line.Validated is true
                 ? Color.Info
-                : line.Split is true
+                : line.Split
                     ? Color.Default
                     : Color.Error;
     }

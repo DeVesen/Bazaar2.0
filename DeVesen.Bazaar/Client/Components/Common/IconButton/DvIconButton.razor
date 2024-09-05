@@ -1,44 +1,35 @@
 ﻿
 <CascadingValue Value="false" Name="SubscribeToParentForm" IsFixed>
-    <MudButton StartIcon="@StartIcon"
-               EndIcon="@EndIcon"
-               IconColor="@IconColor"
-               IconSize="@IconSize"
-               IconClass="@IconClass"
-               Color="@Color"
-               Size="@Size"
-               Variant="@Variant"
-               FullWidth="@FullWidth"
-               Disabled="@Disabled"
-               HtmlTag="@HtmlTag"
-               ButtonType="@ButtonType"
-               Href="@Href"
-               Target="@Target"
-               Rel="@Rel"
-               ClickPropagation="@ClickPropagation"
-               DropShadow="@DropShadow"
-               Ripple="@Ripple"
-               OnClick="@OnClick"
-               Class="@Class"
-               Style="@Style"
-               Tag="@Tag">@ChildContent</MudButton>
+    <MudIconButton Color="@Color"
+                   Edge="@Edge"
+                   Icon="@Icon"
+                   UserAttributes="@UserAttributes"
+                   Size="@Size"
+                   Variant="@Variant"
+                   Disabled="@Disabled"
+                   HtmlTag="@HtmlTag"
+                   ButtonType="@ButtonType"
+                   Href="@Href"
+                   Target="@Target"
+                   Rel="@Rel"
+                   ClickPropagation="@ClickPropagation"
+                   DropShadow="@DropShadow"
+                   Ripple="@Ripple"
+                   OnClick="@OnClick"
+                   Class="@Class"
+                   Style="@Style"
+                   Tag="@Tag">@ChildContent</MudIconButton>
 </CascadingValue>
 
 @code {
     [Parameter]
-    public string? StartIcon { get; set; }
-
+    public Edge Edge { get; set; }
+    
     [Parameter]
-    public string? EndIcon { get; set; }
+    public string? Icon { get; set; }
 
-    [Parameter]
-    public Color IconColor { get; set; } = Color.Inherit;
-
-    [Parameter]
-    public Size? IconSize { get; set; }
-
-    [Parameter]
-    public string? IconClass { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object?> UserAttributes { get; set; } = new();
 
     [Parameter]
     public Color Color { get; set; } = Color.Default;

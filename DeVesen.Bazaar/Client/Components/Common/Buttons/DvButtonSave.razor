@@ -1,27 +1,38 @@
-﻿@if (Hide is false)
-{
-    <MudButton StartIcon="@Icons.Material.Filled.Save"
-               Variant="Variant.Filled"
-               Color="Color.Primary"
-               Disabled="@(Enabled is false)"
-               OnClick="OnClick">Speichern</MudButton>
-}
+﻿
+<MudButton FullWidth="@FullWidth"
+           StartIcon="@IconPath"
+           IconSize="@(IconSize ?? Size)"
+           Size="@Size"
+           Variant="@Variant"
+           Color="@Color"
+           Disabled="@Disabled"
+           OnClick="OnClick"
+           Style="@Style">Speichern</MudButton>
 
 @code {
-    /// <summary>
-    /// If true, the button will be enabled.
-    /// </summary>
-    [Parameter]
-    [Category(CategoryTypes.Button.Behavior)]
-    public bool Enabled { get; set; } = true;
+    const string IconPath = Icons.Material.Filled.Save;
 
     [Parameter]
-    [Category(CategoryTypes.Button.Behavior)]
-    public bool Hide { get; set; }
+    public bool Disabled { get; set; }
 
-    /// <summary>
-    /// Button click event.
-    /// </summary>
+    [Parameter]
+    public bool FullWidth { get; set; } = true;
+
+    [Parameter]
+    public Size? IconSize { get; set; } = Size.Medium;
+
+    [Parameter]
+    public Size Size { get; set; } = Size.Medium;
+
+    [Parameter]
+    public Variant Variant { get; set; } = Variant.Filled;
+
+    [Parameter]
+    public Color Color { get; set; } = Color.Primary;
+
+    [Parameter]
+    public string? Style { get; set; }
+
     [Parameter]
     public EventCallback<MouseEventArgs> OnClick { get; set; }
 }

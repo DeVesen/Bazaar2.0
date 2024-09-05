@@ -1,5 +1,4 @@
-﻿@using DeVesen.Bazaar.Client.Extensions
-@using DeVesen.Bazaar.Client.Models
+﻿@using DeVesen.Bazaar.Client.Models
 @using DeVesen.Bazaar.Client.Pages.Article.Components
 @using DeVesen.Bazaar.Client.Services
 @using DeVesen.Bazaar.Client.State
@@ -17,7 +16,7 @@
 @inject VendorService VendorService
 @inject IState<ArticleState> ArticleState
 
-@inject IDialogService DialogService;
+@inject Services.DialogService DialogService;
 
 @if (ArticleState.Value.IsLoaded is false)
 {
@@ -35,7 +34,7 @@ else
                                 @bind-SearchText:after="@OnArticleFilterChange"
                                 DisableVendorSelection="@_pageSelect"
                                 DisableCreateArticleBtn="@(_vendor == null)"
-                                OnCreateArticleBtnClick="@CreateElementAsync"
+                                OnCreateArticleBtnClick="@CreateArticleAsync"
                                 OnImportArticleBtnClick="@ImportArticleAsync" />
 
         <MudTable T="Article"
@@ -43,7 +42,7 @@ else
                   Hover
                   Items="@ArticleState.Value.Items"
                   SortLabel="Sort By"
-                  OnRowClick="x => ModifyElementAsync(x.Item!)">
+                  OnRowClick="x => ModifyArticleAsync(x.Item!)">
             <HeaderContent>
                 <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Number)">Nummer</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Title)">Title</MudTableSortLabel></MudTh>
@@ -91,71 +90,23 @@ else
         FetchArticleList();
     }
 
-    private async Task CreateElementAsync()
+    private async Task CreateArticleAsync()
     {
-        var options = new DialogOptions
-            {
-                CloseOnEscapeKey = true,
-                BackdropClick = false
-            };
+        await DialogService.CreateArticleAsync(_vendor!.Id);
 
-        var forceNext = false;
-
-        do
-        {
-            var parameters = new DialogParameters<ArticleCreateDialog>
-            {
-                { x => x.ForceNext, forceNext },
-                { x => x.VendorId, _vendor!.Id }
-            };
-
-            var dlg = await DialogService.ShowAsync<ArticleCreateDialog>("Artikel anlegen", parameters, options);
-            var result = await dlg.Result;
-
-            forceNext = result!.Canceled is false && (bool)result.Data!;
-
-            FetchArticleList();
-
-            StateHasChanged();
-        } while (forceNext);
+        FetchArticleList();
     }
 
-    private async Task ModifyElementAsync(Article article)
+    private async Task ModifyArticleAsync(Article article)
     {
-        var parameters = new DialogParameters<ArticleEditDialog>
-        {
-            { x => x.Item, article }
-        };
-
-        var options = new DialogOptions
-        {
-            CloseOnEscapeKey = true,
-            BackdropClick = false
-        };
-
-        var dlg = await DialogService.ShowAsync<ArticleEditDialog>("Artikel ändern", parameters, options);
-        var result = await dlg.Result;
-
-        if (result!.Canceled is false)
-        {
-            FetchArticleList();
-
-            StateHasChanged();
-        }
+        await DialogService.ModifyArticleAsync(article);
+        
+        FetchArticleList();
     }
 
     private async Task ImportArticleAsync()
     {
-        var parameters = new DialogParameters<ArticleImportDialog> { { x => x.VendorId, _vendor!.Id } };
-
-        var options = new DialogOptions
-        {
-            CloseOnEscapeKey = true,
-            BackdropClick = false
-        };
-
-        await DialogService.ShowAsync<ArticleImportDialog>("Artikel importieren", parameters, options)
-                           .WaitForResult();
+        await DialogService.ImportArticleAsync(_vendor!.Id);
 
         FetchArticleList();
     }

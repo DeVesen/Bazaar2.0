@@ -1,5 +1,4 @@
-﻿@using DeVesen.Bazaar.Client.Extensions
-@using DeVesen.Bazaar.Client.Models
+﻿@using DeVesen.Bazaar.Client.Models
 @using DeVesen.Bazaar.Client.Pages.Manufacturer.Components
 @using DeVesen.Bazaar.Client.State
 @using DeVesen.Bazaar.Client.State.Manufacturer
@@ -13,7 +12,7 @@
 @inject TitleFacade TitleFacade
 @inject StateFacade StateFacade
 @inject IState<ManufacturerState> ManufacturerState
-@inject IDialogService DialogService
+@inject Services.DialogService DialogService
 
 <ManufacturerOverviewToolbar @bind-SearchText="@_searchText"
                              @bind-SearchText:after="@ReloadElements"
@@ -24,7 +23,7 @@
           Hover
           Items="@ManufacturerState.Value.Items"
           SortLabel="Sort By"
-          OnRowClick="OnTableRowClickedAsync">
+          OnRowClick="ModifyManufacturerAsync">
     <HeaderContent>
         <MudTh><MudTableSortLabel SortBy="new Func<Manufacturer, object>(x => x.Name)">Bezeichnung</MudTableSortLabel></MudTh>
     </HeaderContent>
@@ -46,51 +45,20 @@
 
     private async Task CreateManufacturerAsync()
     {
-        var options = new DialogOptions
-        {
-            CloseOnEscapeKey = true,
-            BackdropClick = false
-        };
+        await DialogService.CreateManufacturerAsync();
 
-        var forceNext = false;
+        ReloadElements();
+    }
 
-        do
-        {
-            var parameters = new DialogParameters<ManufacturerCreateDialog> { { x => x.ForceNext, forceNext } };
+    private async Task ModifyManufacturerAsync(TableRowClickEventArgs<Manufacturer> args)
+    {
+        await DialogService.ModifyManufacturerAsync(args.Item!);
 
-            var result = await DialogService.ShowAsync<ManufacturerCreateDialog>("Artikel-Kategorie anlegen", parameters, options)
-                                            .WaitForResult<ManufacturerCreateDialog.OkResult>();
-
-            if (result.Canceled is false)
-            {
-                forceNext = result.Data.ForceNext;
-            }
-
-            ReloadElements();
-        } while (forceNext);
+        ReloadElements();
     }
 
     private void ReloadElements()
     {
         StateFacade.Manufacturer.Fetch();
-    }
-
-    private async Task OnTableRowClickedAsync(TableRowClickEventArgs<Manufacturer> args)
-    {
-        var parameters = new DialogParameters<ManufacturerEditDialog>
-        {
-            { x => x.Item, args.Item }
-        };
-
-        var options = new DialogOptions
-        {
-            CloseOnEscapeKey = true,
-            BackdropClick = false
-        };
-
-        await DialogService.ShowAsync<ManufacturerEditDialog>("Artikel-Kategorie ändern", parameters, options)
-                           .WaitForResult();
-        
-        ReloadElements();
     }
 }

@@ -1,6 +1,4 @@
-﻿using DeVesen.Bazaar.Client.Models;
-
-namespace DeVesen.Bazaar.Client.State.Article;
+﻿namespace DeVesen.Bazaar.Client.State.Article;
 
 public class ArticleActions
 {

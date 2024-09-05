@@ -5,6 +5,8 @@
 @using DeVesen.Bazaar.Client.Pages.Sales.Components
 @using DeVesen.Bazaar.Client.State.Title
 @using Fluxor
+@using DeVesen.Bazaar.Client.Components.Common.Buttons
+@using DeVesen.Bazaar.Client.Components.Common
 
 @page "/Sales"
 
@@ -104,8 +106,6 @@
                                         ArticleAlreadyInCart(_article.Number) is false;
     private bool Price01BtnDisabled => ArticleValidForSale is false;
     private bool Price02BtnDisabled => _article == null || _article!.Price02.HasValue is false;
-
-    private Adornment ArticleNumberAdornment => _articleNumber > 0 ? Adornment.End : Adornment.None;
 
     private bool HasItemsInCart => ItemsInCart.Any();
     private IEnumerable<PurchaseItem> ItemsInCart => SalesCartState.Value.PurchaseItems.OrderBy(p => p.ArticleNumber);

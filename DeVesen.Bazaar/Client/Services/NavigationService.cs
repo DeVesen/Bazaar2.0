@@ -34,9 +34,9 @@ public class NavigationService
             NavigationManager.NavigateTo($"vendors/{vendorId}/articles");
         }
 
-        public void ToSettlement(string vendorId)
+        public void ToModify(string vendorId)
         {
-            NavigationManager.NavigateTo($"vendors/{vendorId}/settlement");
+            NavigationManager.NavigateTo($"vendors/{vendorId}/modify");
         }
     }
 

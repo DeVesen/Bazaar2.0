@@ -21,18 +21,22 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Update="Pages\Article\Components\ArticleApprovalDialog.razor">
+    <Content Update="Components\Dialogs\ArticleApprovalDialog.razor">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
     </Content>
-    <Content Update="Pages\Manufacturer\Components\ManufacturerCreateDialog.razor">
+    <Content Update="Components\Dialogs\ManufacturerCreateDialog.razor">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
     </Content>
-    <Content Update="Pages\Manufacturer\Components\ManufacturerEditDialog.razor">
+    <Content Update="Components\Dialogs\ManufacturerEditDialog.razor">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
     </Content>
     <Content Update="Pages\Manufacturer\Components\ManufacturerForm.razor">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Components\Common\NewFolder\" />
   </ItemGroup>
 
 </Project>

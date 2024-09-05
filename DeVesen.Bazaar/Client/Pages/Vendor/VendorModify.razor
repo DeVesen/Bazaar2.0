@@ -5,7 +5,7 @@
 @using DeVesen.Bazaar.Client.Models
 @using Fluxor
 
-@page "/vendors/{vendorId}/settlement"
+@page "/vendors/{vendorId}/modify"
 
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 
@@ -19,16 +19,18 @@
         
         <OverviewOfRefundsCard Articles="@Articles"
                                SalesShare="@VendorItem.SalesShare"
-                               OfferUnitPrice="@VendorItem.OfferUnitPrice" />
+                               OfferUnitPrice="@VendorItem.OfferUnitPrice">
+            <CardActions>
+                <DvButtonPayOut />
+            </CardActions>
+        </OverviewOfRefundsCard>
 
         <ArtikeListCard Avatar="Va"
                         Title="Artikel im Verkauf"
                         Articles="@OpenArticles">
             <CardActions>
-                <DvButtonPrint FullWidth
-                               OuterClass="w-50" />
-                <DvButtonGiveBack FullWidth
-                                  OuterClass="w-50" />
+                <DvButtonPrint />
+                <DvButtonGiveBack />
             </CardActions>
         </ArtikeListCard>
 
@@ -36,10 +38,8 @@
                         Title="Artikel Importieren"
                         Articles="@FreeArticles">
             <CardActions>
-                <DvButtonImport FullWidth
-                                OuterClass="w-50" />
-                <DvButtonApprove FullWidth
-                                 OuterClass="w-50"/>
+                <DvButtonImport />
+                <DvButtonApprove />
             </CardActions>
         </ArtikeListCard>
 
@@ -76,7 +76,7 @@ else
 
     private void SetPageCaption()
     {
-        var caption = "Rückgabe / Abrechnung";
+        var caption = "Management";
 
         TitleFacade.SetCaption(caption);
     }

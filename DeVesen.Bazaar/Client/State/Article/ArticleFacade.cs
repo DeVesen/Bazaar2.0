@@ -1,8 +1,4 @@
-﻿using DeVesen.Bazaar.Client.Domain;
-using DeVesen.Bazaar.Client.Models;
-using DeVesen.Bazaar.Client.Services;
-using DeVesen.Bazaar.Client.State.ArticleCategory;
-using Fluxor;
+﻿using Fluxor;
 
 namespace DeVesen.Bazaar.Client.State.Article;
 

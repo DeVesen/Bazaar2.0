@@ -1,6 +1,7 @@
 ﻿@using DeVesen.Bazaar.Client.Components.Common.Buttons
 @using DeVesen.Bazaar.Client.Models
 @using DeVesen.Bazaar.Client.Services
+@using DeVesen.Bazaar.Client.Pages.Article.Components
 
 @inject ArticleService ArticleService
 
@@ -11,7 +12,7 @@
                      @bind-Item="Item" />
     </DialogContent>
     <DialogActions>
-        <DvButtonSave Enabled="_isValid" OnClick="SubmitAsync" />
+        <DvButtonSave Disabled="@(_isValid is false)" OnClick="SubmitAsync" />
         <DvButtonDelete OnClick="DeleteAsync" />
         <DvButtonCancel OnClick="Cancel" />
     </DialogActions>
