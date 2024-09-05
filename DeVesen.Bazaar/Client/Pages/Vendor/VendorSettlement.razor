@@ -1,21 +1,36 @@
 ﻿@page "/vendors/{vendorId}/settlement"
 
-@using DeVesen.Bazaar.Client.Models
-@using DeVesen.Bazaar.Client.State
+@using DeVesen.Bazaar.Client.State.Settlement
 @using DeVesen.Bazaar.Client.State.Title
+@using Fluxor
 
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 
-@inject StateFacade StateFacade
 @inject TitleFacade TitleFacade
+@inject SettlementFacade SettlementFacade
+@inject IState<SettlementState> SettlementState
 
-@if (_vendor == null)
+@if (SettlementState.Value.IsLoaded)
 {
-    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+    <MudGrid>
+
+        <MudItem>
+            @* Artikelliste *@
+        </MudItem>
+
+        <MudItem>
+            @* Kostenaufstellung *@
+        </MudItem>
+
+        <MudItem>
+            @* Aktionen *@
+        </MudItem>
+
+    </MudGrid>
 }
 else
 {
-    <MudText Typo="Typo.h3">I am Caption</MudText>
+    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
 }
 
 @code {
@@ -27,10 +42,15 @@ else
     {
         await base.OnInitializedAsync();
 
-        TitleFacade.SetCaption("Rückgabe / Abrechnung");
+        SettlementFacade.Fetch(VendorId);
 
-        _vendor = await StateFacade.Vendor.GetById(VendorId);
+        SetPageCaption();
     }
 
-    private Vendor? _vendor;
+    private void SetPageCaption()
+    {
+        var caption = "Rückgabe / Abrechnung";
+
+        TitleFacade.SetCaption(caption);
+    }
 }

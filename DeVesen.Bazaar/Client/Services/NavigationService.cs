@@ -33,6 +33,11 @@ public class NavigationService
         {
             NavigationManager.NavigateTo($"vendors/{vendorId}/articles");
         }
+
+        public void ToSettlement(string vendorId)
+        {
+            NavigationManager.NavigateTo($"vendors/{vendorId}/settlement");
+        }
     }
 
     public abstract class ChildNavigationService

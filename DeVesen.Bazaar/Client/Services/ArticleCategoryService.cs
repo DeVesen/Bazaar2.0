@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using DeVesen.Bazaar.Client.Domain;
 using DeVesen.Bazaar.Client.Extensions;
 using DeVesen.Bazaar.Client.Models;
+using DeVesen.Bazaar.Shared;
 
 namespace DeVesen.Bazaar.Client.Services;
 
@@ -20,25 +21,34 @@ public class ArticleCategoryService
         _httpClient.BaseAddress = hostEnvironment.GetApiEndpointUrl("api/v1/ArticleCategory");
     }
 
-    public async Task<bool> ExistsAsync(string value)
+    public async Task<Response<bool>> ExistsAsync(string value)
     {
-        var filter = new ArticleCategoryFilter
-        {
-            Name = value
-        };
+        var elementResult = await GetAllAsync(value);
 
-        return (await GetAllAsync(filter)).Any();
+        return elementResult.IsValid
+            ? Response<bool>.Valid(elementResult.Value.Any())
+            : Response<bool>.Invalid(elementResult.ErrorMessages);
     }
 
-    public async Task<IEnumerable<ArticleCategory>> GetAllAsync(ArticleCategoryFilter filter)
+    public async Task<Response<IEnumerable<ArticleCategoryDto>>> GetAllAsync(string? name = null, string? searchText = null)
     {
-        var queryBuilder = new ApiQueryBuilder
+        try
         {
-            ["Name"] = filter.Name,
-            ["SearchText"] = filter.SearchText
-        };
+            var queryBuilder = new ApiQueryBuilder
+            {
+                ["Name"] = name,
+                ["SearchText"] = searchText
+            };
 
-        return await _httpClient.GetFromJsonAsync<IEnumerable<ArticleCategory>>(queryBuilder.BuildFinal()) ?? Enumerable.Empty<ArticleCategory>();
+            var dtoElements =
+                await _httpClient.GetFromJsonAsync<IEnumerable<ArticleCategoryDto>>(queryBuilder.BuildFinal()) ?? [];
+
+            return Response<IEnumerable<ArticleCategoryDto>>.Valid(dtoElements);
+        }
+        catch (Exception ex)
+        {
+            return Response<IEnumerable<ArticleCategoryDto>>.Invalid(ex.Message);
+        }
     }
 
     public async Task<Response> CreateAsync(ArticleCategory element)
@@ -89,11 +99,5 @@ public class ArticleCategoryService
 
         _snackBarService.AddError($"Ausnahmefehler {response.StatusCode}");
         return Response.Invalid();
-    }
-
-    public bool FilterFunc(ArticleCategory dto, string filterString)
-    {
-        return string.IsNullOrWhiteSpace(filterString)
-            || dto.Name.Contains(filterString, StringComparison.OrdinalIgnoreCase);
     }
 }

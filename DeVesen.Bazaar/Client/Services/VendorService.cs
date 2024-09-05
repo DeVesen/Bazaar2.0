@@ -2,6 +2,7 @@
 using DeVesen.Bazaar.Client.Domain;
 using DeVesen.Bazaar.Client.Extensions;
 using DeVesen.Bazaar.Client.Models;
+using DeVesen.Bazaar.Shared;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
 namespace DeVesen.Bazaar.Client.Services;
@@ -18,7 +19,7 @@ public class VendorService
         _httpClient.BaseAddress = hostEnvironment.GetApiEndpointUrl("api/v1/Vendor");
     }
 
-    public async Task<VendorView?> GetAsync(string id)
+    public async Task<Response<VendorView?>> GetByIdAsync(string id)
     {
         var requestUri = new UriBuilder(_httpClient.BaseAddress)
                                 .AddUriPart(id)
@@ -26,23 +27,40 @@ public class VendorService
 
         if (string.IsNullOrWhiteSpace(id))
         {
-            return null;
+            return Response<VendorView?>.Valid(null);
         }
 
-        var result = await _httpClient.GetFromJsonAsync<VendorView?>(requestUri);
+        var dtoElement =
+            await _httpClient.GetFromJsonAsync<VendorViewDto?>(requestUri);
 
-        return result;
+        var domainElement = dtoElement != null
+            ? MapToDomain(dtoElement)
+            : null;
+
+        return Response<VendorView?>.Valid(domainElement);
     }
 
-    public async Task<IEnumerable<VendorView>> GetAllAsync(string? id = null, string? salutation = null, string? searchText = null)
+    public async Task<Response<IEnumerable<VendorView>>> GetAllAsync(string? id = null, string? salutation = null, string? searchText = null)
     {
-        var requestUri = new UriBuilder(_httpClient.BaseAddress)
-                                .SetQueryItem("Id", id)
-                                .SetQueryItem("Salutation", salutation)
-                                .SetQueryItem("SearchText", searchText)
-                                .Build();
+        try
+        {
+            var requestUri = new UriBuilder(_httpClient.BaseAddress)
+                .SetQueryItem("Id", id)
+                .SetQueryItem("Salutation", salutation)
+                .SetQueryItem("SearchText", searchText)
+                .Build();
 
-        return await _httpClient.GetFromJsonAsync<IEnumerable<VendorView>>(requestUri) ?? [];
+            var dtoElements =
+                await _httpClient.GetFromJsonAsync<IEnumerable<VendorViewDto>>(requestUri) ?? [];
+
+            var domainElements = MapToDomain(dtoElements);
+
+            return Response<IEnumerable<VendorView>>.Valid(domainElements.ToArray());
+        }
+        catch (Exception ex)
+        {
+            return Response<IEnumerable<VendorView>>.Invalid(ex.Message);
+        }
     }
 
     public async Task<Response<Vendor>> CreateAsync(Vendor element)
@@ -101,4 +119,31 @@ public class VendorService
         _snackBarService.AddError($"Ausnahmefehler {response.StatusCode}");
         return Response.Invalid();
     }
+
+
+    internal static IEnumerable<VendorView> MapToDomain(IEnumerable<VendorViewDto> elements)
+        => elements.Select(MapToDomain);
+
+    internal static VendorView MapToDomain(VendorViewDto dtoElement)
+        => new()
+        {
+            Item = new Vendor
+            {
+                Id = dtoElement.Item.Id,
+                Salutation = dtoElement.Item.Salutation,
+                FirstName = dtoElement.Item.FirstName,
+                LastName = dtoElement.Item.LastName,
+                Address = dtoElement.Item.Address,
+                EMail = dtoElement.Item.EMail,
+                Note = dtoElement.Item.Note
+            },
+            Statistic = new VendorArticleStatistic
+            {
+                NotOpen = dtoElement.Statistic.NotOpen,
+                Open = dtoElement.Statistic.Open,
+                Sold = dtoElement.Statistic.Sold,
+                Settled = dtoElement.Statistic.Settled,
+                Turnover = dtoElement.Statistic.Turnover
+            }
+        };
 }

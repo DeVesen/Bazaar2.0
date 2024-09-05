@@ -20,7 +20,7 @@ public record Response
 
     public string ErrorMessage => ErrorMessages.FirstOrDefault() ?? string.Empty;
 
-    public IEnumerable<string> ErrorMessages { get; init; } = Enumerable.Empty<string>();
+    public string[] ErrorMessages { get; init; } = [];
 
     public static Response Invalid(params string[] errorMessages)
         => new() { IsValid = false, ErrorMessages = errorMessages };

@@ -2,6 +2,7 @@
 using DeVesen.Bazaar.Client.Domain;
 using DeVesen.Bazaar.Client.Extensions;
 using DeVesen.Bazaar.Client.Models;
+using DeVesen.Bazaar.Shared;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
 namespace DeVesen.Bazaar.Client.Services;
@@ -21,25 +22,34 @@ public class ManufacturerService
         _httpClient.BaseAddress = hostEnvironment.GetApiEndpointUrl("api/v1/Manufacturer");
     }
 
-    public async Task<bool> ExistsAsync(string value)
+    public async Task<Response<bool>> ExistsAsync(string value)
     {
-        var filter = new ManufacturerFilter
-        {
-            Name = value
-        };
+        var elementResult = await GetAllAsync(value);
 
-        return (await GetAllAsync(filter)).Any();
+        return elementResult.IsValid
+            ? Response<bool>.Valid(elementResult.Value.Any())
+            : Response<bool>.Invalid(elementResult.ErrorMessages);
     }
 
-    public async Task<IEnumerable<Manufacturer>> GetAllAsync(ManufacturerFilter filter)
+    public async Task<Response<IEnumerable<ManufacturerDto>>> GetAllAsync(string? name = null, string? searchText = null)
     {
-        var queryBuilder = new ApiQueryBuilder
+        try
         {
-            ["Name"] = filter.Name,
-            ["SearchText"] = filter.SearchText
-        };
+            var queryBuilder = new ApiQueryBuilder
+            {
+                ["Name"] = name,
+                ["SearchText"] = searchText
+            };
 
-        return await _httpClient.GetFromJsonAsync<IEnumerable<Manufacturer>>(queryBuilder.BuildFinal()) ?? Enumerable.Empty<Manufacturer>();
+            var dtoElements =
+                await _httpClient.GetFromJsonAsync<IEnumerable<ManufacturerDto>>(queryBuilder.BuildFinal()) ?? [];
+
+            return Response<IEnumerable<ManufacturerDto>>.Valid(dtoElements);
+        }
+        catch (Exception ex)
+        {
+            return Response<IEnumerable<ManufacturerDto>>.Invalid(ex.Message);
+        }
     }
 
     public async Task<Response> CreateAsync(Manufacturer element)
@@ -90,16 +100,5 @@ public class ManufacturerService
 
         _snackBarService.AddError($"Ausnahmefehler {response.StatusCode}");
         return Response.Invalid();
-    }
-
-    public bool FilterFunc(Manufacturer dto, string filterString)
-    {
-        if (string.IsNullOrWhiteSpace(filterString))
-            return true;
-
-        if (dto.Name.Contains(filterString, StringComparison.OrdinalIgnoreCase))
-            return true;
-
-        return false;
     }
 }

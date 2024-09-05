@@ -144,7 +144,7 @@
             return;
         }
         
-        _article = await ArticleService.GetByNumber(_articleNumber.Value);
+        _article = (await ArticleService.GetByNumber(_articleNumber.Value)).Value;
 
         if (_article == null)
         {

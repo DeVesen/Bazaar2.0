@@ -4,7 +4,9 @@ namespace DeVesen.Bazaar.Client.State.Article;
 
 public class ArticleActions
 {
-    public record FetchArticles(ArticleFilter Filter);
+    public record Fetch(string? VendorId, string? Number, string? SearchText);
 
-    public record ArticlesFetched(IEnumerable<Models.Article> Articles);
+    public record Set(IEnumerable<Models.Article> Items);
+
+    public record FetchFailed();
 }

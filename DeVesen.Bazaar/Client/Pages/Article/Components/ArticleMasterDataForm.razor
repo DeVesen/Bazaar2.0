@@ -4,10 +4,15 @@
 @using DeVesen.Bazaar.Client.Components.Autocomplete
 @using DeVesen.Bazaar.Client.Components.TextField
 @using DeVesen.Bazaar.Client.State
+@using DeVesen.Bazaar.Client.State.ArticleCategory
+@using DeVesen.Bazaar.Client.State.Manufacturer
+@using Fluxor
 
 @inject ArticleValidator ArticleValidator
 @inject ArticleCategoryService ArticleCategoryService
 @inject StateFacade StateFacade
+@inject IState<ArticleCategoryState> ArticleCategoryState;
+@inject IState<ManufacturerState> ManufacturerState;
 
 <MudForm IsValid="IsValid"
          IsValidChanged="OnIsValidChanged"
@@ -39,7 +44,7 @@
                             Label="Kategorie"
                             @bind-Value="ArticleItem.ArticleCategory"
                             For="@(() => ArticleItem.ArticleCategory)"
-                            MaxItems="@autocompleteMaxItems"
+                            MaxItems="@AutocompleteMaxItems"
                             SearchFunc="@CategoryAutoCompleteSearchAsync" />
         </MudItem>
         <MudItem xs="12" sm="6">
@@ -48,7 +53,7 @@
                             Label="Hersteller"
                             @bind-Value="ArticleItem.Manufacturer"
                             For="@(() => ArticleItem.Manufacturer)"
-                            MaxItems="@autocompleteMaxItems"
+                            MaxItems="@AutocompleteMaxItems"
                             SearchFunc="@ManufacturerAutoCompleteSearchAsync" />
         </MudItem>
         <MudItem xs="12" sm="6">
@@ -76,7 +81,7 @@
 </MudForm>
 
 @code {
-    private const int autocompleteMaxItems = 25; // todo move to app-Config
+    private const int AutocompleteMaxItems = 25; // todo move to app-Config
 
     [Parameter]
     public required bool DisableNumber { get; set; }
@@ -120,7 +125,7 @@
 
     private async Task<IEnumerable<string>> CategoryAutoCompleteSearchAsync(string value, CancellationToken token)
     {
-        var articleCategoryQuery = StateFacade.ArticleCategory.GetArticleCategories();
+        var articleCategoryQuery = ArticleCategoryState.Value.Items;
 
         if (string.IsNullOrWhiteSpace(value) is false)
         {
@@ -138,7 +143,7 @@
 
     private async Task<IEnumerable<string>> ManufacturerAutoCompleteSearchAsync(string? value, CancellationToken token)
     {
-        var manufacturerQuery = StateFacade.Manufacturer.GetManufacturer().ToArray();
+        var manufacturerQuery = ManufacturerState.Value.Items;
 
         if (string.IsNullOrWhiteSpace(value) is false)
         {

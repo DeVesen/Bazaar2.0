@@ -20,27 +20,36 @@ public class ArticleService
         _httpClient.BaseAddress = hostEnvironment.GetApiEndpointUrl("api/v1/Article");
     }
 
-    public async Task<Article?> GetByNumber(long number)
+    public async Task<Response<Article?>> GetByNumber(long number)
     {
-        var possibleElements = (await GetAllAsync(number: number.ToString()))
-            .Where(p => p.Number == number)
-            .ToArray();
+        var result = await GetAllAsync(number: number.ToString());
 
-        return possibleElements.Length == 1 ? possibleElements.FirstOrDefault() : null;
+        return result.IsValid 
+            ? Response<Article?>.Valid(result.Value.FirstOrDefault())
+            : Response<Article?>.Invalid(result.ErrorMessages);
     }
 
-    public async Task<IEnumerable<Article>> GetAllAsync(string? vendorId = null, string? number = null,
-        string? searchText = null)
+    public async Task<Response<IEnumerable<Article>>> GetAllAsync(string? vendorId = null, string? number = null, string? searchText = null)
     {
-        var queryBuilder = new ApiQueryBuilder
+        try
         {
-            ["VendorId"] = vendorId,
-            ["Number"] = $"{number}",
-            ["SearchText"] = searchText
-        };
+            var requestUri = new UriBuilder(_httpClient.BaseAddress)
+                .SetQueryItem("VendorId", vendorId)
+                .SetQueryItem("Number", number)
+                .SetQueryItem("SearchText", searchText)
+                .Build();
 
-        return await _httpClient.GetFromJsonAsync<IEnumerable<Article>>(queryBuilder.BuildFinal()) ??
-               Enumerable.Empty<Article>();
+            var dtoElements =
+                await _httpClient.GetFromJsonAsync<IEnumerable<ArticleDto>>(requestUri) ?? [];
+
+            var domainElements = MapToDomain(dtoElements);
+
+            return Response<IEnumerable<Article>>.Valid(domainElements.ToArray());
+        }
+        catch (Exception ex)
+        {
+            return Response<IEnumerable<Article>>.Invalid(ex.Message);
+        }
     }
 
     public async Task<Response> CreateAsync(Article element, bool showResultSnackBar = true)
@@ -141,4 +150,27 @@ public class ArticleService
 
         return Response.Invalid(message!.Message);
     }
+
+
+    internal static IEnumerable<Article> MapToDomain(IEnumerable<ArticleDto> elements)
+        => elements.Select(MapToDomain);
+
+    internal static Article MapToDomain(ArticleDto dtoElement)
+        => new()
+        {
+            Id = dtoElement.Id,
+            VendorId = dtoElement.VendorId,
+            Number = dtoElement.Number,
+            Title = dtoElement.Title,
+            ArticleCategory = dtoElement.ArticleCategory,
+            Manufacturer = dtoElement.Manufacturer,
+            Created = dtoElement.Created,
+            Price01 = dtoElement.Price01,
+            Price02 = dtoElement.Price02,
+            Description = dtoElement.Description,
+            ApprovedForSale = dtoElement.ApprovedForSale,
+            Sold = dtoElement.Sold,
+            SoldAt = dtoElement.SoldAt,
+            Settled = dtoElement.Settled
+        };
 }

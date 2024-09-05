@@ -1,22 +1,9 @@
-﻿using DeVesen.Bazaar.Client.Models;
-using Fluxor;
+﻿using Fluxor;
 
 namespace DeVesen.Bazaar.Client.State.Manufacturer;
 
-public class ManufacturerFacade
+public class ManufacturerFacade(IDispatcher dispatcher)
 {
-    private readonly ManufacturerState _manufacturerState;
-    private readonly IDispatcher _dispatcher;
-
-    public ManufacturerFacade(IState<ManufacturerState> manufacturerState, IDispatcher dispatcher)
-    {
-        _manufacturerState = manufacturerState.Value;
-        _dispatcher = dispatcher;
-    }
-
-    public IEnumerable<Models.Manufacturer> GetManufacturer() => _manufacturerState.Vendors;
-
-    public void Fetch() => Fetch(new ManufacturerFilter());
-
-    public void Fetch(ManufacturerFilter filter) => _dispatcher.Dispatch(new ManufacturerActions.FetchManufacturers(filter));
+    public void Fetch(string? name = null, string? searchText = null)
+        => dispatcher.Dispatch(new ManufacturerActions.Fetch(name, searchText));
 }

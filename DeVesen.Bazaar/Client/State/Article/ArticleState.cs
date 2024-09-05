@@ -4,7 +4,7 @@ using Fluxor;
 namespace DeVesen.Bazaar.Client.State.Article;
 
 [FeatureState]
-public record ArticleState(IEnumerable<Models.Article> Articles, ArticleFilter FilterData, bool IsLoaded)
+public record ArticleState(IEnumerable<Models.Article> Items, bool IsLoaded)
 {
-    private ArticleState() : this(Enumerable.Empty<Models.Article>(), new ArticleFilter(), false) { }
+    private ArticleState() : this([], false) { }
 }

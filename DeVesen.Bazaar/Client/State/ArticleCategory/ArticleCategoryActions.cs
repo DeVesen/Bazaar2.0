@@ -1,10 +1,10 @@
-﻿using DeVesen.Bazaar.Client.Models;
-
-namespace DeVesen.Bazaar.Client.State.ArticleCategory;
+﻿namespace DeVesen.Bazaar.Client.State.ArticleCategory;
 
 public class ArticleCategoryActions
 {
-    public record FetchArticleCategories(ArticleCategoryFilter Filter);
+    public record Fetch(string? Name, string? SearchText);
 
-    public record ArticleCategoriesFetched(IEnumerable<Models.ArticleCategory> Items);
+    public record Set(IEnumerable<Models.ArticleCategory> Items);
+
+    public record FetchFailed();
 }

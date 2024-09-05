@@ -3,23 +3,27 @@ using Fluxor;
 
 namespace DeVesen.Bazaar.Client.State.Manufacturer;
 
-public class ManufacturerEffects
+public class ManufacturerEffects(ManufacturerService manufacturerService)
 {
-    private readonly ManufacturerService _manufacturerService;
-
-    public ManufacturerEffects(ManufacturerService manufacturerService)
-    {
-        _manufacturerService = manufacturerService;
-    }
-
     [EffectMethod]
-    public async Task FetchVendors(ManufacturerActions.FetchManufacturers action, IDispatcher dispatcher)
+    public async Task FetchVendors(ManufacturerActions.Fetch action, IDispatcher dispatcher)
     {
-        var elements = await _manufacturerService.GetAllAsync(action.Filter);
+        var response = await manufacturerService.GetAllAsync(action.Name, action.SearchText);
 
-        elements = elements.OrderBy(p => p.Name)
-                           .ToArray();
+        if (response.IsValid is false)
+        {
+            dispatcher.Dispatch(new ManufacturerActions.FetchFailed());
+        }
 
-        dispatcher.Dispatch(new ManufacturerActions.ManufacturersFetched(elements));
+        var domainElements = response.Value
+            .OrderBy(p => p.Name)
+            .Select(dtoElement => new Models.Manufacturer
+            {
+                Id = dtoElement.Id,
+                Name = dtoElement.Name
+            })
+            .ToArray();
+
+        dispatcher.Dispatch(new ManufacturerActions.Set(domainElements));
     }
 }

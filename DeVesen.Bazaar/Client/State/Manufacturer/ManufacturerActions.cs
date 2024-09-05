@@ -1,10 +1,10 @@
-﻿using DeVesen.Bazaar.Client.Models;
-
-namespace DeVesen.Bazaar.Client.State.Manufacturer;
+﻿namespace DeVesen.Bazaar.Client.State.Manufacturer;
 
 public class ManufacturerActions
 {
-    public record FetchManufacturers(ManufacturerFilter Filter);
+    public record Fetch(string? Name, string? SearchText);
 
-    public record ManufacturersFetched(IEnumerable<Models.Manufacturer> Vendors);
+    public record Set(IEnumerable<Models.Manufacturer> Items);
+
+    public record FetchFailed();
 }

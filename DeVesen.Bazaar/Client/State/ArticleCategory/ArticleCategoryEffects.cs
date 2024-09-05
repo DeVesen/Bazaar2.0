@@ -3,23 +3,27 @@ using Fluxor;
 
 namespace DeVesen.Bazaar.Client.State.ArticleCategory;
 
-public class ArticleCategoryEffects
+public class ArticleCategoryEffects(ArticleCategoryService articleCategoryService)
 {
-    private readonly ArticleCategoryService _articleCategoryService;
-
-    public ArticleCategoryEffects(ArticleCategoryService articleCategoryService)
-    {
-        _articleCategoryService = articleCategoryService;
-    }
-
     [EffectMethod]
-    public async Task FetchVendors(ArticleCategoryActions.FetchArticleCategories action, IDispatcher dispatcher)
+    public async Task FetchVendors(ArticleCategoryActions.Fetch action, IDispatcher dispatcher)
     {
-        var elements = await _articleCategoryService.GetAllAsync(action.Filter);
+        var response = await articleCategoryService.GetAllAsync(action.Name, action.SearchText);
 
-        elements = elements.OrderBy(p => p.Name)
-                           .ToArray();
+        if (response.IsValid is false)
+        {
+            dispatcher.Dispatch(new ArticleCategoryActions.FetchFailed());
+        }
 
-        dispatcher.Dispatch(new ArticleCategoryActions.ArticleCategoriesFetched(elements));
+        var domainElements = response.Value
+            .OrderBy(p => p.Name)
+            .Select(dtoElement => new Models.ArticleCategory
+            {
+                Id = dtoElement.Id,
+                Name = dtoElement.Name
+            })
+            .ToArray();
+
+        dispatcher.Dispatch(new ArticleCategoryActions.Set(domainElements));
     }
 }

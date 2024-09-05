@@ -1,10 +1,9 @@
-﻿using DeVesen.Bazaar.Client.Models;
-using Fluxor;
+﻿using Fluxor;
 
 namespace DeVesen.Bazaar.Client.State.Manufacturer;
 
 [FeatureState]
-public record ManufacturerState(IEnumerable<Models.Manufacturer> Vendors, ManufacturerFilter FilterData, bool IsLoaded)
+public record ManufacturerState(IEnumerable<Models.Manufacturer> Items, bool IsLoaded)
 {
-    private ManufacturerState() : this(Enumerable.Empty<Models.Manufacturer>(), new ManufacturerFilter(), false) { }
+    private ManufacturerState() : this([], false) { }
 }

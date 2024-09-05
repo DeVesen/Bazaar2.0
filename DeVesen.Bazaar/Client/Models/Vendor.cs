@@ -11,6 +11,9 @@ public record Vendor
     public string? Phone { get; set; }
     public string? Note { get; set; }
 
+    public double OfferUnitPrice { get; set; } = 0.50d;
+    public double SalesShare { get; set; } = 0.10d;
+
     public static Vendor New => new();
 
     public bool Contains(string text)

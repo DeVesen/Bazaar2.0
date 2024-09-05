@@ -1,6 +1,7 @@
 ﻿@using DeVesen.Bazaar.Client.Extensions
 @using DeVesen.Bazaar.Client.Models
 @using DeVesen.Bazaar.Client.Pages.Article.Components
+@using DeVesen.Bazaar.Client.Services
 @using DeVesen.Bazaar.Client.State
 @using DeVesen.Bazaar.Client.State.Article
 @using DeVesen.Bazaar.Client.State.Title
@@ -13,6 +14,7 @@
 
 @inject TitleFacade TitleFacade
 @inject StateFacade StateFacade
+@inject VendorService VendorService
 @inject IState<ArticleState> ArticleState
 
 @inject IDialogService DialogService;
@@ -33,7 +35,7 @@
     <MudTable T="Article"
               FixedHeader
               Hover
-              Items="@ArticleState.Value.Articles"
+              Items="@ArticleState.Value.Items"
               SortLabel="Sort By"
               OnRowClick="x => ModifyElementAsync(x.Item!)">
         <HeaderContent>
@@ -69,11 +71,11 @@
     {
         await base.OnInitializedAsync();
 
-        _vendor = await StateFacade.Vendor.GetById(VendorId);
+        _vendor = (await VendorService.GetByIdAsync(VendorId)).Value?.Item;
 
         FetchArticleList();
-        
-        TitleFacade.SetCaption("Artikelliste");
+
+        SetPageCaption();
     }
 
     private void OnArticleFilterChange()
@@ -103,7 +105,7 @@
             var result = await dlg.Result;
 
             forceNext = result!.Canceled is false && (bool)result.Data!;
-            
+
             FetchArticleList();
 
             StateHasChanged();
@@ -146,20 +148,25 @@
 
         await DialogService.ShowAsync<ArticleImportDialog>("Artikel importieren", parameters, options)
                            .WaitForResult();
-        
+
         FetchArticleList();
     }
 
     private void FetchArticleList()
     {
-        var articleFilter = new ArticleFilter
-            {
-                VendorId = VendorId,
-                Number = _number,
-                SearchText = _searchText
-            };
+        StateFacade.Article.Fetch(VendorId, _number, _searchText);
+    }
 
-        StateFacade.Article.Fetch(articleFilter);
+    private void SetPageCaption()
+    {
+        var caption = "Artikelliste";
+
+        if (_vendor != null)
+        {
+            caption += $" ({_vendor.GetTotalName()})";
+        }
+
+        TitleFacade.SetCaption(caption);
     }
 
     private static string GetStatus(Article article)

@@ -7,8 +7,9 @@ using DeVesen.Bazaar.Client.State.ArticleCategory;
 using DeVesen.Bazaar.Client.State.Import;
 using DeVesen.Bazaar.Client.State.Manufacturer;
 using DeVesen.Bazaar.Client.State.SalesCart;
+using DeVesen.Bazaar.Client.State.Settlement;
 using DeVesen.Bazaar.Client.State.Title;
-using DeVesen.Bazaar.Client.State.Vendor;
+using DeVesen.Bazaar.Client.State.VendorView;
 using DeVesen.Bazaar.Client.Validator;
 using DeVesen.Bazaar.Shared.Services;
 using Microsoft.AspNetCore.Components.Web;
@@ -24,10 +25,11 @@ builder.Services.AddMudServices()
                 .ConfigureFluxor();
 
 builder.Services.AddTransient<StateFacade>();
-builder.Services.AddTransient<ArticleFacade>();
-builder.Services.AddTransient<VendorFacade>();
 builder.Services.AddTransient<ManufacturerFacade>();
 builder.Services.AddTransient<ArticleCategoryFacade>();
+builder.Services.AddTransient<VendorViewFacade>();
+builder.Services.AddTransient<ArticleFacade>();
+builder.Services.AddTransient<SettlementFacade>();
 
 builder.Services.AddTransient<ImportFacade>();
 builder.Services.AddTransient<SalesCartFacade>();

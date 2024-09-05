@@ -3,25 +3,22 @@ using Fluxor;
 
 namespace DeVesen.Bazaar.Client.State.Article;
 
-public class ArticleEffects
+public class ArticleEffects(ArticleService articleService)
 {
-    private readonly ArticleService _articleService;
-    private readonly IState<ArticleState> _articleState;
-
-    public ArticleEffects(ArticleService articleService, IState<ArticleState> articleState)
-    {
-        _articleService = articleService;
-        _articleState = articleState;
-    }
-
     [EffectMethod]
-    public async Task FetchHazardSigns(ArticleActions.FetchArticles action, IDispatcher dispatcher)
+    public async Task Fetch(ArticleActions.Fetch action, IDispatcher dispatcher)
     {
-        var articles = await _articleService.GetAllAsync(action.Filter.VendorId, action.Filter.Number, action.Filter.SearchText);
+        var response = await articleService.GetAllAsync(action.VendorId, action.Number, action.SearchText);
 
-        articles = articles.OrderBy(p => p.Number)
-                           .ThenBy(p => p.Title);
+        if (response.IsValid is false)
+        {
+            dispatcher.Dispatch(new ArticleActions.FetchFailed());
+        }
 
-        dispatcher.Dispatch(new ArticleActions.ArticlesFetched(articles));
+        var domainElements = response.Value
+            .OrderBy(p => p.Number)
+            .ThenBy(p => p.Title);
+
+        dispatcher.Dispatch(new ArticleActions.Set(domainElements));
     }
 }

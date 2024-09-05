@@ -1,8 +1,10 @@
 ﻿@using DeVesen.Bazaar.Client.Components.TextField
 @using DeVesen.Bazaar.Client.Components.Buttons
+@using DeVesen.Bazaar.Client.Services
 @using DeVesen.Bazaar.Client.State
 
 @inject StateFacade StateFacade
+@inject ArticleService ArticleService
 
 <MudDialog>
     <DialogContent>
@@ -63,7 +65,7 @@
 
     private async Task ApproveArticleAsync(long articleNumber)
     {
-        var result = await StateFacade.Article.ApproveArticleAsync(articleNumber);
+        var result = await ArticleService.ApproveAsync(articleNumber);
 
         if (result.IsValid)
         {

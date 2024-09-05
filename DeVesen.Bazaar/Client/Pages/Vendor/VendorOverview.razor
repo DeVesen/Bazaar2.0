@@ -7,7 +7,7 @@
 @using DeVesen.Bazaar.Client.Pages.Vendor.Components
 @using DeVesen.Bazaar.Client.State
 @using DeVesen.Bazaar.Client.State.Title
-@using DeVesen.Bazaar.Client.State.Vendor
+@using DeVesen.Bazaar.Client.State.VendorView
 @using Fluxor
 
 @page "/vendors"
@@ -19,7 +19,7 @@
 
 @inject TitleFacade TitleFacade
 @inject StateFacade StateFacade
-@inject IState<VendorState> VendorState
+@inject IState<VendorViewState> VendorState
 
 <div class="d-flex flex-column gap-4 px-1">
     <MudToolBar WrapContent Dense Gutters="false">
@@ -55,7 +55,7 @@
 
 
 @code {
-    
+
     private string _searchText = string.Empty;
     private ToolBarGenederSelect.GenderType _genderType = ToolBarGenederSelect.GenderType.All;
 
@@ -85,7 +85,7 @@
             {
                 forceNext = result.Data.ForceNext;
             }
-            
+
             FetchVendorList();
         } while (forceNext);
     }
@@ -124,7 +124,7 @@
 
         await DialogService.ShowAsync<ArticleImportDialog>("Artikel importieren", parameters, options)
                            .WaitForResult();
-        
+
         FetchVendorList();
     }
 
@@ -145,6 +145,8 @@
 
     private async Task OnSettlementVendorAsync(VendorView args)
     {
+        NavigationService.Vendor.ToSettlement(args.Item.Id);
+        await Task.CompletedTask;
     }
 
     private void OnSearchChanged(string newValue)
@@ -163,14 +165,10 @@
 
     private void FetchVendorList()
     {
-        var filter = new VendorFilter
-        {
-            Salutation = _genderType != ToolBarGenederSelect.GenderType.All
-                ? _genderType.ToString()
-                : null,
-            SearchText = _searchText
-        };
+        var salutation = _genderType != ToolBarGenederSelect.GenderType.All
+            ? _genderType.ToString()
+            : null;
 
-        StateFacade.Vendor.Fetch(filter);
+        StateFacade.Vendor.Fetch(salutation: salutation, searchText: _searchText);
     }
 }
