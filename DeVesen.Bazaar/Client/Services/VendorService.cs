@@ -19,25 +19,35 @@ public class VendorService
         _httpClient.BaseAddress = hostEnvironment.GetApiEndpointUrl("api/v1/Vendor");
     }
 
-    public async Task<Response<VendorView?>> GetByIdAsync(string id)
+    public async Task<Response<VendorView>> GetByIdAsync(string id)
     {
-        var requestUri = new UriBuilder(_httpClient.BaseAddress)
-                                .AddUriPart(id)
-                                .Build();
-
-        if (string.IsNullOrWhiteSpace(id))
+        try
         {
-            return Response<VendorView?>.Valid(null);
+            var requestUri = new UriBuilder(_httpClient.BaseAddress)
+                .AddUriPart(id)
+                .Build();
+
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return Response<VendorView>.Invalid("Verkäufer nicht gefunden!");
+            }
+
+            var response = await _httpClient.GetAsync(requestUri);
+
+            if (response.IsSuccessStatusCode is false)
+            {
+                return Response<VendorView>.Invalid("Verkäufer nicht gefunden!");
+            }
+
+            var dtoElement = await response.Content.ReadFromJsonAsync<VendorViewDto>();
+            var domainElement = MapToDomain(dtoElement!);
+
+            return Response<VendorView>.Valid(domainElement);
         }
-
-        var dtoElement =
-            await _httpClient.GetFromJsonAsync<VendorViewDto?>(requestUri);
-
-        var domainElement = dtoElement != null
-            ? MapToDomain(dtoElement)
-            : null;
-
-        return Response<VendorView?>.Valid(domainElement);
+        catch (Exception ex)
+        {
+            return Response<VendorView>.Invalid(ex.Message);
+        }
     }
 
     public async Task<Response<IEnumerable<VendorView>>> GetAllAsync(string? id = null, string? salutation = null, string? searchText = null)

@@ -1,6 +1,6 @@
 ﻿using MudBlazor;
 
-namespace DeVesen.Bazaar.Client.Components.Common.Autocomplete;
+namespace DeVesen.Bazaar.Client.Components.Autocomplete;
 
 public partial class DvAutocomplete<T> : MudAutocomplete<T>
 {

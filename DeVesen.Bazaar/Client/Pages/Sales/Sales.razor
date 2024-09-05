@@ -1,6 +1,4 @@
-﻿@using DeVesen.Bazaar.Client.Components
-@using DeVesen.Bazaar.Client.Components.Buttons
-@using DeVesen.Bazaar.Client.Components.TextField
+﻿@using DeVesen.Bazaar.Client.Components.TextField
 @using DeVesen.Bazaar.Client.Models
 @using DeVesen.Bazaar.Client.Services
 @using DeVesen.Bazaar.Client.State.SalesCart
@@ -22,26 +20,29 @@
         <MudItem xs="12" md="6">
             <MudGrid Spacing="2">
                 <MudItem xs="12" sm="6">
-                    <DvNumericTextField @ref="_articleNumberRef"
-                                        T="long?"
-                                        Label="Artickelnummer"
-                                        Margin="Margin.None"
-                                        @bind-Value="_articleNumber"
-                                        @bind-Value:after="@OnArticleSearchAsync"
-                                        OnKeyUp="@OnArticleSearchKeyUpAsync" />
+                    <DvTextField @ref="_articleNumberRef"
+                                 T="long?"
+                                 Label="Nummer"
+                                 InputMode="InputMode.numeric"
+                                 Margin="Margin.None"
+                                 DebounceInterval="0"
+                                 @bind-Value="_articleNumber"
+                                 @bind-Value:after="@OnArticleSearchAsync"
+                                 OnKeyUp="@OnArticleSearchKeyUpAsync" />
                 </MudItem>
                 <MudItem xs="6" sm="3">
                     <DvButtonSalesPrice Disabled="@Price01BtnDisabled"
                                         Value="_article?.Price01"
                                         Style="min-height: 62px; font-size: 26px"
-                                        Color="Color.Primary"
+                                        Color="@Color.Primary"
                                         OnClick="() => OnArticlePriceClickAsync(_article!, _article!.Price01)" />
                 </MudItem>
                 <MudItem xs="6" sm="3">
                     <DvButtonSalesPrice Disabled="@Price02BtnDisabled"
                                         Value="_article?.Price02"
                                         Style="min-height: 62px; font-size: 20px"
-                                        Color="Color.Secondary"
+                                        Color="@Color.Primary"
+                                        Variant="@Variant.Outlined"
                                         OnClick="() => OnArticlePriceClickAsync(_article!, _article!.Price02!.Value)"/>
                 </MudItem>
                 <MudItem xs="12">
@@ -110,7 +111,7 @@
     private IEnumerable<PurchaseItem> ItemsInCart => SalesCartState.Value.PurchaseItems.OrderBy(p => p.ArticleNumber);
     private double ValueOfGoods => ItemsInCart.Sum(p => p.SalesAmount);
 
-    private DvNumericTextField<long?>? _articleNumberRef;
+    private DvTextField<long?>? _articleNumberRef;
 
     private long? _articleNumber;
     private Article? _article;
@@ -152,37 +153,36 @@
 
             await SelectArticleNumberInput();
         }
-        else if (_article.IsApprovedForSale() is false)
-        {
-            ShowErrorArticleSelectionMessage($"Artikel {_articleNumber} nicht für den Verkauf frei gegeben!");
-
-            await SelectArticleNumberInput();
-        }
-        else if (_article.IsSettled() && _article.IsSold())
-        {
-            var settledMessage = _article.IsSold() ?
-                $"Artikel {_articleNumber} ist bereits abgerechnet!"
-                : $"Artikel {_articleNumber} ist bereits zurückgegeben!";
-
-            ShowErrorArticleSelectionMessage(settledMessage);
-
-            await SelectArticleNumberInput();
-        }
-        else if (_article.IsSettled() is false && _article.IsSold())
-        {
-            ShowErrorArticleSelectionMessage($"Artikel {_articleNumber} ist bereits verkauft!");
-                
-            await SelectArticleNumberInput();
-        }
         else if (ArticleAlreadyInCart(_articleNumber.Value))
         {
             ShowNeutralArticleSelectionMessage($"Artikel {_articleNumber} bereits im Warenkorb!");
-                
+
             await SelectArticleNumberInput();
         }
         else
         {
-            ShowSuccessArticleSelectionMessage($"Artikel {_articleNumber} bereit, bitte Preis wählen...", Variant.Text);
+            switch (_article.Status)
+            {
+                case Article.StatusType.None:
+                    ShowErrorArticleSelectionMessage($"Artikel {_articleNumber} nicht für den Verkauf frei gegeben!");
+                    break;
+                case Article.StatusType.Approved:
+                    ShowSuccessArticleSelectionMessage($"Artikel {_articleNumber} bereit, bitte Preis wählen...", Variant.Text);
+                    break;
+                case Article.StatusType.Sold:
+                    ShowErrorArticleSelectionMessage($"Artikel {_articleNumber} ist bereits verkauft!");
+                    break;
+                case Article.StatusType.Returned:
+                    ShowErrorArticleSelectionMessage($"Artikel {_articleNumber} ist bereits zurückgegeben!");
+                    break;
+                case Article.StatusType.Settled:
+                    ShowErrorArticleSelectionMessage($"Artikel {_articleNumber} ist bereits abgerechnet!");
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            await SelectArticleNumberInput();
         }
     }
 

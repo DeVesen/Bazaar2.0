@@ -1,7 +1,7 @@
 ﻿using Fluxor;
 using Microsoft.AspNetCore.Components;
 
-namespace DeVesen.Bazaar.Client.Components;
+namespace DeVesen.Bazaar.Client.Components.Common;
 
 public partial class DispatchedAction : ComponentBase, IDisposable
 {

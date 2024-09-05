@@ -1,0 +1,35 @@
+﻿
+<DvButton Color="@Color"
+          Variant="@Variant"
+          Disabled="@Disabled"
+          FullWidth="true"
+          Size="@Size.Large"
+          EndIcon="@ShownIcon"
+          IconSize="@Size.Large"
+          OnClick="@OnClick"
+          Style="@Style">
+    @Value
+</DvButton>
+
+@code {
+
+    private string? ShownIcon => Value.HasValue ? @Icons.Material.TwoTone.Euro : null;
+
+    [Parameter, EditorRequired]
+    public double? Value { get; set; }
+
+    [Parameter, EditorRequired]
+    public Color Color { get; set; }
+
+    [Parameter, EditorRequired]
+    public Variant Variant { get; set; } = Variant.Filled;
+
+    [Parameter, EditorRequired]
+    public bool Disabled { get; set; }
+
+    [Parameter, EditorRequired]
+    public EventCallback<MouseEventArgs> OnClick { get; set; }
+
+    [Parameter]
+    public string? Style { get; set; }
+}

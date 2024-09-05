@@ -1,8 +1,11 @@
-﻿@page "/vendors/{vendorId}/settlement"
-
+﻿@using DeVesen.Bazaar.Client.Components.Common.Buttons
+@using DeVesen.Bazaar.Client.Components.Settlement
 @using DeVesen.Bazaar.Client.State.Settlement
 @using DeVesen.Bazaar.Client.State.Title
+@using DeVesen.Bazaar.Client.Models
 @using Fluxor
+
+@page "/vendors/{vendorId}/settlement"
 
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 
@@ -10,23 +13,42 @@
 @inject SettlementFacade SettlementFacade
 @inject IState<SettlementState> SettlementState
 
-@if (SettlementState.Value.IsLoaded)
+@if (SettlementState.Value.State == State.Settlement.SettlementState.LoadingState.Loaded)
 {
-    <MudGrid>
+    <div class="d-flex flex-wrap gap-2">
+        
+        <OverviewOfRefundsCard Articles="@Articles"
+                               SalesShare="@VendorItem.SalesShare"
+                               OfferUnitPrice="@VendorItem.OfferUnitPrice" />
 
-        <MudItem>
-            @* Artikelliste *@
-        </MudItem>
+        <ArtikeListCard Avatar="Va"
+                        Title="Artikel im Verkauf"
+                        Articles="@OpenArticles">
+            <CardActions>
+                <DvButtonPrint FullWidth
+                               OuterClass="w-50" />
+                <DvButtonGiveBack FullWidth
+                                  OuterClass="w-50" />
+            </CardActions>
+        </ArtikeListCard>
 
-        <MudItem>
-            @* Kostenaufstellung *@
-        </MudItem>
+        <ArtikeListCard Avatar="Ia"
+                        Title="Artikel Importieren"
+                        Articles="@FreeArticles">
+            <CardActions>
+                <DvButtonImport FullWidth
+                                OuterClass="w-50" />
+                <DvButtonApprove FullWidth
+                                 OuterClass="w-50"/>
+            </CardActions>
+        </ArtikeListCard>
 
-        <MudItem>
-            @* Aktionen *@
-        </MudItem>
+    </div>
 
-    </MudGrid>
+}
+else if (SettlementState.Value.State == State.Settlement.SettlementState.LoadingState.Failed)
+{
+    <MudText>Fehler beim Laden ...</MudText>
 }
 else
 {
@@ -34,6 +56,11 @@ else
 }
 
 @code {
+
+    private Vendor VendorItem => SettlementState.Value.Vendor!.Item;
+    private IEnumerable<Article> Articles => SettlementState.Value.Articles.OrderBy(p => (int)p.Status);
+    private IEnumerable<Article> OpenArticles => Articles.Where(p => p.IsValidForSale()).OrderBy(p => p.Number);
+    private IEnumerable<Article> FreeArticles => Articles.Where(p => p.IsApprovedForSale() is false).OrderBy(p => p.Number);
 
     [Parameter]
     public string VendorId { get; set; } = string.Empty;

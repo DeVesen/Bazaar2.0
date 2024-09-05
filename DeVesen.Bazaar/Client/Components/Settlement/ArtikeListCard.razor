@@ -1,0 +1,50 @@
+﻿@using DeVesen.Bazaar.Client.Components.Common.Buttons
+@using DeVesen.Bazaar.Client.Models
+
+<MudCard Outlined Elevation="4" Style="width: 350px;">
+    <MudCardHeader>
+        <CardHeaderAvatar>
+            <MudAvatar Color="Color.Secondary">@Avatar</MudAvatar>
+        </CardHeaderAvatar>
+        <CardHeaderContent>
+            <MudText Typo="Typo.subtitle1">@Title</MudText>
+            <MudText Typo="Typo.subtitle2">@SubTitle</MudText>
+        </CardHeaderContent>
+    </MudCardHeader>
+    <MudCardContent>
+        <MudTable T="Article"
+                  FixedHeader
+                  Breakpoint="@Breakpoint.None"
+                  Height="215px"
+                  Items="@Articles">
+            <HeaderContent>
+                <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Number)">Nummer</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Title)">Title</MudTableSortLabel></MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Nummer">@context.Number</MudTd>
+                <MudTd DataLabel="Titel">@context.Title</MudTd>
+            </RowTemplate>
+        </MudTable>
+    </MudCardContent>
+    <MudCardActions Class="gap-2">
+        @CardActions
+    </MudCardActions>
+</MudCard>
+
+@code {
+    [Parameter, EditorRequired]
+    public required string Avatar { get; set; }
+
+    [Parameter, EditorRequired]
+    public required string Title { get; set; }
+
+    [Parameter]
+    public string? SubTitle { get; set; }
+
+    [Parameter, EditorRequired]
+    public required IEnumerable<Article> Articles { get; set; }
+    
+    [Parameter]
+    public RenderFragment? CardActions { get; set; }
+}

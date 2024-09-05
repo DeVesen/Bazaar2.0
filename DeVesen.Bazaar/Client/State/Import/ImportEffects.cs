@@ -46,9 +46,9 @@ public class ImportEffects
     [EffectMethod]
     public async Task DataLineAnalyzedAsync(ImportActions.DataLineAnalyzed action, IDispatcher dispatcher)
     {
-        var items = await _articleService.GetByNumber(action.Info.Article!.Number);
+        var response = await _articleService.GetByNumber(action.Info.Article!.Number);
 
-        var success = items == null;
+        var success = response is { IsValid: true, Value: null };
         var errorMessage = success is false
             ? new[] { "Nummer existiert bereits!" }
             : new[] { "" };

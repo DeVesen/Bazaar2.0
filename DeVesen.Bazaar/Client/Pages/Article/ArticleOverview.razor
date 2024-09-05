@@ -19,43 +19,50 @@
 
 @inject IDialogService DialogService;
 
-<div class="d-flex flex-column gap-4 px-1">
+@if (ArticleState.Value.IsLoaded is false)
+{
+    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+}
+else
+{
+    <div class="d-flex flex-column gap-4 px-1">
 
-    <ArticleOverviewToolbar @bind-Vendor="@_vendor"
-                            @bind-Number="@_number"
-                            @bind-SearchText="@_searchText"
-                            @bind-Vendor:after="@OnArticleFilterChange"
-                            @bind-Number:after="@OnArticleFilterChange"
-                            @bind-SearchText:after="@OnArticleFilterChange"
-                            DisableVendorSelection="@_pageSelect"
-                            DisableCreateArticleBtn="@(_vendor == null)"
-                            OnCreateArticleBtnClick="@CreateElementAsync"
-                            OnImportArticleBtnClick="@ImportArticleAsync" />
+        <ArticleOverviewToolbar @bind-Vendor="@_vendor"
+                                @bind-Number="@_number"
+                                @bind-SearchText="@_searchText"
+                                @bind-Vendor:after="@OnArticleFilterChange"
+                                @bind-Number:after="@OnArticleFilterChange"
+                                @bind-SearchText:after="@OnArticleFilterChange"
+                                DisableVendorSelection="@_pageSelect"
+                                DisableCreateArticleBtn="@(_vendor == null)"
+                                OnCreateArticleBtnClick="@CreateElementAsync"
+                                OnImportArticleBtnClick="@ImportArticleAsync" />
 
-    <MudTable T="Article"
-              FixedHeader
-              Hover
-              Items="@ArticleState.Value.Items"
-              SortLabel="Sort By"
-              OnRowClick="x => ModifyElementAsync(x.Item!)">
-        <HeaderContent>
-            <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Number)">Nummer</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Title)">Title</MudTableSortLabel></MudTh>
-            <MudTh>Status</MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.ArticleCategory)">Kategorie</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Manufacturer)">Manufacturer</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Price01)">Preis</MudTableSortLabel></MudTh>
-        </HeaderContent>
-        <RowTemplate>
-            <MudTd DataLabel="Nummer">@context.Number</MudTd>
-            <MudTd DataLabel="Titel">@context.Title</MudTd>
-            <MudTd DataLabel="Status">@GetStatus(context)</MudTd>
-            <MudTd DataLabel="ArticleCategory">@context.ArticleCategory</MudTd>
-            <MudTd DataLabel="Manufacturer">@context.Manufacturer</MudTd>
-            <MudTd DataLabel="Price01">@context.Price01</MudTd>
-        </RowTemplate>
-    </MudTable>
-</div>
+        <MudTable T="Article"
+                  FixedHeader
+                  Hover
+                  Items="@ArticleState.Value.Items"
+                  SortLabel="Sort By"
+                  OnRowClick="x => ModifyElementAsync(x.Item!)">
+            <HeaderContent>
+                <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Number)">Nummer</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Title)">Title</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Status)">Status</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.ArticleCategory)">Kategorie</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Manufacturer)">Manufacturer</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Price01)">Preis</MudTableSortLabel></MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Nummer">@context.Number</MudTd>
+                <MudTd DataLabel="Titel">@context.Title</MudTd>
+                <MudTd DataLabel="Status">@context.StatusText</MudTd>
+                <MudTd DataLabel="ArticleCategory">@context.ArticleCategory</MudTd>
+                <MudTd DataLabel="Manufacturer">@context.Manufacturer</MudTd>
+                <MudTd DataLabel="Price01">@context.Price01</MudTd>
+            </RowTemplate>
+        </MudTable>
+    </div>
+}
 
 @code {
 
@@ -71,7 +78,8 @@
     {
         await base.OnInitializedAsync();
 
-        _vendor = (await VendorService.GetByIdAsync(VendorId)).Value?.Item;
+        var vendorResult = await VendorService.GetByIdAsync(VendorId);
+        _vendor = vendorResult.IsValid ? vendorResult.Value.Item : null;
 
         FetchArticleList();
 
@@ -167,29 +175,5 @@
         }
 
         TitleFacade.SetCaption(caption);
-    }
-
-    private static string GetStatus(Article article)
-    {
-        if (article.Settled.HasValue && article.Sold.HasValue)
-        {
-            return "Abgerechnet";
-        }
-        else if (article.Settled.HasValue && article.Sold.HasValue is false)
-        {
-            return "Zurückgegeben";
-        }
-        else if (article.Sold.HasValue)
-        {
-            return "Verkauft";
-        }
-        else if (article.ApprovedForSale.HasValue)
-        {
-            return "Freigegeben";
-        }
-        else
-        {
-            return string.Empty;
-        }
     }
 }

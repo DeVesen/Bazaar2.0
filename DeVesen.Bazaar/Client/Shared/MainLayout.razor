@@ -1,5 +1,5 @@
 ﻿@using DeVesen.Bazaar.Client.State
-@using DeVesen.Bazaar.Client.Components.MainLayout
+@using DeVesen.Bazaar.Client.Components.Common.MainLayout
 @using MudBlazor.Utilities
 
 @inherits LayoutComponentBase
@@ -15,7 +15,7 @@
 <MudSnackbarProvider />
 
 <div class="vw-100 vh-100 d-flex flex-column">
-    <MudPaper Class="m-1 p-2 rounded-lg d-flex flex-row justify-space-between">
+    <MudPaper Outlined Class="m-1 p-2 rounded-lg d-flex flex-row justify-space-between" Elevation="2">
         <div class="w-100 align-content-center">
             <MainLayoutTitleBar/>
         </div>
@@ -27,11 +27,11 @@
     </MudPaper>
     <div Class="d-flex flex-row flex-grow-1">
         <div Class="flex-grow-0 sidebar sidebar-toggler">
-            <MudPaper Class="m-1 p-2 rounded-lg ">
+            <MudPaper Outlined Class="m-1 p-2 rounded-lg" Elevation="2">
                 <NavMenu />
             </MudPaper>
         </div>
-        <MudPaper Class="m-1 p-2 rounded-lg flex-grow-1">
+        <MudPaper Outlined Class="m-1 p-2 rounded-lg flex-grow-1" Elevation="2">
             @Body
         </MudPaper>
     </div>

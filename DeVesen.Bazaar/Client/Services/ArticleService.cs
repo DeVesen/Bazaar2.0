@@ -25,7 +25,7 @@ public class ArticleService
         var result = await GetAllAsync(number: number.ToString());
 
         return result.IsValid 
-            ? Response<Article?>.Valid(result.Value.FirstOrDefault())
+            ? Response<Article?>.Valid(result.Value.FirstOrDefault(p => p.Number == number))
             : Response<Article?>.Invalid(result.ErrorMessages);
     }
 

@@ -26,13 +26,18 @@ public class VendorController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<VendorViewDto?> GetByIdAsync(string id)
+    public async Task<IActionResult> GetByIdAsync(string id)
     {
         var filter = new VendorFilter { Id = id };
         var items = await GetAllAsync(filter);
         var item = items.FirstOrDefault();
 
-        return item;
+        if (item == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(item);
     }
 
     [HttpGet]
