@@ -77,6 +77,24 @@ public class DialogService(IDialogService dialogService)
             .WaitForResult();
     }
 
+    public async Task ApproveArticleAsync(string vendorId)
+    {
+        var options = GetDefaultOptions();
+        var parameters = new DialogParameters<ArticleApprovalDialog> { { x => x.VendorId, vendorId } };
+
+        await dialogService.ShowAsync<ArticleApprovalDialog>("Artikel Freigeben", parameters, options)
+            .WaitForResult();
+    }
+
+    public async Task GiveBackArticleAsync(string vendorId)
+    {
+        var options = GetDefaultOptions();
+        var parameters = new DialogParameters<ArticleGiveBackDialog> { { x => x.VendorId, vendorId } };
+
+        await dialogService.ShowAsync<ArticleGiveBackDialog>("Artikel zurückgeben", parameters, options)
+            .WaitForResult();
+    }
+
 
     public async Task CreateArticleCategoryAsync()
     {

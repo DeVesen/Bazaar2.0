@@ -131,6 +131,37 @@ public class VendorService
     }
 
 
+    public async Task<Response> ApproveAsync(string vendorId, long articleNumber)
+    {
+        var requestUri = _httpClient.BaseAddress + $"/{vendorId}/approve/{articleNumber}";
+        var response = await _httpClient.PostAsync(requestUri, null);
+
+        if (response.IsSuccessStatusCode)
+        {
+            return Response.Valid();
+        }
+
+        var message = await response.Content.ReadFromJsonAsync<FailedRequestMessage>();
+
+        return Response.Invalid(message!.Message);
+    }
+
+    public async Task<Response> GiveBackArticleAsync(string vendorId, long articleNumber)
+    {
+        var requestUri = _httpClient.BaseAddress + $"/{vendorId}/giveback/{articleNumber}";
+        var response = await _httpClient.PostAsync(requestUri, null);
+
+        if (response.IsSuccessStatusCode)
+        {
+            return Response.Valid();
+        }
+
+        var message = await response.Content.ReadFromJsonAsync<FailedRequestMessage>();
+
+        return Response.Invalid(message!.Message);
+    }
+
+
     internal static IEnumerable<VendorView> MapToDomain(IEnumerable<VendorViewDto> elements)
         => elements.Select(MapToDomain);
 

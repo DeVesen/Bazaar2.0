@@ -27,6 +27,7 @@ public record ArticleDto
     public DateTime? ApprovedForSale { get; init; } = null;
     public DateTime? Sold { get; init; } = null;
     public double? SoldAt { get; init; } = null;
+    public DateTime? Returned { get; set; }
     public DateTime? Settled { get; init; } = null;
 }
 
@@ -59,6 +60,7 @@ public record ArticleUpdateDto
     public DateTime? ApprovedForSale { get; init; } = null;
     public DateTime? Sold { get; init; } = null;
     public double? SoldAt { get; init; } = null;
+    public DateTime? Returned { get; set; }
     public DateTime? Settled { get; init; } = null;
 }
 

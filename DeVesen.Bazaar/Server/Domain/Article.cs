@@ -15,5 +15,6 @@ public record Article
     public DateTime? ApprovedForSale { get; set; } = null;
     public DateTime? Sold { get; set; } = null;
     public double? SoldAt { get; set; } = null;
+    public DateTime? Returned { get; set; }
     public DateTime? Settled { get; set; } = null;
 }

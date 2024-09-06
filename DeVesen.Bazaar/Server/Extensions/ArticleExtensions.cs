@@ -24,6 +24,7 @@ public static class ArticleExtensions
             Settled = data.Settled,
             Price01 = data.Price01,
             Price02 = data.Price02,
+            Returned = data.Returned,
             Description = data.Description
         };
 
@@ -43,6 +44,7 @@ public static class ArticleExtensions
             Settled = entity.Settled,
             Price01 = entity.Price01,
             Price02 = entity.Price02,
+            Returned = entity.Returned,
             Description = entity.Description
         };
 
@@ -81,6 +83,7 @@ public static class ArticleExtensions
             Settled = data.dto.Settled,
             Price01 = data.dto.Price01,
             Price02 = data.dto.Price02,
+            Returned = data.dto.Returned,
             Description = data.dto.Description
         };
 
@@ -100,6 +103,7 @@ public static class ArticleExtensions
             Settled = data.Settled,
             Price01 = data.Price01,
             Price02 = data.Price02,
+            Returned = data.Returned,
             Description = data.Description
         };
 

@@ -10,21 +10,8 @@ namespace DeVesen.Bazaar.Server.Controllers;
 
 [ApiController]
 [Route("api/v1/[controller]")]
-public class VendorController : ControllerBase
+public class VendorController(VendorStorage vendorStorage, ArticleStorage articleStorage, VendorValidator vendorValidator) : ControllerBase
 {
-    private readonly VendorStorage _vendorStorage;
-    private readonly ArticleStorage _articleStorage;
-    private readonly VendorValidator _vendorValidator;
-
-    public VendorController(VendorStorage vendorStorage,
-                            ArticleStorage articleStorage,
-                            VendorValidator vendorValidator)
-    {
-        _vendorStorage = vendorStorage;
-        _articleStorage = articleStorage;
-        _vendorValidator = vendorValidator;
-    }
-
     [HttpGet("{id}")]
     public async Task<IActionResult> GetByIdAsync(string id)
     {
@@ -43,8 +30,8 @@ public class VendorController : ControllerBase
     [HttpGet]
     public async Task<IEnumerable<VendorViewDto>> GetAllAsync([FromQuery] VendorFilter? parameters)
     {
-        var allVendors = (await _vendorStorage.GetAllAsync(parameters ?? new VendorFilter())).ToArray();
-        var allVendorArticleStats = (await _articleStorage.GetStatisticPerVendor()).ToArray();
+        var allVendors = (await vendorStorage.GetAllAsync(parameters ?? new VendorFilter())).ToArray();
+        var allVendorArticleStats = (await articleStorage.GetStatisticPerVendor()).ToArray();
 
         var groupedItems = from vendor in allVendors
                            join statistic in allVendorArticleStats on vendor.Id equals statistic.VendorId into gj
@@ -62,35 +49,55 @@ public class VendorController : ControllerBase
     public async Task<ActionResult> CreateAsync([FromBody] VendorCreateDto dto)
     {
         var element = dto.ToDomain();
-        var result = await _vendorValidator.ValidateAsync(element);
+        var result = await vendorValidator.ValidateAsync(element);
 
         if (result.IsValid is false)
         {
             return BadRequest(result.Errors.First().ErrorMessage);
         }
 
-        await _vendorStorage.CreateAsync(element);
+        await vendorStorage.CreateAsync(element);
 
         return Ok(element);
+    }
+
+    [HttpPost("{vendorId}/approve/{number:long}")]
+    public async Task<ActionResult> ApproveArticleAsync(string vendorId, long number)
+    {
+        var result = await articleStorage.ApproveArticleAsync(number, vendorId);
+
+        return result.IsSuccess
+            ? Ok()
+            : BadRequest(new FailedRequestMessage(result.Errors.First().Message));
+    }
+
+    [HttpPost("{vendorId}/giveback/{number:long}")]
+    public async Task<ActionResult> GiveBackArticleAsync(string vendorId, long number)
+    {
+        var result = await articleStorage.GiveBackArticleAsync(number, vendorId);
+
+        return result.IsSuccess
+            ? Ok()
+            : BadRequest(new FailedRequestMessage(result.Errors.First().Message));
     }
 
     [HttpPut("{id}")]
     public async Task<ActionResult> UpdateAsync(string id, [FromBody] VendorUpdateDto dto)
     {
-        if (await _vendorStorage.ExistByIdAsync(id) is false)
+        if (await vendorStorage.ExistByIdAsync(id) is false)
         {
             return NotFound(ResourceText.Transform(ResourceText.Vendor.NotFoundById, _ => id));
         }
 
         var element = (id, dto).ToDomain();
-        var result = await _vendorValidator.ValidateAsync(element);
+        var result = await vendorValidator.ValidateAsync(element);
 
         if (result.IsValid is false)
         {
             return BadRequest(result.Errors.First().ErrorMessage);
         }
 
-        await _vendorStorage.UpdateAsync(element);
+        await vendorStorage.UpdateAsync(element);
 
         return Ok();
     }
@@ -98,12 +105,12 @@ public class VendorController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteAsync(string id)
     {
-        if (await _vendorStorage.ExistByIdAsync(id) is false)
+        if (await vendorStorage.ExistByIdAsync(id) is false)
         {
             return NotFound(ResourceText.Transform(ResourceText.Vendor.NotFoundById, _ => id));
         }
 
-        await _vendorStorage.DeleteAsync(id);
+        await vendorStorage.DeleteAsync(id);
 
         return Ok();
     }

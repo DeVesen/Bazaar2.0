@@ -56,20 +56,20 @@
         {
             if (_articleNumber.HasValue)
             {
-                await ApproveArticleAsync(_articleNumber.Value);
+                await OnGiveBackArticleAsync(_articleNumber.Value);
             }
 
             await SelectArticleNumberInput();
         }
     }
 
-    private async Task ApproveArticleAsync(long articleNumber)
+    private async Task OnGiveBackArticleAsync(long articleNumber)
     {
-        var result = await VendorService.ApproveAsync(VendorId, articleNumber);
+        var result = await VendorService.GiveBackArticleAsync(VendorId, articleNumber);
 
         if (result.IsValid)
         {
-            SetReleaseSuccess($"Artikel {articleNumber} erfolgreich freigegeben!");
+            SetReleaseSuccess($"Artikel {articleNumber} erfolgreich zurückgegeben!");
         }
         else
         {

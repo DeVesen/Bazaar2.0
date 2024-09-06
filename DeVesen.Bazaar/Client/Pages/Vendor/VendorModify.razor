@@ -10,6 +10,7 @@
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 
 @inject TitleFacade TitleFacade
+@inject Services.DialogService DialogService
 @inject SettlementFacade SettlementFacade
 @inject IState<SettlementState> SettlementState
 
@@ -30,7 +31,7 @@
                         Articles="@OpenArticles">
             <CardActions>
                 <DvButtonPrint />
-                <DvButtonGiveBack />
+                <DvButtonGiveBack OnClick="OnGiveBackArticleAsync" />
             </CardActions>
         </ArtikeListCard>
 
@@ -38,8 +39,8 @@
                         Title="Artikel Importieren"
                         Articles="@FreeArticles">
             <CardActions>
-                <DvButtonImport />
-                <DvButtonApprove />
+                <DvButtonImport OnClick="OnArticleImportAsync" />
+                <DvButtonApprove OnClick="OnApproveArticleAsync" />
             </CardActions>
         </ArtikeListCard>
 
@@ -69,9 +70,13 @@ else
     {
         await base.OnInitializedAsync();
 
-        SettlementFacade.Fetch(VendorId);
-
+        ReloadData();
         SetPageCaption();
+    }
+
+    private void ReloadData()
+    {
+        SettlementFacade.Fetch(VendorId);
     }
 
     private void SetPageCaption()
@@ -79,5 +84,26 @@ else
         var caption = "Management";
 
         TitleFacade.SetCaption(caption);
+    }
+
+    private async Task OnArticleImportAsync()
+    {
+        await DialogService.ImportArticleAsync(VendorId);
+
+        ReloadData();
+    }
+
+    private async Task OnApproveArticleAsync()
+    {
+        await DialogService.ApproveArticleAsync(VendorId);
+
+        ReloadData();
+    }
+
+    private async Task OnGiveBackArticleAsync()
+    {
+        await DialogService.GiveBackArticleAsync(VendorId);
+
+        ReloadData();
     }
 }

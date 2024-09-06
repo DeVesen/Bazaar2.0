@@ -2,6 +2,7 @@
 using DeVesen.Bazaar.Server.Domain;
 using DeVesen.Bazaar.Server.Extensions;
 using DeVesen.Bazaar.Shared.Services;
+using FluentResults;
 
 namespace DeVesen.Bazaar.Server.Storage;
 
@@ -178,5 +179,67 @@ public class ArticleStorage
 
             await _articleRepository.UpdateAsync(element.ToEntity());
         }
+    }
+
+    public async Task<Result> ApproveArticleAsync(long number, string vendorId)
+    {
+        if (await ExistByNumberAsync(number) is false)
+        {
+            return Result.Fail($"Artikel {number} nicht gefunden!");
+        }
+
+        var article = await GetByNumberAsync(number);
+
+        if (article.VendorId != vendorId)
+        {
+            return Result.Fail($"Artikel {number} gehört nicht zu diesem Händler {vendorId}!");
+        }
+
+        if (article.ApprovedForSale.HasValue)
+        {
+            return Result.Ok();
+        }
+
+        article.ApprovedForSale = _systemClock.GetNow();
+
+        await UpdateAsync(article);
+
+        return Result.Ok();
+    }
+
+    public async Task<Result> GiveBackArticleAsync(long number, string vendorId)
+    {
+        if (await ExistByNumberAsync(number) is false)
+        {
+            return Result.Fail($"Artikel {number} nicht gefunden!");
+        }
+
+        var article = await GetByNumberAsync(number);
+
+        if (article.VendorId != vendorId)
+        {
+            return Result.Fail($"Artikel {number} gehört nicht zu diesem Händler {vendorId}!");
+        }
+
+        if (article.ApprovedForSale.HasValue is false)
+        {
+            return Result.Fail($"Artikel {number} war noch nicht übernommen!");
+        }
+
+        if (article.SoldAt.HasValue)
+        {
+            return Result.Fail($"Artikel {number} wurde bereits verkauft!");
+        }
+
+        if (article.Returned.HasValue)
+        {
+            return Result.Ok();
+        }
+
+        article.Returned = _systemClock.GetNow();
+
+        await UpdateAsync(article);
+
+        return Result.Ok();
     }
 }

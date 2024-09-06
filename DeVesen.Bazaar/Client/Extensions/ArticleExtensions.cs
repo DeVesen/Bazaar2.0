@@ -30,14 +30,15 @@ public static class ArticleExtensions
             Title = data.Title,
             ArticleCategory = data.ArticleCategory,
             Manufacturer = data.Manufacturer,
+            Price01 = data.Price01,
+            Price02 = data.Price02,
+            Description = data.Description,
             Created = data.Created,
             ApprovedForSale = data.ApprovedForSale,
             Sold = data.Sold,
             SoldAt = data.SoldAt,
             Settled = data.Settled,
-            Price01 = data.Price01,
-            Price02 = data.Price02,
-            Description = data.Description
+            Returned = data.Returned
         };
     }
 }

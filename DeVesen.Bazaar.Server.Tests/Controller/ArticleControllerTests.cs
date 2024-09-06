@@ -32,7 +32,7 @@ public class ArticleControllerTests
         var articleStorage = new ArticleStorage(vendorRepository, articleRepository, _systemClock);
         var vendorStorage = new VendorStorage(vendorRepository, articleRepository);
         var articleValidator = new ArticleValidator(articleStorage, vendorStorage);
-        var controller = new ArticleController(_systemClock, articleStorage, articleValidator);
+        var controller = new ArticleController(articleStorage, articleValidator);
 
         // Act
         var result = await controller.GetAllAsync(null);
@@ -50,7 +50,7 @@ public class ArticleControllerTests
         var articleStorage = new ArticleStorage(vendorRepository, articleRepository, _systemClock);
         var vendorStorage = new VendorStorage(vendorRepository, articleRepository);
         var articleValidator = new ArticleValidator(articleStorage, vendorStorage);
-        var controller = new ArticleController(_systemClock, articleStorage, articleValidator);
+        var controller = new ArticleController(articleStorage, articleValidator);
         var expected = new[] { Faker.Entity.Article1, Faker.Entity.Article2, Faker.Entity.Article3 };
 
         // Act
@@ -70,7 +70,7 @@ public class ArticleControllerTests
         var articleStorage = new ArticleStorage(vendorRepository, articleRepository, _systemClock);
         var vendorStorage = new VendorStorage(vendorRepository, articleRepository);
         var articleValidator = new ArticleValidator(articleStorage, vendorStorage);
-        var controller = new ArticleController(_systemClock, articleStorage, articleValidator);
+        var controller = new ArticleController(articleStorage, articleValidator);
 
         // Act
         var result = await controller.CreateAsync(Faker.Dto.ArticleCreate02);
@@ -90,7 +90,7 @@ public class ArticleControllerTests
         var articleStorage = new ArticleStorage(vendorRepository, articleRepository, _systemClock);
         var vendorStorage = new VendorStorage(vendorRepository, articleRepository);
         var articleValidator = new ArticleValidator(articleStorage, vendorStorage);
-        var controller = new ArticleController(_systemClock, articleStorage, articleValidator);
+        var controller = new ArticleController(articleStorage, articleValidator);
 
         // Act
         var result = await controller.CreateAsync(Faker.Dto.ArticleCreate02);
@@ -110,7 +110,7 @@ public class ArticleControllerTests
         var articleStorage = new ArticleStorage(vendorRepository, articleRepository, _systemClock);
         var vendorStorage = new VendorStorage(vendorRepository, articleRepository);
         var articleValidator = new ArticleValidator(articleStorage, vendorStorage);
-        var controller = new ArticleController(_systemClock, articleStorage, articleValidator);
+        var controller = new ArticleController(articleStorage, articleValidator);
 
         // Act
         var result = await controller.CreateAsync(Faker.Dto.ArticleCreate01);
@@ -130,7 +130,7 @@ public class ArticleControllerTests
         var articleStorage = new ArticleStorage(vendorRepository, articleRepository, _systemClock);
         var vendorStorage = new VendorStorage(vendorRepository, articleRepository);
         var articleValidator = new ArticleValidator(articleStorage, vendorStorage);
-        var controller = new ArticleController(_systemClock, articleStorage, articleValidator);
+        var controller = new ArticleController(articleStorage, articleValidator);
 
         // Act
         var result = await controller.UpdateAsync(Faker.Entity.Article2.Id, Faker.Dto.ArticleUpdate02);
@@ -149,7 +149,7 @@ public class ArticleControllerTests
         var articleStorage = new ArticleStorage(vendorRepository, articleRepository, _systemClock);
         var vendorStorage = new VendorStorage(vendorRepository, articleRepository);
         var articleValidator = new ArticleValidator(articleStorage, vendorStorage);
-        var controller = new ArticleController(_systemClock, articleStorage, articleValidator);
+        var controller = new ArticleController(articleStorage, articleValidator);
 
         // Act
         var result = await controller.UpdateAsync(Faker.Entity.Article2.Id, Faker.Dto.ArticleUpdate02);
@@ -168,7 +168,7 @@ public class ArticleControllerTests
         var articleStorage = new ArticleStorage(vendorRepository, articleRepository, _systemClock);
         var vendorStorage = new VendorStorage(vendorRepository, articleRepository);
         var articleValidator = new ArticleValidator(articleStorage, vendorStorage);
-        var controller = new ArticleController(_systemClock, articleStorage, articleValidator);
+        var controller = new ArticleController(articleStorage, articleValidator);
         var article = Faker.Dto.GetArticleUpdate(vendorId: Faker.Entity.Vendor1.Id, title: "Hello Article");
 
         // Act
@@ -191,7 +191,7 @@ public class ArticleControllerTests
         var articleStorage = new ArticleStorage(vendorRepository, articleRepository, _systemClock);
         var vendorStorage = new VendorStorage(vendorRepository, articleRepository);
         var articleValidator = new ArticleValidator(articleStorage, vendorStorage);
-        var controller = new ArticleController(_systemClock, articleStorage, articleValidator);
+        var controller = new ArticleController(articleStorage, articleValidator);
 
         // Act
         var result = await controller.DeleteAsync(Faker.Domain.Article2.Id);
@@ -210,7 +210,7 @@ public class ArticleControllerTests
         var articleStorage = new ArticleStorage(vendorRepository, articleRepository, _systemClock);
         var vendorStorage = new VendorStorage(vendorRepository, articleRepository);
         var articleValidator = new ArticleValidator(articleStorage, vendorStorage);
-        var controller = new ArticleController(_systemClock, articleStorage, articleValidator);
+        var controller = new ArticleController(articleStorage, articleValidator);
 
         // Act
         var result = await controller.DeleteAsync(Faker.Domain.Article2.Id);
@@ -229,7 +229,7 @@ public class ArticleControllerTests
         var articleStorage = new ArticleStorage(vendorRepository, articleRepository, _systemClock);
         var vendorStorage = new VendorStorage(vendorRepository, articleRepository);
         var articleValidator = new ArticleValidator(articleStorage, vendorStorage);
-        var controller = new ArticleController(_systemClock, articleStorage, articleValidator);
+        var controller = new ArticleController(articleStorage, articleValidator);
 
         // Act
         var result = await controller.DeleteAsync(Faker.Domain.Article1.Id);

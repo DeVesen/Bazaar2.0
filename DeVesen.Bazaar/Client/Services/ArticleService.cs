@@ -116,21 +116,6 @@ public class ArticleService
         return Response.Invalid();
     }
 
-    public async Task<Response> ApproveAsync(long number)
-    {
-        var requestUri = _httpClient.BaseAddress + $"/{number}/approve";
-        var response = await _httpClient.PostAsync(requestUri, null);
-
-        if (response.IsSuccessStatusCode)
-        {
-            return Response.Valid();
-        }
-
-        var message = await response.Content.ReadFromJsonAsync<FailedRequestMessage>();
-
-        return Response.Invalid(message!.Message);
-    }
-
     public async Task<Response> BookOrderAsync(IEnumerable<SalesOrderDto.Position> soldItems)
     {
         var soldItemArray = soldItems.ToArray();
@@ -171,6 +156,7 @@ public class ArticleService
             ApprovedForSale = dtoElement.ApprovedForSale,
             Sold = dtoElement.Sold,
             SoldAt = dtoElement.SoldAt,
+            Returned = dtoElement.Returned,
             Settled = dtoElement.Settled
         };
 }

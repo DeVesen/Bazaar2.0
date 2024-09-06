@@ -15,5 +15,6 @@ public record ArticleEntity
     public DateTime? ApprovedForSale { get; init; } = null;
     public DateTime? Sold { get; init; } = null;
     public double? SoldAt { get; init; } = null;
+    public DateTime? Returned { get; init; } = null;
     public DateTime? Settled { get; init; } = null;
 }
