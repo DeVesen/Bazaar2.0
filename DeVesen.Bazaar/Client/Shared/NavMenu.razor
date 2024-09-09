@@ -10,17 +10,15 @@
     
     <MudNavMenu Dense Rounded="true" Margin="Margin.Normal" Class="pa-2">
 
+        <MudNavLink Href="/articles" Icon="@Icons.Material.TwoTone.Article">Annahme</MudNavLink>
         <MudNavLink Href="/sales" Icon="@Icons.Material.TwoTone.ShoppingCart">Verkauf</MudNavLink>
+        <MudNavLink Href="#" Icon="@Icons.Material.TwoTone.ShoppingCart">Rückgabe</MudNavLink>
 
-        <MudNavGroup Title="Stammdaten" Icon="@Icons.Custom.FileFormats.FileDocument" Expanded="true" HideExpandIcon="true">
-            <MudNavLink Href="/vendors" Icon="@Icons.Material.TwoTone.PersonSearch">Verkäufer</MudNavLink>
-            <MudNavLink Href="/articles" Icon="@Icons.Material.TwoTone.Article">Artikel</MudNavLink>
-        </MudNavGroup>
+        <MudDivider />
 
-        <MudNavGroup Title="Basisdaten" Icon="@Icons.Custom.FileFormats.FileCode">
-            <MudNavLink Href="/article-category" Icon="@Icons.Material.TwoTone.Category">Artikel Kategorieren</MudNavLink>
-            <MudNavLink Href="/article-manufacturer" Icon="@Icons.Material.TwoTone.Build">Artikel Hersteller</MudNavLink>
-        </MudNavGroup>
+        <MudNavLink Href="/vendors" Icon="@Icons.Material.TwoTone.PersonSearch">Verkäufer</MudNavLink>
+        <MudNavLink Href="/article-category" Icon="@Icons.Material.TwoTone.Category">Artikel Kategorieren</MudNavLink>
+        <MudNavLink Href="/article-manufacturer" Icon="@Icons.Material.TwoTone.Build">Artikel Hersteller</MudNavLink>
 
     </MudNavMenu>
 
