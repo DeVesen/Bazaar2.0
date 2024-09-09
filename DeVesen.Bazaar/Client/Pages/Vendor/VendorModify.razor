@@ -4,13 +4,14 @@
 @using DeVesen.Bazaar.Client.State.Title
 @using DeVesen.Bazaar.Client.Models
 @using Fluxor
+@using DialogService = DeVesen.Bazaar.Client.Services.DialogService
 
 @page "/vendors/{vendorId}/modify"
 
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 
 @inject TitleFacade TitleFacade
-@inject Services.DialogService DialogService
+@inject DialogService DialogService
 @inject SettlementFacade SettlementFacade
 @inject IState<SettlementState> SettlementState
 
@@ -22,7 +23,7 @@
                                SalesShare="@VendorItem.SalesShare"
                                OfferUnitPrice="@VendorItem.OfferUnitPrice">
             <CardActions>
-                <DvButtonPayOut />
+                <DvButtonPayOut OnClick="OnPayOutAsync" />
             </CardActions>
         </OverviewOfRefundsCard>
 
@@ -86,6 +87,14 @@ else
         TitleFacade.SetCaption(caption);
     }
 
+    private async Task OnPayOutAsync()
+    {
+        if (await DialogService.ShowMessageBox("Auszahlung durchführen?", yesText: "Ja", noText: "Nein") == DialogService.MessageBoxResultType.No)
+        {
+            return;
+        }
+    }
+
     private async Task OnArticleImportAsync()
     {
         await DialogService.ImportArticleAsync(VendorId);
@@ -106,4 +115,5 @@ else
 
         ReloadData();
     }
+
 }
