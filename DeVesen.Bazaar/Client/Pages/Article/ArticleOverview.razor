@@ -113,7 +113,7 @@ else
 
     private void FetchArticleList()
     {
-        StateFacade.Article.Fetch(VendorId, _number, _searchText);
+        StateFacade.Article.Fetch(_vendor?.Id, _number, _searchText);
     }
 
     private void SetPageCaption()
