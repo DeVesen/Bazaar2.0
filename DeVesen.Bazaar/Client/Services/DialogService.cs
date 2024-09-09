@@ -7,6 +7,14 @@ namespace DeVesen.Bazaar.Client.Services;
 
 public class DialogService(IDialogService dialogService)
 {
+    public enum MessageBoxResultType
+    {
+        Yes,
+        No,
+        Cancel
+    }
+
+
     public async Task CreateVendorAsync()
     {
         var options = GetDefaultOptions();
@@ -155,10 +163,25 @@ public class DialogService(IDialogService dialogService)
     }
 
 
-    private static DialogOptions GetDefaultOptions()
+    public async Task<MessageBoxResultType> ShowMessageBox(string message, string? title = null, string yesText = "OK", string? noText = null, string? cancelText = null, bool? fullWidth = null)
+    {
+        var options = GetDefaultOptions(fullWidth);
+        var result = await dialogService.ShowMessageBox(title, message, yesText, noText, cancelText, options);
+
+        if (result.HasValue is false)
+        {
+            return MessageBoxResultType.Cancel;
+        }
+
+        return result.Value ? MessageBoxResultType.Yes : MessageBoxResultType.No;
+    }
+
+
+    private static DialogOptions GetDefaultOptions(bool? fullWidth = null)
         => new()
         {
             CloseOnEscapeKey = true,
-            BackdropClick = false
+            BackdropClick = false,
+            FullWidth = fullWidth
         };
 }
