@@ -6,18 +6,16 @@
 
 <MudDialog>
     <DialogContent>
-        <MudGrid Spacing="1">
-            <MudItem xs="12" Class="d-flex">
-                <DvTextField T="long?"
-                             @ref="_articleNumberRef"
-                             @bind-Value="@_articleNumber"
-                             AutoFocus
-                             OnKeyUp="OnArticleNumberKeyUpAsync" />
-            </MudItem>
-            <MudItem xs="12">
-                <MudAlert Severity="@_releaseSeverityStatus">@_releaseSeverityText</MudAlert>
-            </MudItem>
-        </MudGrid>
+        <div style="width: 350px" class="d-flex flex-column gap-2">
+            <DvTextField T="long?"
+                         @ref="_articleNumberRef"
+                         @bind-Value="@_articleNumber"
+                         FullWidth
+                         OnKeyUp="OnArticleNumberKeyUpAsync"/>
+            
+            <MudAlert Severity="@_releaseSeverityStatus"
+                      Variant="@_releaseVariant">@_releaseSeverityText</MudAlert>
+        </div>
     </DialogContent>
     <DialogActions>
         <DvButtonClose OnClick="OnCloseAsync" />
@@ -32,6 +30,7 @@
     private DvTextField<long?>? _articleNumberRef;
     private long? _articleNumber;
     private Severity _releaseSeverityStatus = Severity.Normal;
+    private Variant _releaseVariant = Variant.Text;
     private string _releaseSeverityText = "Bitte Artickelnummer eingeben ...";
 
     private void OnCloseAsync() => MudDialog.Close();
@@ -39,12 +38,14 @@
     private void SetReleaseSuccess(string text)
     {
         _releaseSeverityStatus = Severity.Success;
+        _releaseVariant = Variant.Filled;
         _releaseSeverityText = text;
     }
 
     private void SetReleaseError(string text)
     {
         _releaseSeverityStatus = Severity.Error;
+        _releaseVariant = Variant.Filled;
         _releaseSeverityText = text;
     }
 

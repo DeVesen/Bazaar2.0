@@ -9,14 +9,25 @@
 
 <MudDialog>
     <DialogContent>
-        <ArticleMasterDataForm IsValid="@_isValid"
-                               IsTouched="@_isTouched"
-                               IsValidChanged="@(x => _isValid = x)"
-                               IsTouchedChanged="@(x => _isTouched = x)"
-                               @bind-ArticleItem="_item" />
+        @if (_item != null)
+        {
+            <ArticleMasterDataForm IsValid="@_isValid"
+                                   IsValidChanged="@(x => _isValid = x)"
+                                   @bind-ArticleItem="_item"/>
+        }
+        else
+        {
+            <MudAlert Dense
+                      Square
+                      Variant="Variant.Filled"
+                      Severity="Severity.Normal"
+                      ContentAlignment="HorizontalAlignment.Center">
+                <MudText>Bereite neuen Artikel vor...</MudText>
+            </MudAlert>
+        }
     </DialogContent>
     <DialogActions>
-        <DvButtonSave Disabled="@Disable" OnClick="SubmitAsync" />
+        <DvButtonSave Disabled="@(_isValid is false)" OnClick="SubmitAsync" />
         <DvButtonCancel OnClick="Cancel" />
     </DialogActions>
 </MudDialog>
@@ -28,22 +39,20 @@
 
     [Parameter] public required string VendorId { get; set; }
 
-    private bool Disable => (_isValid && _isTouched) is false;
-
-    private Article _item = null!;
+    private Article? _item;
     private bool _isValid;
-    private bool _isTouched;
 
-    protected override void OnParametersSet()
+    protected override async Task OnParametersSetAsync()
     {
-        base.OnParametersSet();
+        await base.OnParametersSetAsync();
 
-        _item = Article.CreateNew(VendorId);
+        var numberResponse = await ArticleService.GetNextNumber();
+        _item = Article.CreateNew(VendorId, numberResponse.Value);
     }
 
     private async Task SubmitAsync()
     {
-        _item.ApprovedForSale = SystemClock.GetNow();
+        _item!.ApprovedForSale = SystemClock.GetNow();
 
         await ArticleService.CreateAsync(_item);
 

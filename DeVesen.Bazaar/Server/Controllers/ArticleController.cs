@@ -1,6 +1,7 @@
 ﻿using DeVesen.Bazaar.Server.Basics;
 using DeVesen.Bazaar.Server.Domain;
 using DeVesen.Bazaar.Server.Extensions;
+using DeVesen.Bazaar.Server.Services;
 using DeVesen.Bazaar.Server.Storage;
 using DeVesen.Bazaar.Server.Validator;
 using DeVesen.Bazaar.Shared;
@@ -10,8 +11,16 @@ namespace DeVesen.Bazaar.Server.Controllers;
 
 [ApiController]
 [Route("api/v1/[controller]")]
-public class ArticleController(ArticleStorage articleStorage, ArticleValidator articleValidator) : ControllerBase
+public class ArticleController(ArticleStorage articleStorage, ArticleValidator articleValidator, ArticleNumberService articleNumberService) : ControllerBase
 {
+    [HttpGet("next-number")]
+    public async Task<NextArticleNumberDto> GetAllAsync()
+    {
+        var nextNumber = await articleNumberService.GetNextNumber();
+
+        return new NextArticleNumberDto(nextNumber);
+    }
+
     [HttpGet]
     public async Task<IEnumerable<ArticleDto>> GetAllAsync([FromQuery] ArticleFilter? parameters)
     {

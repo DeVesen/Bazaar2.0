@@ -27,7 +27,7 @@ public class ArticleValidator : BaseValidator<Article>
             .GreaterThan(0).WithMessage(ResourceText.Global.NumberMayNotBeEmpty)
             .MustAsync(BeUniqueNumberAsync).WithMessage(ResourceText.Global.NumberAlreadyTaken);
 
-        RuleFor(x => x.Title)
+        RuleFor(x => x.Description)
             .NotEmpty().WithMessage(ResourceText.Global.TitleMayNotBeEmpty)
             .MaximumLength(80).WithMessage(ResourceText.Transform(ResourceText.Global.TitleMayNotBeLongerThan, _ => 80));
 

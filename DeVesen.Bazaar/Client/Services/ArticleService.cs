@@ -20,6 +20,27 @@ public class ArticleService
         _httpClient.BaseAddress = hostEnvironment.GetApiEndpointUrl("api/v1/Article");
     }
 
+    public async Task<Response<long>> GetNextNumber()
+    {
+        try
+        {
+            var requestUri = new UriBuilder(_httpClient.BaseAddress)
+                .AddUriPart("next-number")
+                .Build();
+
+            var dtoElement =
+                await _httpClient.GetFromJsonAsync<NextArticleNumberDto>(requestUri);
+
+            return dtoElement != null
+                ? Response<long>.Valid(dtoElement.Number)
+                : Response<long>.Invalid("Invalid response!");
+        }
+        catch (Exception ex)
+        {
+            return Response<long>.Invalid(ex.Message);
+        }
+    }
+
     public async Task<Response<Article?>> GetByNumber(long number)
     {
         var result = await GetAllAsync(number: number.ToString());
@@ -63,7 +84,7 @@ public class ArticleService
         {
             if (showResultSnackBar)
             {
-                _snackBarService.AddInfo($"Artikel '{element.Number}' - '{element.Title}' erfolgreich angelegt ...");
+                _snackBarService.AddInfo($"Artikel '{element.Number}' - '{element.Description}' erfolgreich angelegt ...");
             }
 
             return Response.Valid();
@@ -88,7 +109,7 @@ public class ArticleService
 
         if (response.IsSuccessStatusCode)
         {
-            _snackBarService.AddInfo($"Artikel '{element.Number}' - '{element.Title}' erfolgreich geändert ...");
+            _snackBarService.AddInfo($"Artikel '{element.Number}' - '{element.Description}' erfolgreich geändert ...");
             return Response.Valid();
         }
 
@@ -106,7 +127,7 @@ public class ArticleService
 
         if (response.IsSuccessStatusCode)
         {
-            _snackBarService.AddInfo($"Artikel '{element.Number}' - '{element.Title}' erfolgreich gelöscht ...");
+            _snackBarService.AddInfo($"Artikel '{element.Number}' - '{element.Description}' erfolgreich gelöscht ...");
             return Response.Valid();
         }
 
@@ -149,7 +170,7 @@ public class ArticleService
 
             ArticleCategory = dtoElement.ArticleCategory,
             Manufacturer = dtoElement.Manufacturer,
-            Title = dtoElement.Title,
+            Description = dtoElement.Description,
 
             Price01 = dtoElement.Price01,
             Price02 = dtoElement.Price02,

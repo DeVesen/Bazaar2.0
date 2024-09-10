@@ -2,6 +2,7 @@ using DeVesen.Bazaar.Server;
 using DeVesen.Bazaar.Server.Contracts;
 using DeVesen.Bazaar.Server.Extensions;
 using DeVesen.Bazaar.Server.Repository.LiteDb;
+using DeVesen.Bazaar.Server.Services;
 using DeVesen.Bazaar.Server.Storage;
 using DeVesen.Bazaar.Server.Validator;
 using DeVesen.Bazaar.Shared.Services;
@@ -31,6 +32,8 @@ builder.Services.AddTransient<ArticleCategoryValidator>()
                 .AddTransient<ManufacturerValidator>()
                 .AddTransient<VendorValidator>()
                 .AddTransient<ArticleValidator>();
+
+builder.Services.AddSingleton<ArticleNumberService>();
 
 var app = builder.Build();
 

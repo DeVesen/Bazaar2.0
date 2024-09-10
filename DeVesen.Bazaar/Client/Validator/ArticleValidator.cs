@@ -18,7 +18,7 @@ public class ArticleValidator : BaseValidator<Article>
         RuleFor(x => x.Number)
             .Must(x => x > 0).WithMessage("Muss größer 0 sein!");
 
-        RuleFor(x => x.Title)
+        RuleFor(x => x.Description)
             .NotEmpty().WithMessage("Darf nicht leer sein!")
             .MaximumLength(80).WithMessage("Darf nicht lönger 80 Zeichen sein!");
 

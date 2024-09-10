@@ -93,7 +93,7 @@ public class ArticleStorage
         }
         if (articleFilter.SearchText != null)
         {
-            elements = elements.Where(p => p.Title.ToLower().Contains(articleFilter.SearchText.ToLower()));
+            elements = elements.Where(p => p.Description.ToLower().Contains(articleFilter.SearchText.ToLower()));
         }
 
         return elements.Select(p => p.ToDomain());
@@ -192,7 +192,22 @@ public class ArticleStorage
 
         if (article.VendorId != vendorId)
         {
-            return Result.Fail($"Artikel {number} gehört nicht zu diesem Händler {vendorId}!");
+            return Result.Fail($"Artikel {number} gehört nicht zu diesem Händler!");
+        }
+
+        if (article.Settled.HasValue)
+        {
+            return Result.Fail($"Artikel {number} ist bereits abgerechnet!");
+        }
+
+        if (article.Returned.HasValue)
+        {
+            return Result.Fail($"Artikel {number} ist zurückgegeben!");
+        }
+
+        if (article.SoldAt.HasValue)
+        {
+            return Result.Fail($"Artikel {number} wurde bereits verkauft!");
         }
 
         if (article.ApprovedForSale.HasValue)
@@ -218,17 +233,27 @@ public class ArticleStorage
 
         if (article.VendorId != vendorId)
         {
-            return Result.Fail($"Artikel {number} gehört nicht zu diesem Händler {vendorId}!");
+            return Result.Fail($"Artikel {number} gehört nicht zu diesem Händler!");
         }
 
-        if (article.ApprovedForSale.HasValue is false)
+        if (article.Settled.HasValue)
         {
-            return Result.Fail($"Artikel {number} war noch nicht übernommen!");
+            return Result.Fail($"Artikel {number} ist bereits abgerechnet!");
+        }
+
+        if (article.Returned.HasValue)
+        {
+            return Result.Fail($"Artikel {number} ist zurückgegeben!");
         }
 
         if (article.SoldAt.HasValue)
         {
             return Result.Fail($"Artikel {number} wurde bereits verkauft!");
+        }
+
+        if (article.ApprovedForSale.HasValue is false)
+        {
+            return Result.Fail($"Artikel {number} war noch nicht übernommen!");
         }
 
         if (article.Returned.HasValue)

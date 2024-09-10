@@ -9,42 +9,44 @@
 
 <MudDialog>
     <DialogContent>
-        @if (HaveAnyItem is false)
-        {
-            <MudGrid Spacing="1">
-                <MudItem xs="12">
+        <div style="width: 350px">
+            @if (HaveAnyItem is false)
+            {
+                <MudGrid Spacing="1">
+                    <MudItem xs="12">
 
-                    @if (_isLoadingData)
-                    {
-                        <MudProgressLinear Color="Color.Secondary" Indeterminate Class="my-7"/>
-                    }
-                    else
-                    {
-                        <DvFileUpload OnFilesChanged="OnFilesChangedAsync"/>
-                    }
+                        @if (_isLoadingData)
+                        {
+                            <MudProgressLinear Color="Color.Secondary" Indeterminate Class="my-7"/>
+                        }
+                        else
+                        {
+                            <DvFileUpload OnFilesChanged="OnFilesChangedAsync"/>
+                        }
 
-                </MudItem>
-            </MudGrid>
-        }
-        else if (EverythingImported is false)
-        {
+                    </MudItem>
+                </MudGrid>
+            }
+            else if (EverythingImported is false)
+            {
             
-            <MudList T="string">
-                @foreach (var item in @ImportInfoItems)
-                {
-                    <MudListItem Dense="true"
-                                 Gutters="true"
-                                 IconColor="@GetListColor(item)"
-                                 Icon="@Icons.Material.TwoTone.PlayArrow"
-                                 Text="@GetListText(item)"
-                                 SecondaryText="@GetListSecondaryText(item)"/>
-                }
-            </MudList>
-        }
-        else
-        {
-            <MudText> Alle Artikel wurden erfolgreich importiert !</MudText>
-        }
+                <MudList T="string">
+                    @foreach (var item in @ImportInfoItems)
+                    {
+                        <MudListItem Dense="true"
+                                     Gutters="true"
+                                     IconColor="@GetListColor(item)"
+                                     Icon="@Icons.Material.TwoTone.PlayArrow"
+                                     Text="@GetListText(item)"
+                                     SecondaryText="@GetListSecondaryText(item)"/>
+                    }
+                </MudList>
+            }
+            else
+            {
+                <MudText> Alle Artikel wurden erfolgreich importiert !</MudText>
+            }
+        </div>
     </DialogContent>
     <DialogActions>
         <DvButtonSave Disabled="@(HideSaveBtn || EnableSaveBtn is false)" OnClick="OnSave" />
@@ -127,7 +129,7 @@
     {
         return line.Article == null
             ? $"{line.LineIndex:D5}: {line.Line}"
-            : $"{line.LineIndex:D5}: {line.Article.Number} - {line.Article.Title}";
+            : $"{line.LineIndex:D5}: {line.Article.Number} - {line.Article.Description}";
     }
 
     private static string GetListSecondaryText(ImportInfo line)

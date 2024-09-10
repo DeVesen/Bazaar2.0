@@ -20,7 +20,7 @@ public record Article
     public string ArticleCategory { get; set; } = string.Empty;
     public string Manufacturer { get; set; } = string.Empty;
 
-    public string Title { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
 
     public double Price01 { get; set; }
     public double? Price02 { get; set; }
@@ -32,9 +32,10 @@ public record Article
     public DateTime? Returned { get; set; }
     public DateTime? Settled { get; set; }
 
-    public static Article CreateNew(string vendorId) => new()
+    public static Article CreateNew(string vendorId, long? number) => new()
     {
-        VendorId = vendorId
+        VendorId = vendorId,
+        Number = number ?? default
     };
 
     public bool IsValidForSale() => IsApprovedForSale() &&

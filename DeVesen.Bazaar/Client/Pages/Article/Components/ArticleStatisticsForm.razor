@@ -1,4 +1,5 @@
 ﻿@using DeVesen.Bazaar.Client.Models
+@using DeVesen.Bazaar.Client.Components.Common.Buttons
 
 <MudForm Model="Item"
          Style="margin-bottom: 20px; min-width: 370px"
@@ -35,23 +36,33 @@
                 }
             </MudPaper>
         }
+
+        @if (IsReturned)
+        {
+            <MudPaper Class="d-flex p-4 justify-space-between">
+                <MudText>@($"Zurückgegeben um {Item.Returned:dd.MM.yyyy}")</MudText>
+                @if (IsReturnedResetPossible)
+                {
+                    <MudIconButton Size="Size.Small"
+                                   Icon="@Icons.Material.TwoTone.Delete"
+                                   OnClick="ResetSoldAsync"></MudIconButton>
+                }
+            </MudPaper>
+        }
     
         @if (IsSettled)
         {
             <MudPaper Class="d-flex p-4 justify-space-between">
-                @if (IsSold)
-                {
-                    <MudText>@($"Abgerechnet um {Item.Settled:HH:mm} Uhr am {Item.Settled:dd.MM.yyyy}")</MudText>
-                }
-                else
-                {
-                    <MudText>@($"Reckgegeben um {Item.Settled:HH:mm} Uhr am {Item.Settled:dd.MM.yyyy}")</MudText>
-                }
+                <MudText>@($"Abgerechnet um {Item.Settled:HH:mm} Uhr am {Item.Settled:dd.MM.yyyy}")</MudText>
                 <MudIconButton Size="Size.Small"
                                Icon="@Icons.Material.TwoTone.Delete"
                                OnClick="ResetSettledAsync"></MudIconButton>
             </MudPaper>
         }
+        
+        <MudDivider />
+        
+        <DvButtonDelete OnClick="DeleteAsync" />
 
     </div>
 
@@ -70,12 +81,17 @@
     [Parameter]
     public EventCallback<bool> IsTouchedChanged { get; set; }
 
+    [Parameter]
+    public EventCallback OnDeleted { get; set; }
+
     private bool IsApprovedForSale => Item.ApprovedForSale.HasValue;
     private bool IsSold => Item.Sold.HasValue;
+    private bool IsReturned => Item.Returned.HasValue;
     private bool IsSettled => Item.Settled.HasValue;
 
-    private bool IsApprovedForSaleResetPossible => IsSold is false && IsSettled is false;
+    private bool IsApprovedForSaleResetPossible => IsSold is false && IsReturned is false && IsSettled is false;
     private bool IsSoldResetPossible => IsSettled is false;
+    private bool IsReturnedResetPossible => IsSettled is false;
 
     private async Task ApproveForSaleAsync()
     {
@@ -95,8 +111,7 @@
 
     private async Task ResetSoldAsync()
     {
-        Item.Sold = null;
-        Item.SoldAt = null;
+        Item.Returned = null;
 
         await SetTouchedAsync();
         await ItemChanged.InvokeAsync(Item);
@@ -119,5 +134,10 @@
 
         IsTouched = true;
         await IsTouchedChanged.InvokeAsync(IsTouched);
+    }
+
+    private async Task DeleteAsync()
+    {
+        await OnDeleted.InvokeAsync();
     }
 }

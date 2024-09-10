@@ -17,7 +17,7 @@ public class ArticleEffects(ArticleService articleService)
 
         var domainElements = response.Value
             .OrderBy(p => p.Number)
-            .ThenBy(p => p.Title);
+            .ThenBy(p => p.Description);
 
         dispatcher.Dispatch(new ArticleActions.Set(domainElements));
     }

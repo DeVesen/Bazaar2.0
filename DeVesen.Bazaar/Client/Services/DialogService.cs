@@ -2,6 +2,7 @@
 using DeVesen.Bazaar.Client.Extensions;
 using DeVesen.Bazaar.Client.Models;
 using MudBlazor;
+using static DeVesen.Bazaar.Client.Services.DialogService;
 
 namespace DeVesen.Bazaar.Client.Services;
 
@@ -198,4 +199,12 @@ public class DialogService(IDialogService dialogService)
             BackdropClick = false,
             FullWidth = fullWidth
         };
+}
+
+public static class DialogServiceExtensions
+{
+    public static async Task<bool> IsYes(this Task<MessageBoxResultType> msgResult)
+    {
+        return (await msgResult) == MessageBoxResultType.Yes;
+    }
 }

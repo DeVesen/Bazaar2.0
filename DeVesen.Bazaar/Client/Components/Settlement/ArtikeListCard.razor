@@ -18,11 +18,11 @@
                   Items="@Articles">
             <HeaderContent>
                 <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Number)">Nummer</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Title)">Title</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Description)">Description</MudTableSortLabel></MudTh>
             </HeaderContent>
             <RowTemplate>
                 <MudTd DataLabel="Nummer">@context.Number</MudTd>
-                <MudTd DataLabel="Titel">@context.Title</MudTd>
+                <MudTd DataLabel="Titel">@context.Description</MudTd>
             </RowTemplate>
         </MudTable>
     </MudCardContent>

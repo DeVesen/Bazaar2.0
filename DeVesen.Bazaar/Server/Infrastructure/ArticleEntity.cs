@@ -8,7 +8,7 @@ public record ArticleEntity
 
     public required string ArticleCategory { get; init; }
     public required string Manufacturer { get; init; }
-    public required string Title { get; init; }
+    public required string Description { get; init; }
 
     public required DateTime Created { get; init; }
     public required double Price01 { get; init; }

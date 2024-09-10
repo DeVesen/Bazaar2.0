@@ -34,8 +34,8 @@ public static class ResourceText
 
         public static string VendorIdMayNotBeEmpty => "'VendorId' darf nicht leer sein!";
         public static string VendorIdMayNotExist => "'VendorId' ist nicht bekannt!";
-        public static string TitleMayNotBeEmpty => "'Title' darf nicht leer sein!";
-        public static string TitleMayNotBeLongerThan => "'Title' darf nicht lönger {count} Zeichen sein!";
+        public static string TitleMayNotBeEmpty => "'Description' darf nicht leer sein!";
+        public static string TitleMayNotBeLongerThan => "'Description' darf nicht lönger {count} Zeichen sein!";
         public static string ArticleCategoryMayNotBeEmpty => "'Kategorie' darf nicht leer sein!";
         public static string ArticleCategoryMayNotBeLongerThan => "'Kategorie' darf nicht lönger {count} Zeichen sein!";
         public static string ManufacturerMayNotBeEmpty => "'Hersteller' darf nicht leer sein!";

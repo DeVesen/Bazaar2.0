@@ -14,7 +14,7 @@ public static class ArticleExtensions
 
             ArticleCategory = data.ArticleCategory,
             Manufacturer = data.Manufacturer,
-            Title = data.Title,
+            Description = data.Description,
 
             ApprovedForSale = data.ApprovedForSale,
             Price01 = data.Price01,
@@ -31,7 +31,7 @@ public static class ArticleExtensions
 
             ArticleCategory = data.ArticleCategory,
             Manufacturer = data.Manufacturer,
-            Title = data.Title,
+            Description = data.Description,
 
             Price01 = data.Price01,
             Price02 = data.Price02,

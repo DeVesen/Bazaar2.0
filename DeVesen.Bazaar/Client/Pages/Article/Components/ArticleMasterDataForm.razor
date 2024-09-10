@@ -9,10 +9,9 @@
 @inject ArticleCategoryService ArticleCategoryService
 @inject ManufacturerService ManufacturerService
 
-<MudForm IsValid="IsValid"
+<MudForm @ref="_form"
+         ValidationDelay="1000"
          IsValidChanged="OnIsValidChanged"
-         IsTouched="IsTouched"
-         IsTouchedChanged="OnIsTouchedChanged"
          FieldChanged="OnFormFieldChangedAsync"
          Model="ArticleItem"
          Validation="@(ArticleValidator.ValidateAsync)"
@@ -48,9 +47,9 @@
         <MudItem xs="12" sm="12">
             <DvTextField T="string"
                          Required
-                         Label="Title"
-                         @bind-Value="ArticleItem.Title"
-                         For="@(() => ArticleItem.Title)" />
+                         Label="Beschreibung"
+                         @bind-Value="ArticleItem.Description"
+                         For="@(() => ArticleItem.Description)" />
         </MudItem>
 
         <MudItem xs="12" sm="6">
@@ -72,6 +71,7 @@
 
 @code {
     private const int AutocompleteMaxItems = 25; // todo move to app-Config
+    private MudForm _form = null!;
 
     [Parameter]
     public required bool DisableNumber { get; set; }
@@ -96,21 +96,14 @@
 
     private async Task OnIsValidChanged(bool newValue)
     {
-        IsValid = newValue;
-
         await IsValidChanged.InvokeAsync(newValue);
-    }
-
-    private async Task OnIsTouchedChanged(bool newValue)
-    {
-        IsTouched = newValue;
-
-        await IsTouchedChanged.InvokeAsync(newValue);
     }
 
     private async Task OnFormFieldChangedAsync()
     {
         await ArticleItemChanged.InvokeAsync(ArticleItem);
+
+        await _form.Validate();
     }
 
     private async Task<IEnumerable<string>> CategoryAutoCompleteSearchAsync(string value, CancellationToken token)

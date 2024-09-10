@@ -14,7 +14,7 @@ public static class ArticleExtensions
             Id = data.Id,
             VendorId = data.VendorId,
             Number = data.Number,
-            Title = data.Title,
+            Description = data.Description,
             ArticleCategory = data.ArticleCategory,
             Manufacturer = data.Manufacturer,
             Created = data.Created,
@@ -33,7 +33,7 @@ public static class ArticleExtensions
             Id = entity.Id,
             VendorId = entity.VendorId,
             Number = entity.Number,
-            Title = entity.Title,
+            Description = entity.Description,
             ArticleCategory = entity.ArticleCategory,
             Manufacturer = entity.Manufacturer,
             Created = entity.Created,
@@ -55,7 +55,7 @@ public static class ArticleExtensions
 
             ArticleCategory = dto.ArticleCategory,
             Manufacturer = dto.Manufacturer,
-            Title = dto.Title,
+            Description = dto.Description,
 
             Price01 = dto.Price01,
             Price02 = dto.Price02,
@@ -77,7 +77,7 @@ public static class ArticleExtensions
 
             ArticleCategory = data.dto.ArticleCategory,
             Manufacturer = data.dto.Manufacturer,
-            Title = data.dto.Title,
+            Description = data.dto.Description,
 
             Created = data.dto.Created,
             Price01 = data.dto.Price01,
@@ -99,7 +99,7 @@ public static class ArticleExtensions
 
             ArticleCategory = data.ArticleCategory,
             Manufacturer = data.Manufacturer,
-            Title = data.Title,
+            Description = data.Description,
 
             Price01 = data.Price01,
             Price02 = data.Price02,
@@ -131,7 +131,7 @@ public static class ArticleExtensions
 
         builder.Append(dto.VendorId);
         builder.Append(dto.Number);
-        builder.Append(dto.Title);
+        builder.Append(dto.Description);
         builder.Append(dto.ArticleCategory);
         builder.Append(dto.Manufacturer);
         builder.Append(Guid.NewGuid().ToString());

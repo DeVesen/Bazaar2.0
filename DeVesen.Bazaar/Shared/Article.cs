@@ -20,7 +20,7 @@ public record ArticleDto
 
     public required string ArticleCategory { get; init; }
     public required string Manufacturer { get; init; }
-    public required string Title { get; init; }
+    public required string Description { get; init; }
 
     public required DateTime Created { get; init; }
     public required double Price01 { get; init; }
@@ -40,7 +40,7 @@ public record ArticleCreateDto
     public required long Number { get; init; }
     public required string ArticleCategory { get; init; }
     public required string Manufacturer { get; init; }
-    public required string Title { get; init; }
+    public required string Description { get; init; }
     public required double Price01 { get; init; }
     public double? Price02 { get; init; } = null;
     public DateTime? ApprovedForSale { get; init; } = null;
@@ -53,7 +53,7 @@ public record ArticleUpdateDto
     public required long Number { get; init; }
     public required string ArticleCategory { get; init; }
     public required string Manufacturer { get; init; }
-    public required string Title { get; init; }
+    public required string Description { get; init; }
     public required DateTime Created { get; init; }
     public required double Price01 { get; init; }
     public double? Price02 { get; init; } = null;
@@ -75,3 +75,6 @@ public record SalesOrderDto(IEnumerable<Position> Positions)
 {
     public record Position(long Number, double Price);
 }
+
+[ExcludeFromCodeCoverage]
+public record NextArticleNumberDto(long Number);

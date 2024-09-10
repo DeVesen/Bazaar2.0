@@ -4,16 +4,17 @@
 @using DeVesen.Bazaar.Client.Pages.Article.Components
 
 @inject ArticleService ArticleService
+@inject Services.DialogService DialogService
 
 <MudDialog>
     <DialogContent>
         <ArticleForm IsValid="@_isValid"
                      IsValidChanged="@(x => _isValid = x)"
+                     OnDeleted="DeleteAsync"
                      @bind-Item="Item" />
     </DialogContent>
     <DialogActions>
         <DvButtonSave Disabled="@(_isValid is false)" OnClick="SubmitAsync" />
-        <DvButtonDelete OnClick="DeleteAsync" />
         <DvButtonCancel OnClick="Cancel" />
     </DialogActions>
 </MudDialog>
@@ -34,9 +35,12 @@
 
     private async Task DeleteAsync()
     {
-        await ArticleService.DeleteAsync(Item);
+        if (await DialogService.ShowMessageBox("Artikel wirklich löschen?", yesText: "YES", noText: "NO").IsYes())
+        {
+            await ArticleService.DeleteAsync(Item);
 
-        MudDialog.Close(DialogResult.Ok(true));
+            MudDialog.Close(DialogResult.Ok(true));
+        }
     }
 
     private void Cancel() => MudDialog.Cancel();

@@ -80,7 +80,7 @@ public class ImportEffects
             Number = int.Parse(lineParts[0]),
             ArticleCategory = lineParts[1],
             Manufacturer = lineParts[2],
-            Title = lineParts[3],
+            Description = lineParts[3],
 
             Price01 = double.Parse(lineParts[4]),
             Price02 = double.TryParse(lineParts[5], out var price02Val) ? price02Val : null,

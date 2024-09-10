@@ -22,24 +22,20 @@
                             @bind-SearchText="@_searchText"
                             @bind-Vendor:after="@FetchVendorSettlement">
         <MudGrid Spacing="1">
-            <MudItem xs="4" md="12">
+            <MudItem xs="6" sm="4" md="12">
                 <DvButtonPrint Disabled="@(HasArticlesToGiveBack is false)" />
             </MudItem>
-            <MudItem xs="4" md="12">
+            <MudItem xs="6" sm="4" md="12">
                 <DvButtonGiveBack Disabled="@(HasArticlesToGiveBack is false)"
                                   OnClick="OnGiveBackAsync" />
             </MudItem>
-            <MudItem xs="4" md="12">
+            <MudItem xs="6" sm="4" md="12">
                 <DvButtonPayOut Disabled="@(HasArticlesToGiveBack || HasArticlesToSettle is false)"
                                 OnClick="OnPayOutAsync" />
             </MudItem>
         </MudGrid>
     </ArticleOverviewToolbar>
-    @if (SettlementState.Value.IsLoading)
-    {
-        <MudProgressCircular Color="Color.Default" Indeterminate="true" />
-    }
-    else if (SettlementState.Value.IsEmpty)
+    @if (SettlementState.Value.IsEmpty)
     {
         <MudText>Bitte einen Händler auswählen!</MudText>
     }
@@ -49,45 +45,50 @@
     }
     else
     {
-        @if (HasArticlesToSettle is false)
+        @if (SettlementState.Value.IsLoaded)
         {
-            <MudAlert Dense
-                      Square
-                      Variant="Variant.Filled"
-                      Severity="Severity.Error"
-                      ContentAlignment="HorizontalAlignment.Center">
-                <MudText>Dieser Händler hat keine offenen Posten welche abgerechnet werden könnten.</MudText>
-            </MudAlert>
-        }
-        else if (HasArticlesToGiveBack)
-        {
-            <MudAlert Dense
-                      Square
-                      Variant="Variant.Filled"
-                      Severity="Severity.Warning"
-                      ContentAlignment="HorizontalAlignment.Center">
-                <MudText>Es gibt noch Artikel im Verkauf!</MudText>
-            </MudAlert>
+            @if (HasArticlesToSettle is false)
+            {
+                <MudAlert Dense
+                          Square
+                          Variant="Variant.Filled"
+                          Severity="Severity.Error"
+                          ContentAlignment="HorizontalAlignment.Center">
+                    <MudText>Dieser Händler hat keine offenen Posten welche abgerechnet werden könnten.</MudText>
+                </MudAlert>
+            }
+            else if (HasArticlesToGiveBack)
+            {
+                <MudAlert Dense
+                          Square
+                          Variant="Variant.Filled"
+                          Severity="Severity.Warning"
+                          ContentAlignment="HorizontalAlignment.Center">
+                    <MudText>Es gibt noch Artikel im Verkauf!</MudText>
+                </MudAlert>
+            }
         }
         <MudTable T="Article"
                   FixedHeader
                   Hover
+                  Loading="@SettlementState.Value.IsLoading"
                   Items="@GetFilteredArticles()"
+                  Height="@TableHeight"
                   SortLabel="Sort By">
             <HeaderContent>
                 <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Number)">Nummer</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.ArticleCategory)">Kategorie</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Manufacturer)">Manufacturer</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Manufacturer)">Hersteller</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Description)">Beschreibung</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Price01)">Preis</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Title)">Title</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Status)">Status</MudTableSortLabel></MudTh>
             </HeaderContent>
             <RowTemplate>
                 <MudTd DataLabel="Nummer">@context.Number</MudTd>
-                <MudTd DataLabel="ArticleCategory">@context.ArticleCategory</MudTd>
-                <MudTd DataLabel="Manufacturer">@context.Manufacturer</MudTd>
-                <MudTd DataLabel="Titel">@context.Title</MudTd>
-                <MudTd DataLabel="Price01">@context.Price01</MudTd>
+                <MudTd DataLabel="Kategorie">@context.ArticleCategory</MudTd>
+                <MudTd DataLabel="Hersteller">@context.Manufacturer</MudTd>
+                <MudTd DataLabel="Beschreibung">@context.Description</MudTd>
+                <MudTd DataLabel="Preis">@context.Price01</MudTd>
                 <MudTd DataLabel="Status">@context.StatusText</MudTd>
             </RowTemplate>
         </MudTable>
@@ -96,11 +97,30 @@
 
 @code {
     private bool HasArticlesToGiveBack
-        => SettlementState.Value.IsLoaded &&
-           SettlementState.Value.Articles.Any(p => p.IsReturned() is false && p.IsSettled() is false);
+    {
+        get
+        {
+            var result = SettlementState.Value.IsLoaded &&
+                         SettlementState.Value.Articles.Any() &&
+                         SettlementState.Value.Articles.Any(p => p.IsReturned() is false && p.IsSold() is false && p.IsSettled() is false);
+
+            return result;
+        }
+    }
+
     private bool HasArticlesToSettle
-        => SettlementState.Value.IsLoaded &&
-           SettlementState.Value.Articles.All(p => p.IsSettled() is false);
+    {
+        get
+        {
+            var result = SettlementState.Value.IsLoaded &&
+                         SettlementState.Value.Articles.Any() &&
+                         SettlementState.Value.Articles.All(p => p.IsSettled() is false);
+            return result;
+        }
+    }
+
+    private string TableHeight
+        => HasArticlesToSettle is false || HasArticlesToGiveBack ? "59vh" : "66.9vh";
 
     private Vendor? _vendor;
     private string? _number;
@@ -109,6 +129,8 @@
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
+
+        SettlementFacade.ResetSelection();
 
         TitleFacade.SetCaption("Rückgabe / Abrechnung");
     }
@@ -146,7 +168,7 @@
         return searchText.BiContainsIgnoreCase(article.Number) ||
                searchText.BiContainsIgnoreCase(article.ArticleCategory) ||
                searchText.BiContainsIgnoreCase(article.Manufacturer) ||
-               searchText.BiContainsIgnoreCase(article.Title);
+               searchText.BiContainsIgnoreCase(article.Description);
     }
 
     private async Task OnGiveBackAsync()
