@@ -1,7 +1,6 @@
 using DeVesen.Bazaar.Client;
 using DeVesen.Bazaar.Client.Extensions;
 using DeVesen.Bazaar.Client.Services;
-using DeVesen.Bazaar.Client.State;
 using DeVesen.Bazaar.Client.State.Article;
 using DeVesen.Bazaar.Client.State.ArticleCategory;
 using DeVesen.Bazaar.Client.State.Import;
@@ -24,7 +23,6 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddMudServices()
                 .ConfigureFluxor();
 
-builder.Services.AddTransient<StateFacade>();
 builder.Services.AddTransient<ManufacturerFacade>();
 builder.Services.AddTransient<ArticleCategoryFacade>();
 builder.Services.AddTransient<VendorViewFacade>();

@@ -81,6 +81,16 @@ public class VendorController(VendorStorage vendorStorage, ArticleStorage articl
             : BadRequest(new FailedRequestMessage(result.Errors.First().Message));
     }
 
+    [HttpPost("{vendorId}/settle")]
+    public async Task<ActionResult> SettleAsync(string vendorId, [FromBody] IEnumerable<string> actionArticleIds)
+    {
+        var result = await articleStorage.SettleArticleAsync(actionArticleIds.ToArray());
+
+        return result.IsSuccess
+            ? Ok()
+            : BadRequest(new FailedRequestMessage(result.Errors.First().Message));
+    }
+
     [HttpPut("{id}")]
     public async Task<ActionResult> UpdateAsync(string id, [FromBody] VendorUpdateDto dto)
     {

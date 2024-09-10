@@ -42,6 +42,20 @@ public class DialogService(IDialogService dialogService)
                            .WaitForResult();
     }
 
+    public async Task<bool> PayOutVendorAsync(double openSales, double shareOfSales, double articleCommission)
+    {
+        var options = GetDefaultOptions(true);
+        var parameters = new DialogParameters<ArticlePayOutDialog>
+        {
+            { x => x.OpenSales, openSales },
+            { x => x.ShareOfSales, shareOfSales },
+            { x => x.ArticleCommission, articleCommission }
+        };
+
+        return await dialogService.ShowAsync<ArticlePayOutDialog>("Artikel zurückgeben", parameters, options)
+                                  .WaitForResult();
+    }
+
 
     public async Task CreateArticleAsync(string vendorId)
     {

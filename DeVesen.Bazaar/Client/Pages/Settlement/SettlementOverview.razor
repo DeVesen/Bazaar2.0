@@ -1,0 +1,180 @@
+﻿@using DeVesen.Bazaar.Client.Models
+@using DeVesen.Bazaar.Client.Pages.Article.Components
+@using DeVesen.Bazaar.Client.State.Title
+@using DeVesen.Bazaar.Client.Components.Common.Buttons
+@using DeVesen.Bazaar.Client.State.Settlement
+@using DeVesen.Bazaar.Shared.Extensions
+
+@page "/GiveBack"
+
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+
+@inject TitleFacade TitleFacade
+@inject SettlementFacade SettlementFacade
+@inject IState<SettlementState> SettlementState
+
+@inject Services.DialogService DialogService;
+
+<div class="d-flex flex-column gap-4 px-1">
+
+    <ArticleOverviewToolbar @bind-Vendor="@_vendor"
+                            @bind-Number="@_number"
+                            @bind-SearchText="@_searchText"
+                            @bind-Vendor:after="@FetchVendorSettlement">
+        <MudGrid Spacing="1">
+            <MudItem xs="4" md="12">
+                <DvButtonPrint Disabled="@(HasArticlesToGiveBack is false)" />
+            </MudItem>
+            <MudItem xs="4" md="12">
+                <DvButtonGiveBack Disabled="@(HasArticlesToGiveBack is false)"
+                                  OnClick="OnGiveBackAsync" />
+            </MudItem>
+            <MudItem xs="4" md="12">
+                <DvButtonPayOut Disabled="@(HasArticlesToGiveBack || HasArticlesToSettle is false)"
+                                OnClick="OnPayOutAsync" />
+            </MudItem>
+        </MudGrid>
+    </ArticleOverviewToolbar>
+    @if (SettlementState.Value.IsLoading)
+    {
+        <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+    }
+    else if (SettlementState.Value.IsEmpty)
+    {
+        <MudText>Bitte einen Händler auswählen!</MudText>
+    }
+    else if (SettlementState.Value.IsFailed)
+    {
+        <MudText>Fehler beim laden des Händlers!</MudText>
+    }
+    else
+    {
+        @if (HasArticlesToSettle is false)
+        {
+            <MudAlert Dense
+                      Square
+                      Variant="Variant.Filled"
+                      Severity="Severity.Error"
+                      ContentAlignment="HorizontalAlignment.Center">
+                <MudText>Dieser Händler hat keine offenen Posten welche abgerechnet werden könnten.</MudText>
+            </MudAlert>
+        }
+        else if (HasArticlesToGiveBack)
+        {
+            <MudAlert Dense
+                      Square
+                      Variant="Variant.Filled"
+                      Severity="Severity.Warning"
+                      ContentAlignment="HorizontalAlignment.Center">
+                <MudText>Es gibt noch Artikel im Verkauf!</MudText>
+            </MudAlert>
+        }
+        <MudTable T="Article"
+                  FixedHeader
+                  Hover
+                  Items="@GetFilteredArticles()"
+                  SortLabel="Sort By">
+            <HeaderContent>
+                <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Number)">Nummer</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.ArticleCategory)">Kategorie</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Manufacturer)">Manufacturer</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Price01)">Preis</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Title)">Title</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Status)">Status</MudTableSortLabel></MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Nummer">@context.Number</MudTd>
+                <MudTd DataLabel="ArticleCategory">@context.ArticleCategory</MudTd>
+                <MudTd DataLabel="Manufacturer">@context.Manufacturer</MudTd>
+                <MudTd DataLabel="Titel">@context.Title</MudTd>
+                <MudTd DataLabel="Price01">@context.Price01</MudTd>
+                <MudTd DataLabel="Status">@context.StatusText</MudTd>
+            </RowTemplate>
+        </MudTable>
+    }
+</div>
+
+@code {
+    private bool HasArticlesToGiveBack
+        => SettlementState.Value.IsLoaded &&
+           SettlementState.Value.Articles.Any(p => p.IsReturned() is false && p.IsSettled() is false);
+    private bool HasArticlesToSettle
+        => SettlementState.Value.IsLoaded &&
+           SettlementState.Value.Articles.All(p => p.IsSettled() is false);
+
+    private Vendor? _vendor;
+    private string? _number;
+    private string? _searchText;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        TitleFacade.SetCaption("Rückgabe / Abrechnung");
+    }
+
+    private void FetchVendorSettlement()
+    {
+        if (_vendor == null)
+        {
+            SettlementFacade.ResetSelection();
+        }
+        else
+        {
+            SettlementFacade.Fetch(_vendor.Id);
+        }
+    }
+
+    private IEnumerable<Article> GetFilteredArticles()
+    {
+        var result = SettlementState.Value.Articles.AsEnumerable();
+
+        if (string.IsNullOrEmpty(_number) is false)
+        {
+            result = result.Where(p => _number.BiContainsIgnoreCase(p.Number));
+        }
+        if (string.IsNullOrWhiteSpace(_searchText) is false)
+        {
+            result = result.Where(p => MatchArticle(p, _searchText));
+        }
+
+        return result;
+    }
+
+    private static bool MatchArticle(Article article, string searchText)
+    {
+        return searchText.BiContainsIgnoreCase(article.Number) ||
+               searchText.BiContainsIgnoreCase(article.ArticleCategory) ||
+               searchText.BiContainsIgnoreCase(article.Manufacturer) ||
+               searchText.BiContainsIgnoreCase(article.Title);
+    }
+
+    private async Task OnGiveBackAsync()
+    {
+        await DialogService.GiveBackArticleAsync(_vendor!.Id).ConfigureAwait(false);
+
+        FetchVendorSettlement();
+    }
+
+    private async Task OnPayOutAsync()
+    {
+        var openSales = SettlementState.Value.GetOpenSales();
+        var shareOfSales = SettlementState.Value.GetShareOfSales();
+        var articleCommission = SettlementState.Value.GetArticleCommission();
+
+        var payedOut = await DialogService.PayOutVendorAsync(openSales, shareOfSales, articleCommission).ConfigureAwait(false);
+
+        if (payedOut)
+        {
+            var articleIds = SettlementState.Value.Articles.Where(p => p.IsSettled() is false)
+                                                           .Select(p => p.Id);
+
+            SettlementFacade.PayOut(_vendor!.Id, articleIds);
+        }
+        else
+        {
+            SettlementFacade.Fetch(_vendor!.Id);
+        }
+    }
+
+}

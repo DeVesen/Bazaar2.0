@@ -11,13 +11,14 @@ public static class ArticleExtensions
         {
             VendorId = data.VendorId,
             Number = data.Number,
-            Title = data.Title,
+
             ArticleCategory = data.ArticleCategory,
             Manufacturer = data.Manufacturer,
+            Title = data.Title,
+
             ApprovedForSale = data.ApprovedForSale,
             Price01 = data.Price01,
             Price02 = data.Price02,
-            Description = data.Description
         };
     }
 
@@ -27,13 +28,15 @@ public static class ArticleExtensions
         {
             VendorId = data.VendorId,
             Number = data.Number,
-            Title = data.Title,
+
             ArticleCategory = data.ArticleCategory,
             Manufacturer = data.Manufacturer,
+            Title = data.Title,
+
             Price01 = data.Price01,
             Price02 = data.Price02,
-            Description = data.Description,
             Created = data.Created,
+
             ApprovedForSale = data.ApprovedForSale,
             Sold = data.Sold,
             SoldAt = data.SoldAt,

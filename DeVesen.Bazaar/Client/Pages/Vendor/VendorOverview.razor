@@ -3,10 +3,8 @@
 @using DeVesen.Bazaar.Client.Components.Common.TextField
 @using DeVesen.Bazaar.Client.Models
 @using DeVesen.Bazaar.Client.Pages.Vendor.Components
-@using DeVesen.Bazaar.Client.State
 @using DeVesen.Bazaar.Client.State.Title
 @using DeVesen.Bazaar.Client.State.VendorView
-@using Fluxor
 
 @page "/vendors"
 
@@ -16,7 +14,7 @@
 @inject NavigationService NavigationService
 
 @inject TitleFacade TitleFacade
-@inject StateFacade StateFacade
+@inject VendorViewFacade VendorFacade
 @inject IState<VendorViewState> VendorState
 
 <div class="d-flex flex-column gap-4 px-1">
@@ -58,6 +56,8 @@
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
+
+        FetchVendorList();
 
         TitleFacade.SetCaption("Verkäufer");
     }
@@ -108,6 +108,6 @@
             ? _genderType.ToString()
             : null;
 
-        StateFacade.Vendor.Fetch(salutation: salutation, searchText: _searchText);
+        VendorFacade.Fetch(salutation: salutation, searchText: _searchText);
     }
 }

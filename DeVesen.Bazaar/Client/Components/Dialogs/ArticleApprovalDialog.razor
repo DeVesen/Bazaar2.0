@@ -1,9 +1,7 @@
 ﻿@using DeVesen.Bazaar.Client.Components.Common.TextField
 @using DeVesen.Bazaar.Client.Components.Common.Buttons
 @using DeVesen.Bazaar.Client.Services
-@using DeVesen.Bazaar.Client.State
 
-@inject StateFacade StateFacade
 @inject VendorService VendorService
 
 <MudDialog>
@@ -75,9 +73,6 @@
         {
             SetReleaseError(result.ErrorMessage);
         }
-
-        StateFacade.Article.Fetch();
-        StateFacade.Vendor.Fetch();
     }
 
     private async Task SelectArticleNumberInput()

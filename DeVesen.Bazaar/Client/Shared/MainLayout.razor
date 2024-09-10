@@ -1,9 +1,6 @@
-﻿@using DeVesen.Bazaar.Client.State
-@using DeVesen.Bazaar.Client.Components.Common.MainLayout
+﻿@using DeVesen.Bazaar.Client.Components.Common.MainLayout
 
 @inherits LayoutComponentBase
-
-@inject StateFacade StateFacade
 
 @* Required *@
 <MudThemeProvider Theme="_dis3dpTheme" IsDarkMode="true" />
@@ -175,13 +172,6 @@
         };
 
     private bool _showSidebar;
-
-    protected override async Task OnInitializedAsync()
-    {
-        await base.OnInitializedAsync();
-
-        StateFacade.FetchAll();
-    }
 
     private async Task ToggleNavMenuAsync()
     {

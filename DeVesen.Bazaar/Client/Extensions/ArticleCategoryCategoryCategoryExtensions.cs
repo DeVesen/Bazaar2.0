@@ -20,4 +20,13 @@ public static class ArticleCategoryCategoryCategoryExtensions
             Name = data.Name
         };
     }
+
+    public static ArticleCategory ToDomain(this ArticleCategoryDto dto)
+    {
+        return new ArticleCategory
+        {
+            Id = dto.Id,
+            Name = dto.Name
+        };
+    }
 }

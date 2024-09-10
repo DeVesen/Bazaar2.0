@@ -52,8 +52,7 @@ public static class Faker
                 Manufacturer = manufacturer,
                 Created = new DateTime(2024, 1, 1, 1, 1, 1),
                 Price01 = price01,
-                Price02 = price02,
-                Description = description ?? string.Empty,
+                Price02 = price02
             };
 
         public static VendorEntity Vendor1 => GetVendorEntity(id: "61eb9e6e", firstName: "FirstName_1", lastName: "LastName_1");
@@ -120,8 +119,7 @@ public static class Faker
                 Manufacturer = manufacturer,
                 Created = new DateTime(2024, 1, 1, 1, 1, 1),
                 Price01 = price01,
-                Price02 = price02,
-                Description = description ?? string.Empty
+                Price02 = price02
             };
 
         public static Vendor Vendor1 => GetVendor(id: "61eb9e6e", firstName: "FirstName_1", lastName: "LastName_1");
@@ -218,8 +216,7 @@ public static class Faker
                 ArticleCategory = category,
                 Manufacturer = manufacturer,
                 Price01 = price01,
-                Price02 = price02,
-                Description = description
+                Price02 = price02
             };
 
         public static ArticleUpdateDto ArticleUpdate01 => GetArticleUpdate(number: 1, title: "Article_1", vendorId: "61eb9e6e");
@@ -241,8 +238,7 @@ public static class Faker
                 Manufacturer = manufacturer,
                 Created = new DateTime(2024, 1, 1, 1, 1, 1),
                 Price01 = price01,
-                Price02 = price02,
-                Description = description
+                Price02 = price02
             };
 
 

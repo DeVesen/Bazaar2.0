@@ -161,6 +161,21 @@ public class VendorService
         return Response.Invalid(message!.Message);
     }
 
+    public async Task<Response> SettleAsync(string vendorId, IEnumerable<string> actionArticleIds)
+    {
+        var requestUri = _httpClient.BaseAddress + $"/{vendorId}/settle";
+        var response = await _httpClient.PostAsJsonAsync(requestUri, actionArticleIds);
+
+        if (response.IsSuccessStatusCode)
+        {
+            return Response.Valid();
+        }
+
+        var message = await response.Content.ReadFromJsonAsync<FailedRequestMessage>();
+
+        return Response.Invalid(message!.Message);
+    }
+
 
     internal static IEnumerable<VendorView> MapToDomain(IEnumerable<VendorViewDto> elements)
         => elements.Select(MapToDomain);

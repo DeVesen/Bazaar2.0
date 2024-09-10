@@ -242,4 +242,19 @@ public class ArticleStorage
 
         return Result.Ok();
     }
+
+    public async Task<Result> SettleArticleAsync(params string[] actionArticleIds)
+    {
+        var articles = await GetAllAsync();
+        articles = articles.Where(p => actionArticleIds.Contains(p.Id));
+
+        foreach (var article in articles)
+        {
+            article.Settled = _systemClock.GetNow();
+
+            await UpdateAsync(article);
+        }
+
+        return Result.Ok();
+    }
 }

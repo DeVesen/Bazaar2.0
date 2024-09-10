@@ -25,7 +25,6 @@ public static class ArticleExtensions
             Price01 = data.Price01,
             Price02 = data.Price02,
             Returned = data.Returned,
-            Description = data.Description
         };
 
     public static Article ToDomain(this ArticleEntity entity)
@@ -45,7 +44,6 @@ public static class ArticleExtensions
             Price01 = entity.Price01,
             Price02 = entity.Price02,
             Returned = entity.Returned,
-            Description = entity.Description
         };
 
     public static Article ToDomain(this ArticleCreateDto dto)
@@ -54,17 +52,20 @@ public static class ArticleExtensions
             Id = dto.ToShortHash(),
             VendorId = dto.VendorId,
             Number = dto.Number,
-            Title = dto.Title,
+
             ArticleCategory = dto.ArticleCategory,
             Manufacturer = dto.Manufacturer,
+            Title = dto.Title,
+
+            Price01 = dto.Price01,
+            Price02 = dto.Price02,
             Created = dto.ApprovedForSale ?? DateTime.Now,
+
             ApprovedForSale = dto.ApprovedForSale,
             Sold = null,
             SoldAt = null,
-            Settled = null,
-            Price01 = dto.Price01,
-            Price02 = dto.Price02,
-            Description = dto.Description
+            Returned = null,
+            Settled = null
         };
 
     public static Article ToDomain(this (string id, ArticleUpdateDto dto) data)
@@ -73,18 +74,20 @@ public static class ArticleExtensions
             Id = data.id,
             VendorId = data.dto.VendorId,
             Number = data.dto.Number,
-            Title = data.dto.Title,
+
             ArticleCategory = data.dto.ArticleCategory,
             Manufacturer = data.dto.Manufacturer,
+            Title = data.dto.Title,
+
             Created = data.dto.Created,
+            Price01 = data.dto.Price01,
+            Price02 = data.dto.Price02,
+
             ApprovedForSale = data.dto.ApprovedForSale,
             Sold = data.dto.Sold,
             SoldAt = data.dto.SoldAt,
-            Settled = data.dto.Settled,
-            Price01 = data.dto.Price01,
-            Price02 = data.dto.Price02,
             Returned = data.dto.Returned,
-            Description = data.dto.Description
+            Settled = data.dto.Settled
         };
 
     public static ArticleDto ToDto(this Article data)
@@ -93,18 +96,20 @@ public static class ArticleExtensions
             Id = data.Id,
             VendorId = data.VendorId,
             Number = data.Number,
-            Title = data.Title,
+
             ArticleCategory = data.ArticleCategory,
             Manufacturer = data.Manufacturer,
+            Title = data.Title,
+
+            Price01 = data.Price01,
+            Price02 = data.Price02,
             Created = data.Created,
+
             ApprovedForSale = data.ApprovedForSale,
             Sold = data.Sold,
             SoldAt = data.SoldAt,
-            Settled = data.Settled,
-            Price01 = data.Price01,
-            Price02 = data.Price02,
             Returned = data.Returned,
-            Description = data.Description
+            Settled = data.Settled,
         };
 
     public static VendorArticleStatisticDto ToDto(this VendorArticleStatistic data)

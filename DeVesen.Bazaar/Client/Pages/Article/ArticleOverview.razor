@@ -1,10 +1,9 @@
 ﻿@using DeVesen.Bazaar.Client.Models
 @using DeVesen.Bazaar.Client.Pages.Article.Components
 @using DeVesen.Bazaar.Client.Services
-@using DeVesen.Bazaar.Client.State
 @using DeVesen.Bazaar.Client.State.Article
 @using DeVesen.Bazaar.Client.State.Title
-@using Fluxor
+@using DeVesen.Bazaar.Client.Components.Common.Buttons
 
 @page "/articles"
 @page "/vendors/{vendorId}/articles"
@@ -12,7 +11,7 @@
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 
 @inject TitleFacade TitleFacade
-@inject StateFacade StateFacade
+@inject ArticleFacade ArticleFacade
 @inject VendorService VendorService
 @inject IState<ArticleState> ArticleState
 
@@ -25,17 +24,32 @@
 else
 {
     <div class="d-flex flex-column gap-4 px-1">
-
+        
         <ArticleOverviewToolbar @bind-Vendor="@_vendor"
                                 @bind-Number="@_number"
                                 @bind-SearchText="@_searchText"
                                 @bind-Vendor:after="@OnArticleFilterChange"
                                 @bind-Number:after="@OnArticleFilterChange"
                                 @bind-SearchText:after="@OnArticleFilterChange"
-                                DisableVendorSelection="@_pageSelect"
-                                DisableCreateArticleBtn="@(_vendor == null)"
-                                OnCreateArticleBtnClick="@CreateArticleAsync"
-                                OnImportArticleBtnClick="@ImportArticleAsync" />
+                                DisableVendorSelection="@(string.IsNullOrWhiteSpace(VendorId) is false)">
+            <MudGrid Spacing="1">
+                <MudItem xs="4" md="12" lg="6">
+                    <DvButtonNeu Disabled="@(_vendor == null)"
+                                 OnClick="CreateArticleAsync" />
+                </MudItem>
+                <MudItem xs="4" md="12" lg="6">
+                    <DvButtonImport Disabled="@(_vendor == null)"
+                                    OnClick="ImportArticleAsync" />
+                </MudItem>
+                <MudItem xs="4" md="12" lg="6">
+                    <DvButtonApprove Disabled="@(_vendor == null)"
+                                     OnClick="ApproveArticleAsync" />
+                </MudItem>
+                <MudItem xs="4" md="12" lg="6">
+                    <DvButtonPrint Disabled="@(_vendor == null)" />
+                </MudItem>
+            </MudGrid>
+        </ArticleOverviewToolbar>
 
         <MudTable T="Article"
                   FixedHeader
@@ -45,19 +59,19 @@ else
                   OnRowClick="x => ModifyArticleAsync(x.Item!)">
             <HeaderContent>
                 <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Number)">Nummer</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Title)">Title</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Status)">Status</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.ArticleCategory)">Kategorie</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Manufacturer)">Manufacturer</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Price01)">Preis</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Title)">Title</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Status)">Status</MudTableSortLabel></MudTh>
             </HeaderContent>
             <RowTemplate>
                 <MudTd DataLabel="Nummer">@context.Number</MudTd>
-                <MudTd DataLabel="Titel">@context.Title</MudTd>
-                <MudTd DataLabel="Status">@context.StatusText</MudTd>
                 <MudTd DataLabel="ArticleCategory">@context.ArticleCategory</MudTd>
                 <MudTd DataLabel="Manufacturer">@context.Manufacturer</MudTd>
+                <MudTd DataLabel="Titel">@context.Title</MudTd>
                 <MudTd DataLabel="Price01">@context.Price01</MudTd>
+                <MudTd DataLabel="Status">@context.StatusText</MudTd>
             </RowTemplate>
         </MudTable>
     </div>
@@ -68,7 +82,6 @@ else
     [Parameter]
     public string VendorId { get; set; } = string.Empty;
 
-    private bool _pageSelect;
     private Vendor? _vendor;
     private string? _number;
     private string? _searchText;
@@ -111,9 +124,16 @@ else
         FetchArticleList();
     }
 
+    private async Task ApproveArticleAsync()
+    {
+        await DialogService.ApproveArticleAsync(_vendor!.Id);
+
+        FetchArticleList();
+    }
+
     private void FetchArticleList()
     {
-        StateFacade.Article.Fetch(_vendor?.Id, _number, _searchText);
+        ArticleFacade.Fetch(_vendor?.Id, _number, _searchText);
     }
 
     private void SetPageCaption()

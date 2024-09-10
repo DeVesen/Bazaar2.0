@@ -32,9 +32,6 @@ public class ArticleValidator : BaseValidator<Article>
 
         RuleFor(x => x.Price01)
             .Must(x => x > 0).WithMessage("Muss größer 0 sein!");
-
-        RuleFor(x => x.Description)
-            .MaximumLength(200).WithMessage("Darf nicht lönger 200 Zeichen sein!");
     }
 
     private async Task<bool> BeExistAsArticleCategoryAsync(Article dto, string value, CancellationToken _)

@@ -3,16 +3,11 @@
 @using DeVesen.Bazaar.Client.Validator
 @using DeVesen.Bazaar.Client.Components.Common.Autocomplete
 @using DeVesen.Bazaar.Client.Components.Common.TextField
-@using DeVesen.Bazaar.Client.State
-@using DeVesen.Bazaar.Client.State.ArticleCategory
-@using DeVesen.Bazaar.Client.State.Manufacturer
-@using Fluxor
+@using DeVesen.Bazaar.Client.Extensions
 
 @inject ArticleValidator ArticleValidator
 @inject ArticleCategoryService ArticleCategoryService
-@inject StateFacade StateFacade
-@inject IState<ArticleCategoryState> ArticleCategoryState;
-@inject IState<ManufacturerState> ManufacturerState;
+@inject ManufacturerService ManufacturerService
 
 <MudForm IsValid="IsValid"
          IsValidChanged="OnIsValidChanged"
@@ -23,7 +18,7 @@
          Validation="@(ArticleValidator.ValidateAsync)"
          Style="margin-bottom: 20px; min-width: 370px">
     <MudGrid Spacing="2">
-        <MudItem xs="12" sm="3">
+        <MudItem xs="12" sm="2">
             <DvTextField T="long"
                          Required
                          Label="Nummer"
@@ -31,14 +26,8 @@
                          @bind-Value="ArticleItem.Number"
                          For="@(() => ArticleItem.Number)" />
         </MudItem>
-        <MudItem xs="12" sm="9">
-            <DvTextField T="string"
-                         Required
-                         Label="Title"
-                         @bind-Value="ArticleItem.Title"
-                         For="@(() => ArticleItem.Title)" />
-        </MudItem>
-        <MudItem xs="12" sm="6">
+
+        <MudItem xs="12" sm="5">
             <DvAutocomplete T="string"
                             Required
                             Label="Kategorie"
@@ -47,7 +36,7 @@
                             MaxItems="@AutocompleteMaxItems"
                             SearchFunc="@CategoryAutoCompleteSearchAsync" />
         </MudItem>
-        <MudItem xs="12" sm="6">
+        <MudItem xs="12" sm="5">
             <DvAutocomplete T="string"
                             Required
                             Label="Hersteller"
@@ -56,6 +45,14 @@
                             MaxItems="@AutocompleteMaxItems"
                             SearchFunc="@ManufacturerAutoCompleteSearchAsync" />
         </MudItem>
+        <MudItem xs="12" sm="12">
+            <DvTextField T="string"
+                         Required
+                         Label="Title"
+                         @bind-Value="ArticleItem.Title"
+                         For="@(() => ArticleItem.Title)" />
+        </MudItem>
+
         <MudItem xs="12" sm="6">
             <DvTextField T="double"
                          Required
@@ -68,13 +65,6 @@
                          Label="Preis alternativ"
                          @bind-Value="ArticleItem.Price02"
                          For="@(() => ArticleItem.Price02)" />
-        </MudItem>
-        <MudItem xs="12" sm="12">
-            <DvTextField T="string"
-                         Label="Notize"
-                         Lines="4"
-                         @bind-Value="ArticleItem.Description"
-                         For="@(() => ArticleItem.Description)" />
         </MudItem>
     </MudGrid>
     
@@ -125,7 +115,8 @@
 
     private async Task<IEnumerable<string>> CategoryAutoCompleteSearchAsync(string value, CancellationToken token)
     {
-        var articleCategoryQuery = ArticleCategoryState.Value.Items;
+        var response = await ArticleCategoryService.GetAllAsync(searchText: value);
+        var articleCategoryQuery = response.Value.Select(p => p.ToDomain());
 
         if (string.IsNullOrWhiteSpace(value) is false)
         {
@@ -143,7 +134,8 @@
 
     private async Task<IEnumerable<string>> ManufacturerAutoCompleteSearchAsync(string? value, CancellationToken token)
     {
-        var manufacturerQuery = ManufacturerState.Value.Items;
+        var response = await ManufacturerService.GetAllAsync(searchText: value);
+        var manufacturerQuery = response.Value.Select(p => p.ToDomain());
 
         if (string.IsNullOrWhiteSpace(value) is false)
         {

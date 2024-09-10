@@ -146,13 +146,15 @@ public class ArticleService
             Id = dtoElement.Id,
             VendorId = dtoElement.VendorId,
             Number = dtoElement.Number,
-            Title = dtoElement.Title,
+
             ArticleCategory = dtoElement.ArticleCategory,
             Manufacturer = dtoElement.Manufacturer,
-            Created = dtoElement.Created,
+            Title = dtoElement.Title,
+
             Price01 = dtoElement.Price01,
             Price02 = dtoElement.Price02,
-            Description = dtoElement.Description,
+            Created = dtoElement.Created,
+
             ApprovedForSale = dtoElement.ApprovedForSale,
             Sold = dtoElement.Sold,
             SoldAt = dtoElement.SoldAt,

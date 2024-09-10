@@ -1,16 +1,14 @@
 ﻿@using DeVesen.Bazaar.Client.Models
 @using DeVesen.Bazaar.Client.Pages.ArticleCategory.Components
-@using DeVesen.Bazaar.Client.State
 @using DeVesen.Bazaar.Client.State.ArticleCategory
 @using DeVesen.Bazaar.Client.State.Title
-@using Fluxor
 
 @page "/article-category"
 
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 
 @inject TitleFacade TitleFacade
-@inject StateFacade StateFacade
+@inject ArticleCategoryFacade ArticleCategoryFacade
 @inject IState<ArticleCategoryState> ArticleCategoryState
 @inject Services.DialogService DialogService
 
@@ -59,7 +57,7 @@
 
     private void ReloadElements()
     {
-        StateFacade.ArticleCategory.Fetch();
+        ArticleCategoryFacade.Fetch();
 
         StateHasChanged();
     }

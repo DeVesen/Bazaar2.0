@@ -1,4 +1,6 @@
-﻿namespace DeVesen.Bazaar.Client.Models;
+﻿using DeVesen.Bazaar.Shared.Extensions;
+
+namespace DeVesen.Bazaar.Client.Models;
 
 public record Vendor
 {
@@ -18,12 +20,10 @@ public record Vendor
 
     public bool Contains(string text)
     {
-        text = text.Trim().ToLower();
-
-        return text.Contains(Id.ToLower()) ||
-               text.Contains(FirstName.ToLower()) ||
-               text.Contains(LastName.ToLower()) ||
-               (Note ?? string.Empty).ToLower().Contains(text);
+        return text.BiContainsIgnoreCase(Id) ||
+               text.BiContainsIgnoreCase(FirstName) ||
+               text.BiContainsIgnoreCase(LastName) ||
+               text.BiContainsIgnoreCase(Note);
     }
 
     public string GetGender()

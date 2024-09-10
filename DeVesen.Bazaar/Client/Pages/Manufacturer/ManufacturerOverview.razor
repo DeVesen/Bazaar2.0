@@ -1,16 +1,14 @@
 ﻿@using DeVesen.Bazaar.Client.Models
 @using DeVesen.Bazaar.Client.Pages.Manufacturer.Components
-@using DeVesen.Bazaar.Client.State
 @using DeVesen.Bazaar.Client.State.Manufacturer
 @using DeVesen.Bazaar.Client.State.Title
-@using Fluxor
 
 @page "/article-manufacturer"
 
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 
 @inject TitleFacade TitleFacade
-@inject StateFacade StateFacade
+@inject ManufacturerFacade ManufacturerFacade
 @inject IState<ManufacturerState> ManufacturerState
 @inject Services.DialogService DialogService
 
@@ -59,6 +57,6 @@
 
     private void ReloadElements()
     {
-        StateFacade.Manufacturer.Fetch();
+        ManufacturerFacade.Fetch();
     }
 }

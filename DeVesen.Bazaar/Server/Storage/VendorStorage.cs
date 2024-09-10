@@ -1,6 +1,7 @@
 ﻿using DeVesen.Bazaar.Server.Contracts;
 using DeVesen.Bazaar.Server.Domain;
 using DeVesen.Bazaar.Server.Extensions;
+using DeVesen.Bazaar.Shared.Extensions;
 
 namespace DeVesen.Bazaar.Server.Storage;
 

@@ -64,7 +64,7 @@
 
     private async Task<IEnumerable<VendorSelectBase>> VendorSearchAsync(string value, CancellationToken token)
     {
-        var vendorResponse = await VendorService.GetAllAsync();
+        var vendorResponse = await VendorService.GetAllAsync(searchText: value);
         var elements = vendorResponse.Value;
 
         if (string.IsNullOrWhiteSpace(value) is false)
@@ -76,7 +76,7 @@
             .ThenBy(p => p.Item.FirstName)
             .ThenBy(p => p.Item.Salutation);
 
-        var finalList = elements.Select(p => (VendorSelectBase)VendorSelectItem.Create(p.Item))
+        var finalList = elements.Select(VendorSelectBase (p) => VendorSelectItem.Create(p.Item))
                                 .ToList();
 
         if (string.IsNullOrWhiteSpace(value) is false)

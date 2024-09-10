@@ -6,7 +6,7 @@ public static class SettlementReducer
 {
     [ReducerMethod(typeof(SettlementActions.FetchSettlement))]
     public static SettlementState FetchSettlement(SettlementState state)
-        => state with { Articles = Enumerable.Empty<Models.Article>(), State = SettlementState.LoadingState.Loading };
+        => state with { Vendor = null, Articles = [], State = SettlementState.LoadingState.Loading };
 
     [ReducerMethod]
     public static SettlementState SettlementFetched(SettlementState state, SettlementActions.SetSettlement action)
@@ -15,4 +15,8 @@ public static class SettlementReducer
     [ReducerMethod(typeof(SettlementActions.SettlementFetchFailed))]
     public static SettlementState SettlementFetchFailed(SettlementState state)
         => state with { State = SettlementState.LoadingState.Failed };
+
+    [ReducerMethod(typeof(SettlementActions.ResetSelection))]
+    public static SettlementState ResetSelection(SettlementState state)
+        => state with { Vendor = null, Articles = [], State = SettlementState.LoadingState.None };
 }

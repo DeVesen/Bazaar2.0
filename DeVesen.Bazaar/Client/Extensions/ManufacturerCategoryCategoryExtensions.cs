@@ -20,4 +20,13 @@ public static class ManufacturerCategoryCategoryExtensions
             Name = data.Name
         };
     }
+
+    public static Manufacturer ToDomain(this ManufacturerDto dto)
+    {
+        return new Manufacturer
+        {
+            Id = dto.Id,
+            Name = dto.Name
+        };
+    }
 }

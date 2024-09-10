@@ -1,4 +1,5 @@
-﻿using DeVesen.Bazaar.Client.Services;
+﻿using DeVesen.Bazaar.Client.Extensions;
+using DeVesen.Bazaar.Client.Services;
 using Fluxor;
 
 namespace DeVesen.Bazaar.Client.State.ArticleCategory;
@@ -17,11 +18,7 @@ public class ArticleCategoryEffects(ArticleCategoryService articleCategoryServic
 
         var domainElements = response.Value
             .OrderBy(p => p.Name)
-            .Select(dtoElement => new Models.ArticleCategory
-            {
-                Id = dtoElement.Id,
-                Name = dtoElement.Name
-            })
+            .Select(dtoElement => dtoElement.ToDomain())
             .ToArray();
 
         dispatcher.Dispatch(new ArticleCategoryActions.Set(domainElements));

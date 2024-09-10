@@ -66,7 +66,7 @@ public class ImportEffects
 
     private bool TryMapToArticle(string vendorId, string line, out Models.Article? value)
     {
-        var lineParts = line.Split(new[] { ";" }, StringSplitOptions.None);
+        var lineParts = line.Split([";"], StringSplitOptions.None);
 
         if (lineParts.Length != 7)
         {
@@ -78,13 +78,13 @@ public class ImportEffects
         {
             VendorId = vendorId,
             Number = int.Parse(lineParts[0]),
-            Title = lineParts[1],
-            ArticleCategory = lineParts[2],
-            Manufacturer = lineParts[3],
-            Created = _systemClock.GetNow(),
+            ArticleCategory = lineParts[1],
+            Manufacturer = lineParts[2],
+            Title = lineParts[3],
+
             Price01 = double.Parse(lineParts[4]),
             Price02 = double.TryParse(lineParts[5], out var price02Val) ? price02Val : null,
-            Description = lineParts[6]
+            Created = _systemClock.GetNow()
         };
 
         return true;

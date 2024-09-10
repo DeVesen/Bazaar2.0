@@ -9,7 +9,7 @@ public static class DialogResultExtensions
         var dlgReference = await dialogReferenceTask;
         var dataResult = await dlgReference.Result;
 
-        return dataResult!.Canceled;
+        return dataResult!.Canceled is false;
     }
 
     public static async Task<(bool Canceled, T Data)> WaitForResult<T>(this Task<IDialogReference> dialogReferenceTask)

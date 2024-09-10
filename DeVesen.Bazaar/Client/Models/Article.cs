@@ -17,13 +17,15 @@ public record Article
     public string Id { get; init; } = string.Empty;
     public required string VendorId { get; init; }
     public long Number { get; set; }
-    public string Title { get; set; } = string.Empty;
     public string ArticleCategory { get; set; } = string.Empty;
     public string Manufacturer { get; set; } = string.Empty;
-    public DateTime Created { get; init; }
+
+    public string Title { get; set; } = string.Empty;
+
     public double Price01 { get; set; }
     public double? Price02 { get; set; }
-    public string? Description { get; set; }
+    public DateTime Created { get; init; }
+
     public DateTime? ApprovedForSale { get; set; }
     public DateTime? Sold { get; set; }
     public double? SoldAt { get; set; }
@@ -76,11 +78,11 @@ public record Article
     private string GetStatusText()
         => Status switch
         {
-            Article.StatusType.None => "Angelegt",
-            Article.StatusType.Approved => "Freigegeben",
-            Article.StatusType.Sold => "Verkauft",
-            Article.StatusType.Returned => "Zurückgegeben",
-            Article.StatusType.Settled => "Abgerechnet",
+            StatusType.None => "Angelegt",
+            StatusType.Approved => "Freigegeben",
+            StatusType.Sold => "Verkauft",
+            StatusType.Returned => "Zurückgegeben",
+            StatusType.Settled => "Abgerechnet",
             _ => "F/N"
         };
 }

@@ -1,0 +1,31 @@
+﻿@using DeVesen.Bazaar.Client.Components.Common.Buttons
+@using DeVesen.Bazaar.Client.Components.Settlement
+
+<MudDialog>
+    <DialogContent>
+        <OverviewOfRefundsTable OpenSales="@OpenSales"
+                                ShareOfSales="@ShareOfSales"
+                                ArticleCommission="@ArticleCommission" />
+    </DialogContent>
+    <DialogActions>
+        <DvButtonPayOut OnClick="OnPayOutAsync" />
+        <DvButtonClose OnClick="OnCloseAsync" />
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
+
+    [Parameter]
+    public double OpenSales { get; set; }
+
+    [Parameter]
+    public double ShareOfSales { get; set; }
+
+    [Parameter]
+    public double ArticleCommission { get; set; }
+
+    private void OnPayOutAsync() => MudDialog.Close(DialogResult.Ok(true));
+
+    private void OnCloseAsync() => MudDialog.Close(DialogResult.Cancel());
+}
