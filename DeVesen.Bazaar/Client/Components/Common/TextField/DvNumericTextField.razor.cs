@@ -1,6 +1,6 @@
 ﻿using MudBlazor;
 
-namespace DeVesen.Bazaar.Client.Components.TextField;
+namespace DeVesen.Bazaar.Client.Components.Common.TextField;
 
 public partial class DvNumericTextField<T> : MudNumericField<T>
 {

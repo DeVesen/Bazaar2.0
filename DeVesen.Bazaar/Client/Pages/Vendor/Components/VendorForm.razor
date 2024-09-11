@@ -9,38 +9,23 @@
          Model="Item"
          Validation="@Validation"
          Style="margin-bottom: 20px; min-width: 370px">
+
     <MudGrid Spacing="2">
-        <MudItem xs="12" sm="2">
-            <MudSelect T="string"
-                       Required
-                       ShrinkLabel
-                       Margin="Margin.Dense"
-                       Variant="Variant.Outlined"
-                       Label="Anrede"
-                       @bind-Value="@Item.Salutation"
-                       For="@(() => Item.Salutation)">
-                <MudSelectItem Value="@("Male")">
-                    <MudIcon Icon="@Icons.Material.TwoTone.Male"></MudIcon>
-                </MudSelectItem>
-                <MudSelectItem Value="@("Female")">
-                    <MudIcon Icon="@Icons.Material.TwoTone.Female"></MudIcon>
-                </MudSelectItem>
-            </MudSelect>
-        </MudItem>
-        <MudItem xs="12" sm="5">
+        <MudItem xs="12" sm="6">
             <DvTextField T="string"
                          Required
                          Label="Vorname"
                          @bind-Value="Item.FirstName"
-                         For="@(() => Item.FirstName)" />
+                         For="@(() => Item.FirstName)"/>
         </MudItem>
-        <MudItem xs="12" sm="5">
+        <MudItem xs="12" sm="6">
             <DvTextField T="string"
                          Required
                          Label="Nachname"
                          @bind-Value="Item.LastName"
-                         For="@(() => Item.LastName)" />
+                         For="@(() => Item.LastName)"/>
         </MudItem>
+
         <MudItem xs="12" sm="12">
             <DvTextField T="string"
                          Label="Anschrift"
@@ -50,6 +35,7 @@
                          @bind-Value="Item.Address"
                          For="@(() => Item.Address)" />
         </MudItem>
+
         <MudItem xs="12" sm="6">
             <DvTextField T="string"
                          Label="E-Mail"
@@ -62,6 +48,27 @@
                          @bind-Value="Item.Phone"
                          For="@(() => Item.Phone)" />
         </MudItem>
+
+        <MudItem xs="12" sm="6">
+            <DvTextField T="double"
+                         Label="Umsatzanteil"
+                         Value="@(Item.SalesShare * 100)"
+                         ValueChanged="@(x => Item.SalesShare = x / 100)"
+                         Adornment="Adornment.End"
+                         AdornmentText="%"
+                         HelperText="Entfällt auf die Summe des Verkaufserlös."
+                         For="@(() => Item.SalesShare)" />
+        </MudItem>
+        <MudItem xs="12" sm="6">
+            <DvTextField T="double"
+                         Label="Arbeitskosten"
+                         @bind-Value="Item.OfferUnitPrice"
+                         Adornment="Adornment.End"
+                         AdornmentText="€ pro Stück"
+                         HelperText="Entfällt auf jeden Artikel der nicht verkauft aber angeboten wurde."
+                         For="@(() => Item.OfferUnitPrice)" />
+        </MudItem>
+
         <MudItem xs="12" sm="12">
             <DvTextField T="string"
                          Label="Notiz"
@@ -72,7 +79,7 @@
                          For="@(() => Item.Note)" />
         </MudItem>
     </MudGrid>
-    
+
 </MudForm>
 
 @code {

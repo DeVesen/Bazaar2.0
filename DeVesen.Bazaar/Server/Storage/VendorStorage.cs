@@ -29,10 +29,6 @@ public class VendorStorage
         {
             elements = elements.Where(p => p.Id == filter.Id);
         }
-        if (string.IsNullOrWhiteSpace(filter.Salutation) is false)
-        {
-            elements = elements.Where(p => p.Salutation == filter.Salutation);
-        }
         if (string.IsNullOrWhiteSpace(filter.SearchText) is false)
         {
             elements = elements.Where(p => p.FirstName.BiContainsIgnoreCase(filter.SearchText)

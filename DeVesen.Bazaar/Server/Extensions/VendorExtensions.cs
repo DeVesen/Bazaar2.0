@@ -12,65 +12,70 @@ public static class VendorExtensions
         => new()
         {
             Id = entity.Id,
-            Salutation = entity.Salutation,
             FirstName = entity.FirstName,
             LastName = entity.LastName,
             Address = entity.Address,
             EMail = entity.EMail,
             Phone = entity.Phone,
-            Note = entity.Note
+            Note = entity.Note,
+            OfferUnitPrice = entity.OfferUnitPrice,
+            SalesShare = entity.SalesShare
         };
 
     public static Vendor ToDomain(this VendorEntity entity)
         => new()
         {
             Id = entity.Id,
-            Salutation = entity.Salutation,
             FirstName = entity.FirstName,
             LastName = entity.LastName,
             Address = entity.Address,
             EMail = entity.EMail,
             Phone = entity.Phone,
-            Note = entity.Note
+            Note = entity.Note,
+            OfferUnitPrice = entity.OfferUnitPrice,
+            SalesShare = entity.SalesShare
         };
 
     public static Vendor ToDomain(this VendorCreateDto dto)
         => new()
         {
             Id = dto.ToShortHash(),
-            Salutation = dto.Salutation,
             FirstName = dto.FirstName,
             LastName = dto.LastName,
             Address = dto.Address,
             EMail = dto.EMail,
             Phone = dto.Phone,
-            Note = dto.Note
+            Note = dto.Note,
+            OfferUnitPrice = dto.OfferUnitPrice,
+            SalesShare = dto.SalesShare
         };
 
     public static Vendor ToDomain(this (string id, VendorUpdateDto dto) data)
         => new()
         {
             Id = data.id,
-            Salutation = data.dto.Salutation,
             FirstName = data.dto.FirstName,
             LastName = data.dto.LastName,
             Address = data.dto.Address,
             EMail = data.dto.EMail,
             Phone = data.dto.Phone,
-            Note = data.dto.Note
+            Note = data.dto.Note,
+            OfferUnitPrice = data.dto.OfferUnitPrice,
+            SalesShare = data.dto.SalesShare
         };
 
     public static VendorDto ToDto(this Vendor data)
         => new()
         {
             Id = data.Id,
-            Salutation = data.Salutation,
             FirstName = data.FirstName,
             LastName = data.LastName,
             Address = data.Address,
             EMail = data.EMail,
             Phone = data.Phone,
-            Note = data.Note
+            Note = data.Note,
+            OfferUnitPrice = data.OfferUnitPrice,
+            SalesShare = data.SalesShare
         };
 
     private static string ToShortHash(this VendorCreateDto dto)

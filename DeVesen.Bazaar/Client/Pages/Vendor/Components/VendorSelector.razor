@@ -57,6 +57,9 @@
     [Parameter]
     public bool Disabled { get; set; }
 
+    [Parameter]
+    public bool DisableNewItem { get; set; }
+
     public bool IsAddElement => _selectedItem is VendorSelectNewItem;
 
     private bool _lockChange = false;
@@ -73,13 +76,13 @@
         }
 
         elements = elements.OrderBy(p => p.Item.LastName)
-            .ThenBy(p => p.Item.FirstName)
-            .ThenBy(p => p.Item.Salutation);
+            .ThenBy(p => p.Item.FirstName);
 
         var finalList = elements.Select(VendorSelectBase (p) => VendorSelectItem.Create(p.Item))
                                 .ToList();
 
-        if (string.IsNullOrWhiteSpace(value) is false)
+        if (string.IsNullOrWhiteSpace(value) is false &&
+            DisableNewItem is false)
         {
             finalList.Add(new VendorSelectNewItem
             {
@@ -173,7 +176,7 @@
         {
             var builder = new StringBuilder();
 
-            builder.Append($"{vendor.Id}: {vendor.GetGender()} {vendor.LastName}, {vendor.FirstName}");
+            builder.Append($"{vendor.Id}: {vendor.LastName}, {vendor.FirstName}");
 
             if (string.IsNullOrWhiteSpace(vendor.EMail) is false)
             {

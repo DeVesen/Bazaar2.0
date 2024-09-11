@@ -8,10 +8,6 @@ public class VendorValidator : BaseValidator<Vendor>
 {
     public VendorValidator()
     {
-        RuleFor(x => x.Salutation)
-            .NotEmpty().WithMessage("Darf nicht leer sein!")
-            .MaximumLength(20).WithMessage("Darf nicht lönger 20 Zeichen sein!");
-
         RuleFor(x => x.FirstName)
             .NotEmpty().WithMessage("Darf nicht leer sein!")
             .MaximumLength(20).WithMessage("Darf nicht lönger 20 Zeichen sein!");

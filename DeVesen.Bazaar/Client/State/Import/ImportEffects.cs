@@ -68,7 +68,7 @@ public class ImportEffects
     {
         var lineParts = line.Split([";"], StringSplitOptions.None);
 
-        if (lineParts.Length != 7)
+        if (lineParts.Length is not 5 or 6)
         {
             value = null!;
             return false;
@@ -83,7 +83,7 @@ public class ImportEffects
             Description = lineParts[3],
 
             Price01 = double.Parse(lineParts[4]),
-            Price02 = double.TryParse(lineParts[5], out var price02Val) ? price02Val : null,
+            Price02 = lineParts.Length == 6 && double.TryParse(lineParts[5], out var price02Val) ? price02Val : null,
             Created = _systemClock.GetNow()
         };
 

@@ -13,13 +13,14 @@ public record VendorFilterDto
 public record VendorDto
 {
     public required string Id { get; init; }
-    public required string Salutation { get; init; }
     public required string FirstName { get; init; }
     public required string LastName { get; init; }
     public string? Address { get; init; }
     public string? EMail { get; init; }
     public string? Phone { get; init; }
     public string? Note { get; init; }
+    public double OfferUnitPrice { get; set; }
+    public double SalesShare { get; set; }
 }
 
 [ExcludeFromCodeCoverage]
@@ -32,25 +33,27 @@ public record VendorViewDto
 [ExcludeFromCodeCoverage]
 public record VendorCreateDto
 {
-    public required string Salutation { get; init; }
     public required string FirstName { get; init; }
     public required string LastName { get; init; }
     public string? Address { get; init; }
     public string? EMail { get; init; }
     public string? Phone { get; init; }
     public string? Note { get; init; }
+    public double OfferUnitPrice { get; set; }
+    public double SalesShare { get; set; }
 }
 
 [ExcludeFromCodeCoverage]
 public record VendorUpdateDto
 {
-    public required string Salutation { get; init; }
     public required string FirstName { get; init; }
     public required string LastName { get; init; }
     public string? Address { get; init; }
     public string? EMail { get; init; }
     public string? Phone { get; init; }
     public string? Note { get; init; }
+    public double OfferUnitPrice { get; set; }
+    public double SalesShare { get; set; }
 }
 
 [ExcludeFromCodeCoverage]

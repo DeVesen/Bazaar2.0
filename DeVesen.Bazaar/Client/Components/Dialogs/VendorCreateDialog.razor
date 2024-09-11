@@ -40,7 +40,22 @@
 
     protected override void OnParametersSet()
     {
-        _item.LastName = StartText;
+        StartText = StartText.Trim();
+
+        if (string.IsNullOrWhiteSpace(StartText))
+        {
+            return;
+        }
+
+        var lastSpacePos = StartText.LastIndexOf(' ');
+        if (lastSpacePos < 0)
+        {
+            _item.LastName = StartText;
+            return;
+        }
+
+        _item.FirstName = StartText.Trim()[..lastSpacePos].Trim();
+        _item.LastName = StartText.Trim()[lastSpacePos..].Trim();
     }
 
     private async Task SubmitAsync()

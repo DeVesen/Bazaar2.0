@@ -9,13 +9,14 @@ public static class VendorCategoryCategoryExtensions
     {
         return new VendorCreateDto
         {
-            Salutation = data.Salutation,
             FirstName = data.FirstName,
             LastName = data.LastName,
             Address = data.Address,
             EMail = data.EMail,
             Phone = data.Phone,
-            Note = data.Note
+            Note = data.Note,
+            OfferUnitPrice = data.OfferUnitPrice,
+            SalesShare = data.SalesShare
         };
     }
 
@@ -23,13 +24,14 @@ public static class VendorCategoryCategoryExtensions
     {
         return new VendorUpdateDto
         {
-            Salutation = data.Salutation,
             FirstName = data.FirstName,
             LastName = data.LastName,
             Address = data.Address,
             EMail = data.EMail,
             Phone = data.Phone,
-            Note = data.Note
+            Note = data.Note,
+            OfferUnitPrice = data.OfferUnitPrice,
+            SalesShare = data.SalesShare
         };
     }
 }

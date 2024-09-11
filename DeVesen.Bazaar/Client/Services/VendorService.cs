@@ -186,12 +186,13 @@ public class VendorService
             Item = new Vendor
             {
                 Id = dtoElement.Item.Id,
-                Salutation = dtoElement.Item.Salutation,
                 FirstName = dtoElement.Item.FirstName,
                 LastName = dtoElement.Item.LastName,
                 Address = dtoElement.Item.Address,
                 EMail = dtoElement.Item.EMail,
-                Note = dtoElement.Item.Note
+                Note = dtoElement.Item.Note,
+                OfferUnitPrice = dtoElement.Item.OfferUnitPrice,
+                SalesShare = dtoElement.Item.SalesShare
             },
             Statistic = new VendorArticleStatistic
             {

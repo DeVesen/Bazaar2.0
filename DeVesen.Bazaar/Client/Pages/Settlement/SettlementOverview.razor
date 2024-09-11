@@ -17,7 +17,8 @@
 
 <div class="d-flex flex-column gap-4 px-1">
 
-    <ArticleOverviewToolbar @bind-Vendor="@_vendor"
+    <ArticleOverviewToolbar DisableNewItem="true"
+                            @bind-Vendor="@_vendor"
                             @bind-Number="@_number"
                             @bind-SearchText="@_searchText"
                             @bind-Vendor:after="@FetchVendorSettlement">

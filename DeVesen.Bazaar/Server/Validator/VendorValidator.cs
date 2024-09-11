@@ -12,10 +12,6 @@ public class VendorValidator : BaseValidator<Vendor>
         RuleFor(x => x.Id)
             .NotEmpty().WithMessage(ResourceText.Global.IdMayNotBeEmpty);
 
-        RuleFor(x => x.Salutation)
-            .NotEmpty().WithMessage(ResourceText.Global.SalutationMayNotBeEmpty)
-            .MaximumLength(20).WithMessage(ResourceText.Transform(ResourceText.Global.SalutationMayNotBeLongerThan, _ => 20));
-
         RuleFor(x => x.FirstName)
             .NotEmpty().WithMessage(ResourceText.Global.FirstNameMayNotBeEmpty)
             .MaximumLength(20).WithMessage(ResourceText.Transform(ResourceText.Global.FirstNameMayNotBeLongerThan, _ => 20));

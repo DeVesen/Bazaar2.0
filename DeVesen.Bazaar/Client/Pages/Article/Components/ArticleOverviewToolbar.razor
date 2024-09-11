@@ -11,7 +11,8 @@
             <MudItem xs="12">
                 <VendorSelector Item="Vendor"
                                 ItemChanged="@VendorChanged"
-                                Disabled="@DisableVendorSelection" />
+                                Disabled="@DisableVendorSelection"
+                                DisableNewItem="@DisableNewItem" />
             </MudItem>
 
             <MudItem xs="3">
@@ -53,6 +54,9 @@
 
     [Parameter]
     public bool DisableVendorSelection { get; set; }
+
+    [Parameter]
+    public bool DisableNewItem { get; set; }
 
     [Parameter]
     public EventCallback<Vendor?> VendorChanged { get; set; }

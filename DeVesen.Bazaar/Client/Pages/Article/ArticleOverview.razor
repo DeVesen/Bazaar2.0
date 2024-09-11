@@ -27,19 +27,19 @@
                             @bind-SearchText:after="@OnArticleFilterChange"
                             DisableVendorSelection="@(string.IsNullOrWhiteSpace(VendorId) is false)">
         <MudGrid Spacing="1">
-            <MudItem xs="4" md="12" lg="6">
+            <MudItem xs="6" md="12" lg="6">
                 <DvButtonNeu Disabled="@(_vendor == null)"
                              OnClick="CreateArticleAsync" />
             </MudItem>
-            <MudItem xs="4" md="12" lg="6">
+            <MudItem xs="6" md="12" lg="6">
                 <DvButtonImport Disabled="@(_vendor == null)"
                                 OnClick="ImportArticleAsync" />
             </MudItem>
-            <MudItem xs="4" md="12" lg="6">
+            <MudItem xs="6" md="12" lg="6">
                 <DvButtonApprove Disabled="@(_vendor == null)"
                                  OnClick="ApproveArticleAsync" />
             </MudItem>
-            <MudItem xs="4" md="12" lg="6">
+            <MudItem xs="6" md="12" lg="6">
                 <DvButtonPrint Disabled="@(_vendor == null)" />
             </MudItem>
         </MudGrid>
@@ -51,7 +51,7 @@
               Loading="@(ArticleState.Value.IsLoaded is false)"
               Items="@ArticleState.Value.Items"
               SortLabel="Sort By"
-              Height="70.5vh"
+              Height="68.8vh"
               OnRowClick="x => ModifyArticleAsync(x.Item!)">
         <HeaderContent>
             <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Number)">Nummer</MudTableSortLabel></MudTh>
