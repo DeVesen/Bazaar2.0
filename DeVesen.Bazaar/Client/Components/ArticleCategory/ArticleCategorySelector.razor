@@ -5,10 +5,10 @@
 
 @inherits MudFormComponent<string, string>
 
-@inject ManufacturerService ManufacturerService
+@inject ArticleCategoryService ArticleCategoryService
 
 <CascadingValue Value="false" Name="SubscribeToParentForm" IsFixed>
-    <DvSelector Label="Hersteller"
+    <DvSelector Label="Kategorie"
                 Required="@Required"
                 RequiredError="@RequiredError"
                 ErrorText="@ErrorText"
@@ -44,7 +44,7 @@
 
     private async Task<IEnumerable<DvSelector.SelectorItem>> SearchItemsAsync(string searchText, CancellationToken cancellation)
     {
-        var possibleElements = (await ManufacturerService.GetAllAsync()).Value;
+        var possibleElements = (await ArticleCategoryService.GetAllAsync()).Value;
 
         if (string.IsNullOrWhiteSpace(searchText) is false)
         {
@@ -60,7 +60,7 @@
 
     private async Task<DvSelector.SelectorItem?> CreateNewElement(string value)
     {
-        await ManufacturerService.CreateAsync(new Manufacturer { Name = value });
+        await ArticleCategoryService.CreateAsync(new ArticleCategory { Name = value });
 
         return new DvSelector.SelectorItem { Caption = value };
     }

@@ -1,14 +1,10 @@
-﻿@using DeVesen.Bazaar.Client.Services
-@using DeVesen.Bazaar.Client.Models
+﻿@using DeVesen.Bazaar.Client.Models
 @using DeVesen.Bazaar.Client.Validator
-@using DeVesen.Bazaar.Client.Components.Common.Autocomplete
 @using DeVesen.Bazaar.Client.Components.Common.TextField
-@using DeVesen.Bazaar.Client.Extensions
 @using DeVesen.Bazaar.Client.Components.Manufacturer
+@using DeVesen.Bazaar.Client.Components.ArticleCategory
 
 @inject ArticleValidator ArticleValidator
-@inject ArticleCategoryService ArticleCategoryService
-@inject ManufacturerService ManufacturerService
 
 <MudForm @ref="_form"
          ValidationDelay="1000"
@@ -28,13 +24,9 @@
         </MudItem>
 
         <MudItem xs="12" sm="5">
-            <DvAutocomplete T="string"
-                            Required
-                            Label="Kategorie"
-                            @bind-Value="ArticleItem.ArticleCategory"
-                            For="@(() => ArticleItem.ArticleCategory)"
-                            MaxItems="@AutocompleteMaxItems"
-                            SearchFunc="@CategoryAutoCompleteSearchAsync" />
+            <ArticleCategorySelector Required
+                                     For="@(() => ArticleItem.ArticleCategory)"
+                                     @bind-Value="ArticleItem.ArticleCategory" />
         </MudItem>
         <MudItem xs="12" sm="5">
             <ManufacturerSelector Required
@@ -67,7 +59,6 @@
 </MudForm>
 
 @code {
-    private const int AutocompleteMaxItems = 25; // todo move to app-Config
     private MudForm _form = null!;
 
     [Parameter]
@@ -101,44 +92,6 @@
         await ArticleItemChanged.InvokeAsync(ArticleItem);
 
         await _form.Validate();
-    }
-
-    private async Task<IEnumerable<string>> CategoryAutoCompleteSearchAsync(string value, CancellationToken token)
-    {
-        var response = await ArticleCategoryService.GetAllAsync(searchText: value);
-        var articleCategoryQuery = response.Value.Select(p => p.ToDomain());
-
-        if (string.IsNullOrWhiteSpace(value) is false)
-        {
-            articleCategoryQuery = articleCategoryQuery.Where(Compare);
-        }
-
-        return await Task.FromResult(articleCategoryQuery.Select(p => p.Name).ToArray());
-
-        bool Compare(ArticleCategory articleCategory)
-        {
-            return articleCategory.Name.ToLower().Contains(value)
-                   || value.Contains(articleCategory.Name.ToLower());
-        }
-    }
-
-    private async Task<IEnumerable<string>> ManufacturerAutoCompleteSearchAsync(string? value, CancellationToken token)
-    {
-        var response = await ManufacturerService.GetAllAsync(searchText: value);
-        var manufacturerQuery = response.Value.Select(p => p.ToDomain());
-
-        if (string.IsNullOrWhiteSpace(value) is false)
-        {
-            manufacturerQuery = manufacturerQuery.Where(Compare).ToArray();
-        }
-
-        return await Task.FromResult(manufacturerQuery.Select(p => p.Name).ToArray());
-
-        bool Compare(Manufacturer category)
-        {
-            return category.Name.ToLower().Contains(value)
-                || value.Contains(category.Name.ToLower());
-        }
     }
 
 

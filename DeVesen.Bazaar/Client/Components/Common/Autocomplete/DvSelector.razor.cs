@@ -1,6 +1,6 @@
 ﻿using MudBlazor;
 
-namespace DeVesen.Bazaar.Client.Components.Manufacturer
+namespace DeVesen.Bazaar.Client.Components.Common.Autocomplete
 {
     public partial class DvSelector : MudFormComponent<DvSelector.SelectorItemBase, string>
     {
