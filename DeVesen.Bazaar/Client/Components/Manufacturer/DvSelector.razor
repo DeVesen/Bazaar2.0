@@ -1,0 +1,145 @@
+﻿@inherits MudFormComponent<DvSelector.SelectorItemBase, string>
+
+<CascadingValue Value="false" Name="SubscribeToParentForm" IsFixed>
+    <MudAutocomplete T="SelectorItemBase"
+                     Clearable
+                     ShrinkLabel
+                     ShowProgressIndicator
+                     Label="@Label"
+                     Required="@Required"
+                     RequiredError="@RequiredError"
+                     ErrorText="@ErrorText"
+                     Error="@Error"
+                     ErrorId="@ErrorId"
+                     ResetValueOnEmptyText="true"
+                     Variant="Variant.Filled"
+                     MaxItems="@MaxItems"
+                     MinCharacters="@MinCharacters"
+                     SearchFunc="SearchItemsAsync"
+                     ToStringFunc="ItemToString"
+                     Value="_value"
+                     ValueChanged="OnValueChangedAsync"
+                     OnBlur="OnBlurAsync" />
+</CascadingValue>
+
+@code {
+    private bool _setValueIsLocked = false;
+
+    [Parameter]
+    public string? Label { get; set; }
+
+    [Parameter]
+    public SelectorItem? Value
+    {
+        get => _value as SelectorItem;
+        set
+        {
+            if (_setValueIsLocked)
+            {
+                return;
+            }
+            _value = value;
+            Touched = true;
+        }
+    }
+
+    [Parameter]
+    public int? MaxItems { get; set; } = 30;
+
+    [Parameter]
+    public int MinCharacters { get; set; } = 0;
+
+    [Parameter]
+    public Func<string, CancellationToken, Task<IEnumerable<SelectorItem>>> SearchFunc { get; set; }
+
+    [Parameter]
+    public Func<string, Task<SelectorItem?>>? AddFunc { get; set; }
+
+    [Parameter]
+    public EventCallback<SelectorItem?> ValueChanged { get; set; }
+
+    [Parameter]
+    public EventCallback<FocusEventArgs> OnBlur { get; set; }
+
+
+    private async Task<IEnumerable<SelectorItemBase>> SearchItemsAsync(string searchText, CancellationToken cancellation)
+    {
+        var possibleElements = (await SearchFunc.Invoke(searchText, cancellation)).ToArray()
+                                                                                  .AsEnumerable();
+
+        var possibleElementList = possibleElements.OfType<SelectorItemBase>()
+                                                  .OrderBy(p => p.Caption)
+                                                  .ToList();
+
+        if (string.IsNullOrWhiteSpace(searchText) is false && AddFunc != null)
+        {
+            possibleElementList.Add(new SelectorItemNew { Caption = searchText });
+        }
+
+        return possibleElementList;
+    }
+
+    private async Task<SelectorItem> CreateNewElement(string value)
+    {
+        await AddFunc!.Invoke(value);
+
+        return new SelectorItem { Caption = value };
+    }
+
+    private async Task OnValueChangedAsync(SelectorItemBase selectedItem)
+    {
+        if (selectedItem is SelectorItemNew)
+        {
+            var createdItem = await CreateNewElement(selectedItem.Caption);
+
+            SetValue(createdItem);
+        }
+        else
+        {
+            await WriteValueAsync(selectedItem);
+        }
+    }
+
+    private async Task OnBlurAsync(FocusEventArgs args)
+    {
+        await OnBlur.InvokeAsync(args);
+    }
+
+
+    private void SetValue(SelectorItem? item)
+    {
+        Task.Run(async () =>
+        {
+            await WriteValueAsync(item);
+            Touched = true;
+        });
+    }
+
+
+    protected override async Task WriteValueAsync(SelectorItemBase? value)
+    {
+        _setValueIsLocked = true;
+
+        await base.WriteValueAsync(value);
+        FieldChanged(value);
+        await ValueChanged.InvokeAsync(value as SelectorItem);
+
+        _setValueIsLocked = false;
+    }
+
+    protected override void OnConversionErrorOccurred(string error)
+    {
+        /* Descendants can override this method to catch conversion errors */
+    }
+
+    private string ItemToString(SelectorItemBase arg)
+    {
+        return arg switch
+        {
+            SelectorItem => arg.Caption,
+            SelectorItemNew => $"\"{arg.Caption}\" erstellen ...",
+            _ => throw new NotImplementedException()
+        };
+    }
+
+}

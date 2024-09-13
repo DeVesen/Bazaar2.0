@@ -4,6 +4,7 @@
 @using DeVesen.Bazaar.Client.Components.Common.Autocomplete
 @using DeVesen.Bazaar.Client.Components.Common.TextField
 @using DeVesen.Bazaar.Client.Extensions
+@using DeVesen.Bazaar.Client.Components.Manufacturer
 
 @inject ArticleValidator ArticleValidator
 @inject ArticleCategoryService ArticleCategoryService
@@ -36,13 +37,9 @@
                             SearchFunc="@CategoryAutoCompleteSearchAsync" />
         </MudItem>
         <MudItem xs="12" sm="5">
-            <DvAutocomplete T="string"
-                            Required
-                            Label="Hersteller"
-                            @bind-Value="ArticleItem.Manufacturer"
-                            For="@(() => ArticleItem.Manufacturer)"
-                            MaxItems="@AutocompleteMaxItems"
-                            SearchFunc="@ManufacturerAutoCompleteSearchAsync" />
+            <ManufacturerSelector Required
+                                  For="@(() => ArticleItem.Manufacturer)"
+                                  @bind-Value="ArticleItem.Manufacturer" />
         </MudItem>
         <MudItem xs="12" sm="12">
             <DvTextField T="string"
@@ -143,4 +140,6 @@
                 || value.Contains(category.Name.ToLower());
         }
     }
+
+
 }

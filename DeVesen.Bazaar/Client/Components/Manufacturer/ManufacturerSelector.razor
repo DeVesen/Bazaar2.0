@@ -1,0 +1,102 @@
+﻿@using DeVesen.Bazaar.Client.Models
+@using DeVesen.Bazaar.Client.Services
+@using DeVesen.Bazaar.Shared.Extensions
+
+@inherits MudFormComponent<string, string>
+
+@inject ManufacturerService ManufacturerService
+
+<CascadingValue Value="false" Name="SubscribeToParentForm" IsFixed>
+    <DvSelector Label="Hersteller"
+                Required="@Required"
+                RequiredError="@RequiredError"
+                ErrorText="@ErrorText"
+                Error="@Error"
+                ErrorId="@ErrorId"
+                Value="@ActualSelectorItem"
+                SearchFunc="SearchItemsAsync"
+                AddFunc="CreateNewElement"
+                ValueChanged="OnValueChangedAsync"
+                OnBlur="OnBlurAsync" />
+</CascadingValue>
+
+@code {
+    private bool _setValueIsLocked = false;
+
+    private DvSelector.SelectorItem? ActualSelectorItem =>
+        string.IsNullOrWhiteSpace(_value) is false
+            ? new DvSelector.SelectorItem { Caption = _value }
+            : null;
+
+    [Parameter]
+    public string? Value
+    {
+        get => _value;
+        set => SetValue(value);
+    }
+
+    [Parameter]
+    public EventCallback<string?> ValueChanged { get; set; }
+
+    [Parameter]
+    public EventCallback<FocusEventArgs> OnBlur { get; set; }
+
+    private async Task<IEnumerable<DvSelector.SelectorItem>> SearchItemsAsync(string searchText, CancellationToken cancellation)
+    {
+        var possibleElements = (await ManufacturerService.GetAllAsync()).Value;
+
+        if (string.IsNullOrWhiteSpace(searchText) is false)
+        {
+            possibleElements = possibleElements.Where(p => p.Name.BiContainsIgnoreCase(searchText));
+        }
+
+        var result = possibleElements.OrderBy(p => p.Name)
+            .Select(p => new DvSelector.SelectorItem { Caption = p.Name })
+            .ToArray();
+
+        return result;
+    }
+
+    private async Task<DvSelector.SelectorItem?> CreateNewElement(string value)
+    {
+        await ManufacturerService.CreateAsync(new Manufacturer { Name = value });
+
+        return new DvSelector.SelectorItem { Caption = value };
+    }
+
+
+    private async Task OnValueChangedAsync(DvSelector.SelectorItem? newValue)
+    {
+        await WriteValueAsync(newValue?.Caption);
+        await Validate();
+    }
+
+    private async Task OnBlurAsync(FocusEventArgs args)
+    {
+        await OnBlur.InvokeAsync(args);
+        await Validate();
+    }
+
+
+    protected override async Task WriteValueAsync(string? value)
+    {
+        _setValueIsLocked = true;
+
+        await base.WriteValueAsync(value);
+        FieldChanged(value);
+        await ValueChanged.InvokeAsync(value);
+        await Validate();
+
+        _setValueIsLocked = false;
+    }
+
+
+    private void SetValue(string? item)
+    {
+        if (_setValueIsLocked is false)
+        {
+            _value = item;
+            Touched = true;
+        }
+    }
+}
