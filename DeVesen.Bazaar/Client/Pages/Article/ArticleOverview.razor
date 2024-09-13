@@ -51,7 +51,6 @@
               Loading="@(ArticleState.Value.IsLoaded is false)"
               Items="@ArticleState.Value.Items"
               SortLabel="Sort By"
-              Height="68.8vh"
               OnRowClick="x => ModifyArticleAsync(x.Item!)">
         <HeaderContent>
             <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Number)">Nummer</MudTableSortLabel></MudTh>

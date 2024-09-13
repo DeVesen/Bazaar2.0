@@ -13,12 +13,13 @@
 @inject Services.DialogService DialogService
 
 <ArticleCategoryOverviewToolbar @bind-SearchText="@_searchText"
-                                @bind-SearchText:after="@ReloadElements"
+                                @bind-SearchText:after="@FetchArticleCategoryList"
                                 OnCreateBtnClick="@CreateArticleCategoryAsync" />
 
 <MudTable T="ArticleCategory"
           FixedHeader
           Hover
+          Loading="@(ArticleCategoryState.Value.IsLoaded is false)"
           Items="@ArticleCategoryState.Value.Items"
           SortLabel="Sort By"
           OnRowClick="ModifyArticleCategoryAsync">
@@ -38,6 +39,8 @@
     {
         await base.OnInitializedAsync();
 
+        FetchArticleCategoryList();
+
         TitleFacade.SetCaption("Kategorien");
     }
 
@@ -45,17 +48,17 @@
     {
         await DialogService.CreateArticleCategoryAsync();
         
-        ReloadElements();
+        FetchArticleCategoryList();
     }
 
     private async Task ModifyArticleCategoryAsync(TableRowClickEventArgs<ArticleCategory> args)
     {
         await DialogService.ModifyArticleCategoryAsync(args.Item!);
 
-        ReloadElements();
+        FetchArticleCategoryList();
     }
 
-    private void ReloadElements()
+    private void FetchArticleCategoryList()
     {
         ArticleCategoryFacade.Fetch();
 

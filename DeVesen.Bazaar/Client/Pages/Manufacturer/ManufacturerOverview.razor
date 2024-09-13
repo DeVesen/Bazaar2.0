@@ -13,12 +13,13 @@
 @inject Services.DialogService DialogService
 
 <ManufacturerOverviewToolbar @bind-SearchText="@_searchText"
-                             @bind-SearchText:after="@ReloadElements"
+                             @bind-SearchText:after="@FetchManufacturerList"
                              OnCreateBtnClick="@CreateManufacturerAsync" />
 
 <MudTable T="Manufacturer"
           FixedHeader
           Hover
+          Loading="@(ManufacturerState.Value.IsLoaded is false)"
           Items="@ManufacturerState.Value.Items"
           SortLabel="Sort By"
           OnRowClick="ModifyManufacturerAsync">
@@ -38,6 +39,8 @@
     {
         await base.OnInitializedAsync();
 
+        FetchManufacturerList();
+
         TitleFacade.SetCaption("Verkauf");
     }
 
@@ -45,17 +48,17 @@
     {
         await DialogService.CreateManufacturerAsync();
 
-        ReloadElements();
+        FetchManufacturerList();
     }
 
     private async Task ModifyManufacturerAsync(TableRowClickEventArgs<Manufacturer> args)
     {
         await DialogService.ModifyManufacturerAsync(args.Item!);
 
-        ReloadElements();
+        FetchManufacturerList();
     }
 
-    private void ReloadElements()
+    private void FetchManufacturerList()
     {
         ManufacturerFacade.Fetch();
     }

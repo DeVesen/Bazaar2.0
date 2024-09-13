@@ -74,7 +74,6 @@
                   Hover
                   Loading="@SettlementState.Value.IsLoading"
                   Items="@GetFilteredArticles()"
-                  Height="@TableHeight"
                   SortLabel="Sort By">
             <HeaderContent>
                 <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Number)">Nummer</MudTableSortLabel></MudTh>
@@ -119,9 +118,6 @@
             return result;
         }
     }
-
-    private string TableHeight
-        => HasArticlesToSettle is false || HasArticlesToGiveBack ? "59vh" : "66.9vh";
 
     private Vendor? _vendor;
     private string? _number;
