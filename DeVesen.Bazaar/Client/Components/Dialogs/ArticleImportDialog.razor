@@ -9,27 +9,24 @@
 
 <MudDialog>
     <DialogContent>
-        <div style="width: 350px">
+        <div style="width: 350px" class="d-flex flex-column gap-2">
             @if (HaveAnyItem is false)
             {
-                <MudGrid Spacing="1">
-                    <MudItem xs="12">
-
-                        @if (_isLoadingData)
-                        {
-                            <MudProgressLinear Color="Color.Secondary" Indeterminate Class="my-7"/>
-                        }
-                        else
-                        {
-                            <DvFileUpload OnFilesChanged="OnFilesChangedAsync"/>
-                        }
-
-                    </MudItem>
-                </MudGrid>
+                
+                @if (_isLoadingData)
+                {
+                    <MudProgressLinear Color="Color.Secondary" Indeterminate Class="my-7"/>
+                }
+                else
+                {
+                    <DvFileUpload OnFilesChanged="OnFilesChangedAsync"/>
+                    <MudSwitch @bind-Value="@_skipFirstRow" Label="Erste Zeile überspringen" LabelPosition="LabelPosition.Start" Color="Color.Warning" />
+                }
             }
             else if (EverythingImported is false)
             {
-            
+                <MudDivider />
+
                 <MudList T="string">
                     @foreach (var item in @ImportInfoItems)
                     {
@@ -71,15 +68,17 @@
 
     private bool _isLoadingData;
     private bool _importTried;
+    private bool _skipFirstRow = true;
 
     private void OnSave()
     {
         _importTried = true;
 
-        foreach (var article in ImportState.Value.Items.ToArray())
-        {
-            ImportFacade.ImportDataLine(article.LineIndex, article.Article!);
-        }
+        var linesToImport = ImportState.Value.Items.ToArray()
+            .Select(p => new ImportActions.ImportDataLine(p.LineIndex, p.Article!))
+            .ToArray();
+
+        ImportFacade.ImportDataLines(linesToImport);
     }
 
     private void OnClose()
@@ -96,17 +95,25 @@
         var reader = new StreamReader(fileStream);
 
         var line = await reader.ReadLineAsync();
-        var lineCount = 1;
+        var lineCounter = 1;
 
         while (line != null)
         {
-            ImportFacade.AnalyzeDataLine(VendorId, lineCount, line);
+            if (SkipRow(lineCounter) is false)
+            {
+                ImportFacade.AnalyzeDataLine(VendorId, lineCounter, line);
+            }
 
             line = await reader.ReadLineAsync();
-            lineCount++;
+            lineCounter++;
         }
 
         _isLoadingData = false;
+    }
+
+    private bool SkipRow(int lineIndex)
+    {
+        return lineIndex == 1 && _skipFirstRow;
     }
 
     private static Color GetListColor(ImportInfo line)

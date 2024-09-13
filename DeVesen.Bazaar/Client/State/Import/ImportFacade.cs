@@ -17,7 +17,7 @@ namespace DeVesen.Bazaar.Client.State.Import
         public void AnalyzeDataLine(string vendorId, int lineIndex, string lineData)
             => _dispatcher.Dispatch(new ImportActions.AnalyzeDataLine(vendorId, lineIndex, lineData));
 
-        public void ImportDataLine(int lineIndex, Models.Article article)
-            => _dispatcher.Dispatch(new ImportActions.ImportDataLine(lineIndex, article));
+        public void ImportDataLines(IEnumerable<ImportActions.ImportDataLine> lines)
+            => _dispatcher.Dispatch(new ImportActions.ImportDataLines(lines));
     }
 }

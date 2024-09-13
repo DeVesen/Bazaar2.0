@@ -57,6 +57,15 @@ public class ImportEffects
     }
 
     [EffectMethod]
+    public async Task ImportDataLinesAsync(ImportActions.ImportDataLines action, IDispatcher dispatcher)
+    {
+        foreach (var line in action.Lines)
+        {
+            dispatcher.Dispatch(line);
+        }
+    }
+
+    [EffectMethod]
     public async Task ImportDataLineAsync(ImportActions.ImportDataLine action, IDispatcher dispatcher)
     {
         var result = await _articleService.CreateAsync(action.Article, false);
@@ -68,7 +77,7 @@ public class ImportEffects
     {
         var lineParts = line.Split([";"], StringSplitOptions.None);
 
-        if (lineParts.Length is not 5 or 6)
+        if (lineParts.Length < 5)
         {
             value = null!;
             return false;
@@ -78,9 +87,9 @@ public class ImportEffects
         {
             VendorId = vendorId,
             Number = int.Parse(lineParts[0]),
-            ArticleCategory = lineParts[1],
-            Manufacturer = lineParts[2],
-            Description = lineParts[3],
+            Description = lineParts[1],
+            ArticleCategory = lineParts[2],
+            Manufacturer = lineParts[3],
 
             Price01 = double.Parse(lineParts[4]),
             Price02 = lineParts.Length == 6 && double.TryParse(lineParts[5], out var price02Val) ? price02Val : null,
