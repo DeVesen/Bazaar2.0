@@ -1,12 +1,13 @@
 ﻿using Fluxor;
+using static DeVesen.Bazaar.Client.State.SalesCart.SalesCartActions;
 
 namespace DeVesen.Bazaar.Client.State.SalesCart;
 
 
 [FeatureState]
-public record SalesCartState(IEnumerable<PurchaseItem> PurchaseItems)
+public record SalesCartState(IEnumerable<PurchaseItem> PurchaseItems, IEnumerable<CriticalWarning> CriticalWarnings, bool BookingInProcess)
 {
-    private SalesCartState() : this(Enumerable.Empty<PurchaseItem>()) { }
+    private SalesCartState() : this([], [], false) { }
 }
 
 
@@ -16,3 +17,5 @@ public record PurchaseItem
     public required double SalesAmount { get; init; }
     public required Models.Article Article { get; init; }
 }
+
+public record CriticalWarning(long ArticleNumber, string Reason);

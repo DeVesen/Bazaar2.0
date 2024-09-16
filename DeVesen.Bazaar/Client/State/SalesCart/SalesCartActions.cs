@@ -12,7 +12,10 @@ public class SalesCartActions
 
     public record RemoveItemFromCart(long ArticleNumber);
 
-    public record CompleteSale;
+    public record BookSale;
 
-    public record SaleCompleted;
+    public record BookSaleCompleted;
+
+
+    public record AddCriticalWarning(CriticalWarning Warning);
 }

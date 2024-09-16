@@ -7,13 +7,13 @@ public class SalesCartReducer
     [ReducerMethod(typeof(SalesCartActions.ClearCart))]
     public static SalesCartState ClearCart(SalesCartState state)
     {
-        return state with { PurchaseItems = Enumerable.Empty<PurchaseItem>() };
+        return state with { PurchaseItems = [], CriticalWarnings = [], BookingInProcess = false };
     }
 
-    [ReducerMethod(typeof(SalesCartActions.SaleCompleted))]
+    [ReducerMethod(typeof(SalesCartActions.BookSaleCompleted))]
     public static SalesCartState SaleCompleted(SalesCartState state)
     {
-        return state with { PurchaseItems = Enumerable.Empty<PurchaseItem>() };
+        return state with { PurchaseItems = Enumerable.Empty<PurchaseItem>(), BookingInProcess = false };
     }
 
     [ReducerMethod]
@@ -39,5 +39,31 @@ public class SalesCartReducer
         tmpPurchaseItems.RemoveAll(p => p.ArticleNumber == action.ArticleNumber);
 
         return state with { PurchaseItems = tmpPurchaseItems };
+    }
+
+    [ReducerMethod(typeof(SalesCartActions.BookSale))]
+    public static SalesCartState BookSale(SalesCartState state)
+    {
+        return state with { BookingInProcess = true };
+    }
+
+    [ReducerMethod]
+    public static SalesCartState AddCriticalWarning(SalesCartState state, SalesCartActions.AddCriticalWarning action)
+    {
+        if (state.BookingInProcess || state.PurchaseItems.Any() is false)
+        {
+            return state;
+        }
+
+        var criticalWarnings = state.CriticalWarnings.ToList();
+
+        if (criticalWarnings.Any(p => p.ArticleNumber == action.Warning.ArticleNumber))
+        {
+            return state;
+        }
+
+        criticalWarnings.Add(action.Warning);
+
+        return state with { CriticalWarnings = criticalWarnings };
     }
 }

@@ -10,6 +10,7 @@
     private IDisposable _addedActionHandle = null!;
     private IDisposable _updatedActionHandle = null!;
     private IDisposable _removedActionHandle = null!;
+    private IDisposable _statusChangedActionHandle = null!;
 
     [Parameter]
     public EventCallback<ArticleAddedInfo> Added { get; set; }
@@ -32,7 +33,7 @@
         _addedActionHandle = ArticleHub.RegisterOnAdded(OnAdded);
         _updatedActionHandle = ArticleHub.RegisterOnUpdated(OnUpdated);
         _removedActionHandle = ArticleHub.RegisterOnRemoved(OnRemoved);
-        _removedActionHandle = ArticleHub.RegisterOnStatusChanged(OnStatusChanged);
+        _statusChangedActionHandle = ArticleHub.RegisterOnStatusChanged(OnStatusChanged);
     }
 
     private void OnAdded(ArticleAddedInfo args)
@@ -60,6 +61,7 @@
         // _addedActionHandle.Dispose();
         // _updatedActionHandle.Dispose();
         // _removedActionHandle.Dispose();
+        // _statusChangedActionHandle.Dispose();
 
         await ArticleHub.StopAsync();
     }

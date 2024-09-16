@@ -21,11 +21,22 @@
 <ArticleHubActionHandler Updated="OnArticleUpdated" Removed="OnArticleRemoved" StatusChanged="OnStatusChanged" />
 
 <div class="d-flex flex-column gap-4 px-1">
-    @if (string.IsNullOrWhiteSpace(_criticalWarningAlertText) is false)
+    @if (CriticalWarnings.Any())
     {
         <MudAlert Variant="Variant.Filled"
                   Severity="Severity.Error"
-                  ContentAlignment="HorizontalAlignment.Center">@_criticalWarningAlertText</MudAlert>
+                  ContentAlignment="HorizontalAlignment.Center">
+            <MudText Typo="Typo.h5">Einer Ihrer Artikel wurde verändert, bitte Warenkorb neu anlegen!</MudText>
+            @foreach(var warningItem in CriticalWarnings)
+            {
+                <div class="d-flex">
+                    <MudText Style="width: 200px;">@warningItem.ArticleNumber</MudText>
+                    <MudText>@warningItem.Reason</MudText>
+                </div>
+            }
+        </MudAlert>
+
+        <MudButton Color="Color.Error" OnClick="@SalesCartFacade.ClearCart">Neu anlegen</MudButton>
     }
     else
     {
@@ -123,6 +134,8 @@
     private IEnumerable<PurchaseItem> ItemsInCart => SalesCartState.Value.PurchaseItems.OrderBy(p => p.ArticleNumber);
     private double ValueOfGoods => ItemsInCart.Sum(p => p.SalesAmount);
 
+    private IEnumerable<CriticalWarning> CriticalWarnings => SalesCartState.Value.CriticalWarnings;
+
     private DvTextField<long?>? _articleNumberRef;
 
     private long? _articleNumber;
@@ -131,14 +144,23 @@
     private Severity _articleAlertSeverity = Severity.Normal;
     private Variant _articleAlertVariant = Variant.Text;
     private string _articleAlertText = "Bitte Artikelnummer eingeben ...";
-    private string _criticalWarningAlertText = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
 
         TitleFacade.SetCaption("Verkauf");
+
+        SalesCartFacade.ClearCart();
     }
+
+    protected override void Dispose(bool disposing)
+    {
+        base.Dispose(disposing);
+
+        SalesCartFacade.ClearCart();
+    }
+
 
     private async Task OnArticleSearchKeyUpAsync(KeyboardEventArgs args)
     {
@@ -210,7 +232,7 @@
 
     private async Task DispatchedActionCallback(object action)
     {
-        if (action is SalesCartActions.AddItemToCart or SalesCartActions.ClearCart or SalesCartActions.RemoveItemFromCart or SalesCartActions.SaleCompleted)
+        if (action is SalesCartActions.AddItemToCart or SalesCartActions.ClearCart or SalesCartActions.RemoveItemFromCart or SalesCartActions.BookSaleCompleted)
         {
             if (action is SalesCartActions.AddItemToCart toCart)
             {
@@ -321,22 +343,31 @@
 
     private void OnArticleUpdated(ArticleUpdatedInfo args)
     {
-        if (SalesCartState.Value.PurchaseItems.Any(p => p.ArticleNumber == args.ArticleNumber))
-        {
-            _criticalWarningAlertText = "Einer Ihrer Artikel wurde verändert, bitte Warenkorb neu anlegen";
-        }
+        SalesCartFacade.AddCriticalWarning(args.ArticleNumber, "Artikel wurde verändert!");
     }
 
     private void OnArticleRemoved(ArticleRemovedInfo args)
     {
         if (SalesCartState.Value.PurchaseItems.Any(p => p.ArticleNumber == args.ArticleNumber))
         {
-            _criticalWarningAlertText = "Einer Ihrer Artikel wurde gelöscht, bitte Warenkorb neu anlegen";
+            SalesCartFacade.AddCriticalWarning(args.ArticleNumber, "Artikel wurde gelöscht!");
         }
     }
 
     private void OnStatusChanged(ArticleStatusChangedInfo args)
     {
-        _criticalWarningAlertText = "Einer Ihrer Artikel wurde verändert, bitte Warenkorb neu anlegen";
+        if (SalesCartState.Value.PurchaseItems.Any(p => p.ArticleNumber == args.ArticleNumber))
+        {
+            var procedure = args.Field switch
+            {
+                ArticleStatusChangedInfo.ChangedField.Approved => "Freigegeben",
+                ArticleStatusChangedInfo.ChangedField.Sold => "Verkauft",
+                ArticleStatusChangedInfo.ChangedField.Returned => "Zurückgegeben",
+                ArticleStatusChangedInfo.ChangedField.Settled => "Abgerechnet",
+                _ => string.Empty
+            };
+
+            SalesCartFacade.AddCriticalWarning(args.ArticleNumber, $"Artikel wurde verändert: {procedure}");
+        }
     }
 }

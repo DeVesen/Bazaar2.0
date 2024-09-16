@@ -23,5 +23,8 @@ public class SalesCartFacade
         => Dispatcher.Dispatch(new SalesCartActions.RemoveItemFromCart(articleNumber));
 
     public void CompleteSale()
-        => Dispatcher.Dispatch(new SalesCartActions.CompleteSale());
+        => Dispatcher.Dispatch(new SalesCartActions.BookSale());
+
+    public void AddCriticalWarning(long articleNumber, string reason)
+        => Dispatcher.Dispatch(new SalesCartActions.AddCriticalWarning(new CriticalWarning(articleNumber, reason)));
 }

@@ -16,7 +16,7 @@ public class SalesCartEffects
     }
 
     [EffectMethod]
-    public Task AnalyzeDataLineAsync(SalesCartActions.RequestItemToCart action, IDispatcher dispatcher)
+    public Task RequestItemToCart(SalesCartActions.RequestItemToCart action, IDispatcher dispatcher)
     {
         if (_state.Value.PurchaseItems.Any(p => p.ArticleNumber == action.ArticleNumber))
         {
@@ -30,8 +30,8 @@ public class SalesCartEffects
         return Task.CompletedTask;
     }
 
-    [EffectMethod(typeof(SalesCartActions.CompleteSale))]
-    public async Task AnalyzeDataLineAsync(IDispatcher dispatcher)
+    [EffectMethod(typeof(SalesCartActions.BookSale))]
+    public async Task BookSale(IDispatcher dispatcher)
     {
         var soldItems =
             _state.Value.PurchaseItems
@@ -40,6 +40,6 @@ public class SalesCartEffects
 
         await _articleService.BookOrderAsync(soldItems);
 
-        dispatcher.Dispatch(new SalesCartActions.SaleCompleted());
+        dispatcher.Dispatch(new SalesCartActions.BookSaleCompleted());
     }
 }
