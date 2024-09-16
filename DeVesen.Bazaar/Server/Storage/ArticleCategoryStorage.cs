@@ -1,16 +1,19 @@
 ﻿using DeVesen.Bazaar.Server.Contracts;
 using DeVesen.Bazaar.Server.Domain;
 using DeVesen.Bazaar.Server.Extensions;
+using DeVesen.Bazaar.Server.Hubs;
 
 namespace DeVesen.Bazaar.Server.Storage
 {
     public class ArticleCategoryStorage
     {
         private readonly IArticleCategoryRepository _articleCategoryRepository;
+        private readonly ArticleCategoryHubContext _articleCategoryHubContext;
 
-        public ArticleCategoryStorage(IArticleCategoryRepository articleCategoryRepository)
+        public ArticleCategoryStorage(IArticleCategoryRepository articleCategoryRepository, ArticleCategoryHubContext articleCategoryHubContext)
         {
             _articleCategoryRepository = articleCategoryRepository;
+            _articleCategoryHubContext = articleCategoryHubContext;
         }
 
         public async Task<bool> ExistByIdAsync(string id)
@@ -68,6 +71,8 @@ namespace DeVesen.Bazaar.Server.Storage
             }
 
             await _articleCategoryRepository.CreateAsync(element.ToEntity());
+
+            await _articleCategoryHubContext.SendAdded();
         }
 
         public async Task UpdateAsync(ArticleCategory element)
@@ -87,6 +92,8 @@ namespace DeVesen.Bazaar.Server.Storage
             }
 
             await _articleCategoryRepository.UpdateAsync(element.ToEntity());
+
+            await _articleCategoryHubContext.SendUpdated(element.Id);
         }
 
         public async Task DeleteAsync(string id)
@@ -97,6 +104,8 @@ namespace DeVesen.Bazaar.Server.Storage
             }
 
             await _articleCategoryRepository.DeleteAsync(id);
+
+            await _articleCategoryHubContext.SendRemoved(id);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using DeVesen.Bazaar.Server.Contracts;
 using DeVesen.Bazaar.Server.Domain;
 using DeVesen.Bazaar.Server.Extensions;
+using DeVesen.Bazaar.Server.Hubs;
 using DeVesen.Bazaar.Shared.Extensions;
 
 namespace DeVesen.Bazaar.Server.Storage;
@@ -9,11 +10,13 @@ public class VendorStorage
 {
     private readonly IVendorRepository _vendorRepository;
     private readonly IArticleRepository _articleRepository;
+    private readonly VendorHubContext _vendorHubContext;
 
-    public VendorStorage(IVendorRepository vendorRepository, IArticleRepository articleRepository)
+    public VendorStorage(IVendorRepository vendorRepository, IArticleRepository articleRepository, VendorHubContext vendorHubContext)
     {
         _vendorRepository = vendorRepository;
         _articleRepository = articleRepository;
+        _vendorHubContext = vendorHubContext;
     }
 
     public async Task<bool> ExistByIdAsync(string id)
@@ -50,6 +53,8 @@ public class VendorStorage
         }
 
         await _vendorRepository.CreateAsync(element.ToEntity());
+
+        await _vendorHubContext.SendAdded();
     }
 
     public async Task UpdateAsync(Vendor element)
@@ -60,6 +65,8 @@ public class VendorStorage
         }
 
         await _vendorRepository.UpdateAsync(element.ToEntity());
+
+        await _vendorHubContext.SendUpdated(element.Id);
     }
 
     public async Task DeleteAsync(string id)
@@ -72,6 +79,8 @@ public class VendorStorage
         await DeleteRelatedArticles(id);
 
         await _vendorRepository.DeleteAsync(id);
+
+        await _vendorHubContext.SendRemoved(id);
     }
 
     private async Task DeleteRelatedArticles(string vendorId)

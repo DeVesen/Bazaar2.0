@@ -6,6 +6,8 @@
 @using DeVesen.Bazaar.Client.Components.Common.Buttons
 @using DeVesen.Bazaar.Client.Components.Common
 @using DeVesen.Bazaar.Client.Components.Common.TextField
+@using DeVesen.Bazaar.Client.Components.HubHandler
+@using DeVesen.Bazaar.Shared.Events
 
 @page "/Sales"
 
@@ -16,83 +18,94 @@
 @inject SalesCartFacade SalesCartFacade;
 @inject IState<SalesCartState> SalesCartState;
 
+<ArticleHubActionHandler Updated="OnArticleUpdated" Removed="OnArticleRemoved" StatusChanged="OnStatusChanged" />
+
 <div class="d-flex flex-column gap-4 px-1">
-    <MudGrid>
-        <MudItem xs="12" md="6">
-            <MudGrid Spacing="2">
-                <MudItem xs="12" sm="6">
-                    <DvTextField @ref="_articleNumberRef"
-                                 T="long?"
-                                 Label="Nummer"
-                                 InputMode="InputMode.numeric"
-                                 Margin="Margin.None"
-                                 DebounceInterval="0"
-                                 @bind-Value="_articleNumber"
-                                 @bind-Value:after="@OnArticleSearchAsync"
-                                 OnKeyUp="@OnArticleSearchKeyUpAsync" />
-                </MudItem>
-                <MudItem xs="6" sm="3">
-                    <DvButtonSalesPrice Disabled="@Price01BtnDisabled"
-                                        Value="_article?.Price01"
-                                        Style="min-height: 62px; font-size: 26px"
-                                        Color="@Color.Primary"
-                                        OnClick="() => OnArticlePriceClickAsync(_article!, _article!.Price01)" />
-                </MudItem>
-                <MudItem xs="6" sm="3">
-                    <DvButtonSalesPrice Disabled="@Price02BtnDisabled"
-                                        Value="_article?.Price02"
-                                        Style="min-height: 62px; font-size: 20px"
-                                        Color="@Color.Primary"
-                                        Variant="@Variant.Outlined"
-                                        OnClick="() => OnArticlePriceClickAsync(_article!, _article!.Price02!.Value)"/>
-                </MudItem>
-                <MudItem xs="12">
-                    <MudAlert Dense
-                              Square
-                              NoIcon="@_articleAlertNoIcon"
-                              Variant="@_articleAlertVariant"
-                              Severity="@_articleAlertSeverity"
-                              ContentAlignment="HorizontalAlignment.Center">@_articleAlertText</MudAlert>
-                </MudItem>
-            </MudGrid>
-        </MudItem>
-        
-        @if (HasItemsInCart)
-        {
+    @if (string.IsNullOrWhiteSpace(_criticalWarningAlertText) is false)
+    {
+        <MudAlert Variant="Variant.Filled"
+                  Severity="Severity.Error"
+                  ContentAlignment="HorizontalAlignment.Center">@_criticalWarningAlertText</MudAlert>
+    }
+    else
+    {
+        <MudGrid>
             <MudItem xs="12" md="6">
                 <MudGrid Spacing="2">
+                    <MudItem xs="12" sm="6">
+                        <DvTextField @ref="_articleNumberRef"
+                                     T="long?"
+                                     Label="Nummer"
+                                     InputMode="InputMode.numeric"
+                                     Margin="Margin.None"
+                                     DebounceInterval="0"
+                                     @bind-Value="_articleNumber"
+                                     @bind-Value:after="@OnArticleSearchAsync"
+                                     OnKeyUp="@OnArticleSearchKeyUpAsync"/>
+                    </MudItem>
+                    <MudItem xs="6" sm="3">
+                        <DvButtonSalesPrice Disabled="@Price01BtnDisabled"
+                                            Value="_article?.Price01"
+                                            Style="min-height: 62px; font-size: 26px"
+                                            Color="@Color.Primary"
+                                            OnClick="() => OnArticlePriceClickAsync(_article!, _article!.Price01)"/>
+                    </MudItem>
+                    <MudItem xs="6" sm="3">
+                        <DvButtonSalesPrice Disabled="@Price02BtnDisabled"
+                                            Value="_article?.Price02"
+                                            Style="min-height: 62px; font-size: 20px"
+                                            Color="@Color.Primary"
+                                            Variant="@Variant.Outlined"
+                                            OnClick="() => OnArticlePriceClickAsync(_article!, _article!.Price02!.Value)"/>
+                    </MudItem>
                     <MudItem xs="12">
-                        <MudStack>
-                            @foreach (var item in ItemsInCart)
-                            {
-                                <ArticleInCartItem Item="item" OnRemoveClick="x => SalesCartFacade.RemoveItemFromCart(x)"/>
-                            }
-                        </MudStack>
-                    </MudItem>
-                    <MudItem xs="4">
-                        <MudField Label="Summe" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.TwoTone.Euro" Variant="Variant.Filled">@ValueOfGoods</MudField>
-                    </MudItem>
-                    <MudSpacer/>
-                    <MudItem xs="4" Class="d-flex justify-end gap-2">
-                        <MudIconButton Disabled="@(HasItemsInCart is false)"
-                                       Icon="@Icons.Material.TwoTone.Delete"
-                                       Variant="Variant.Filled"
-                                       Color="Color.Primary"
-                                       Size="Size.Large"
-                                       OnClick="@OnClearCartClicked"
-                                       Class="p-3"/>
-                        <MudIconButton Disabled="@(HasItemsInCart is false)"
-                                       Icon="@Icons.Material.TwoTone.Euro"
-                                       Variant="Variant.Filled"
-                                       Color="Color.Primary"
-                                       Size="Size.Large"
-                                       OnClick="@OnCompleteSaleClicked"
-                                       Class="p-3" />
+                        <MudAlert Dense
+                                  Square
+                                  NoIcon="@_articleAlertNoIcon"
+                                  Variant="@_articleAlertVariant"
+                                  Severity="@_articleAlertSeverity"
+                                  ContentAlignment="HorizontalAlignment.Center">@_articleAlertText</MudAlert>
                     </MudItem>
                 </MudGrid>
             </MudItem>
-        }
-    </MudGrid>
+
+            @if (HasItemsInCart)
+            {
+                <MudItem xs="12" md="6">
+                    <MudGrid Spacing="2">
+                        <MudItem xs="12">
+                            <MudStack>
+                                @foreach (var item in ItemsInCart)
+                                {
+                                    <ArticleInCartItem Item="item" OnRemoveClick="x => SalesCartFacade.RemoveItemFromCart(x)"/>
+                                }
+                            </MudStack>
+                        </MudItem>
+                        <MudItem xs="4">
+                            <MudField Label="Summe" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.TwoTone.Euro" Variant="Variant.Filled">@ValueOfGoods</MudField>
+                        </MudItem>
+                        <MudSpacer/>
+                        <MudItem xs="4" Class="d-flex justify-end gap-2">
+                            <MudIconButton Disabled="@(HasItemsInCart is false)"
+                                           Icon="@Icons.Material.TwoTone.Delete"
+                                           Variant="Variant.Filled"
+                                           Color="Color.Primary"
+                                           Size="Size.Large"
+                                           OnClick="@OnClearCartClicked"
+                                           Class="p-3"/>
+                            <MudIconButton Disabled="@(HasItemsInCart is false)"
+                                           Icon="@Icons.Material.TwoTone.Euro"
+                                           Variant="Variant.Filled"
+                                           Color="Color.Primary"
+                                           Size="Size.Large"
+                                           OnClick="@OnCompleteSaleClicked"
+                                           Class="p-3"/>
+                        </MudItem>
+                    </MudGrid>
+                </MudItem>
+            }
+        </MudGrid>
+    }
 </div>
 
 <DispatchedAction Callback="DispatchedActionCallback" />
@@ -118,6 +131,7 @@
     private Severity _articleAlertSeverity = Severity.Normal;
     private Variant _articleAlertVariant = Variant.Text;
     private string _articleAlertText = "Bitte Artikelnummer eingeben ...";
+    private string _criticalWarningAlertText = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -131,7 +145,7 @@
         if (args.Key == "Enter")
         {
             await OnArticleSearchAsync();
-            
+
             await SelectArticleNumberInput();
         }
     }
@@ -143,7 +157,7 @@
             _article = null;
             return;
         }
-        
+
         _article = (await ArticleService.GetByNumber(_articleNumber.Value)).Value;
 
         if (_article == null)
@@ -205,14 +219,14 @@
 
             _articleNumber = null;
             _article = null;
-            
+
             await SelectArticleNumberInput();
         }
 
         if (action is SalesCartActions.AddItemToCartFailed failedInfo)
         {
             ShowErrorArticleSelectionMessage(failedInfo.Message);
-            
+
             await SelectArticleNumberInput();
         }
     }
@@ -273,10 +287,10 @@
         {
             SalesCartFacade.ClearCart();
         }
-        
+
         _articleNumber = null;
         _article = null;
-            
+
         await SelectArticleNumberInput();
     }
 
@@ -297,11 +311,32 @@
         {
             SalesCartFacade.CompleteSale();
         }
-        
+
         _articleNumber = null;
         _article = null;
-            
+
         await SelectArticleNumberInput();
     }
 
+
+    private void OnArticleUpdated(ArticleUpdatedInfo args)
+    {
+        if (SalesCartState.Value.PurchaseItems.Any(p => p.ArticleNumber == args.ArticleNumber))
+        {
+            _criticalWarningAlertText = "Einer Ihrer Artikel wurde verändert, bitte Warenkorb neu anlegen";
+        }
+    }
+
+    private void OnArticleRemoved(ArticleRemovedInfo args)
+    {
+        if (SalesCartState.Value.PurchaseItems.Any(p => p.ArticleNumber == args.ArticleNumber))
+        {
+            _criticalWarningAlertText = "Einer Ihrer Artikel wurde gelöscht, bitte Warenkorb neu anlegen";
+        }
+    }
+
+    private void OnStatusChanged(ArticleStatusChangedInfo args)
+    {
+        _criticalWarningAlertText = "Einer Ihrer Artikel wurde verändert, bitte Warenkorb neu anlegen";
+    }
 }

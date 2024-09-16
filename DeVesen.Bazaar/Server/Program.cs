@@ -1,6 +1,7 @@
 using DeVesen.Bazaar.Server;
 using DeVesen.Bazaar.Server.Contracts;
 using DeVesen.Bazaar.Server.Extensions;
+using DeVesen.Bazaar.Server.Hubs;
 using DeVesen.Bazaar.Server.Repository.LiteDb;
 using DeVesen.Bazaar.Server.Services;
 using DeVesen.Bazaar.Server.Storage;
@@ -18,6 +19,11 @@ builder.Services.AddSingleton<ILiteDbEngine, LiteDbEngine>(_ => new LiteDbEngine
 
 builder.Services.AddTransient<SystemClock>();
 
+builder.Services.AddTransient<VendorHubContext>();
+builder.Services.AddTransient<ArticleHubContext>();
+builder.Services.AddTransient<ArticleCategoryHubContext>();
+builder.Services.AddTransient<ManufacturerHubContext>();
+
 builder.Services.AddTransient<IArticleCategoryRepository, ArticleCategoryLiteDbRepository>()
                 .AddTransient<IManufacturerRepository, ManufacturerLiteDbRepository>()
                 .AddTransient<IVendorRepository, VendorLiteDbRepository>()
@@ -34,6 +40,8 @@ builder.Services.AddTransient<ArticleCategoryValidator>()
                 .AddTransient<ArticleValidator>();
 
 builder.Services.AddSingleton<ArticleNumberService>();
+
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
@@ -61,6 +69,12 @@ app.UseRouting();
 
 app.MapRazorPages();
 app.MapControllers();
+
+app.MapHub<VendorHub>("/DataSync/Vendor");
+app.MapHub<ArticleHub>("/DataSync/Article");
+app.MapHub<ManufacturerHub>("/DataSync/Manufacturer");
+app.MapHub<ArticleCategoryHub>("/DataSync/ArticleCategory");
+
 app.MapFallbackToFile("index.html");
 
 app.Run();

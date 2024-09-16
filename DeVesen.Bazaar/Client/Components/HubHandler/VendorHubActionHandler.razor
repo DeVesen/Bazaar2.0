@@ -1,0 +1,57 @@
+﻿@using DeVesen.Bazaar.Client.Extensions
+
+@implements IAsyncDisposable;
+
+@inject VendorHubConnectionService VendorHub;
+
+@code {
+
+    private IDisposable _addedActionHandle = null!;
+    private IDisposable _updatedActionHandle = null!;
+    private IDisposable _removedActionHandle = null!;
+
+    [Parameter]
+    public EventCallback Added { get; set; }
+
+    [Parameter]
+    public EventCallback<string> Updated { get; set; }
+
+    [Parameter]
+    public EventCallback<string> Removed { get; set; }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        await VendorHub.StartAsync();
+        
+        _addedActionHandle = VendorHub.RegisterOnAdded(OnAdded);
+        _updatedActionHandle = VendorHub.RegisterOnUpdated(OnUpdated);
+        _removedActionHandle = VendorHub.RegisterOnRemoved(OnRemoved);
+    }
+
+    private void OnAdded()
+    {
+        Added.InvokeAsync();
+    }
+
+    private void OnUpdated(string id)
+    {
+        Updated.InvokeAsync(id);
+    }
+
+    private void OnRemoved(string id)
+    {
+        Removed.InvokeAsync(id);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        // _addedActionHandle.Dispose();
+        // _updatedActionHandle.Dispose();
+        // _removedActionHandle.Dispose();
+
+        await VendorHub.StopAsync();
+    }
+
+}

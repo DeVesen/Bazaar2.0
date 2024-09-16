@@ -5,6 +5,7 @@
 @using DeVesen.Bazaar.Client.Pages.Vendor.Components
 @using DeVesen.Bazaar.Client.State.Title
 @using DeVesen.Bazaar.Client.State.VendorView
+@using DeVesen.Bazaar.Client.Components.HubHandler
 
 @page "/vendors"
 
@@ -16,6 +17,9 @@
 @inject TitleFacade TitleFacade
 @inject VendorViewFacade VendorFacade
 @inject IState<VendorViewState> VendorState
+
+<VendorHubActionHandler Added="FetchVendorList" Updated="FetchVendorList" Removed="FetchVendorList" />
+<ArticleHubActionHandler Added="FetchVendorList" Updated="FetchVendorList" Removed="FetchVendorList" />
 
 <div class="d-flex flex-column gap-4 px-1">
     <MudToolBar WrapContent Dense Gutters="false">
@@ -88,11 +92,10 @@
         await Task.CompletedTask;
     }
 
+
     private void OnSearchChanged(string newValue)
     {
         _searchText = newValue;
-
-        FetchVendorList();
     }
 
     private void OnGenderChanged(ToolBarGenederSelect.GenderType newGenderType)

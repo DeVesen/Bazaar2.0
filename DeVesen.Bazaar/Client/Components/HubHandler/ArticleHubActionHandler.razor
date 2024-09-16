@@ -1,0 +1,67 @@
+﻿@using DeVesen.Bazaar.Client.Extensions
+@using DeVesen.Bazaar.Shared.Events
+
+@implements IAsyncDisposable;
+
+@inject ArticleHubConnectionService ArticleHub;
+
+@code {
+
+    private IDisposable _addedActionHandle = null!;
+    private IDisposable _updatedActionHandle = null!;
+    private IDisposable _removedActionHandle = null!;
+
+    [Parameter]
+    public EventCallback<ArticleAddedInfo> Added { get; set; }
+
+    [Parameter]
+    public EventCallback<ArticleUpdatedInfo> Updated { get; set; }
+
+    [Parameter]
+    public EventCallback<ArticleRemovedInfo> Removed { get; set; }
+
+    [Parameter]
+    public EventCallback<ArticleStatusChangedInfo> StatusChanged { get; set; }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        await ArticleHub.StartAsync();
+        
+        _addedActionHandle = ArticleHub.RegisterOnAdded(OnAdded);
+        _updatedActionHandle = ArticleHub.RegisterOnUpdated(OnUpdated);
+        _removedActionHandle = ArticleHub.RegisterOnRemoved(OnRemoved);
+        _removedActionHandle = ArticleHub.RegisterOnStatusChanged(OnStatusChanged);
+    }
+
+    private void OnAdded(ArticleAddedInfo args)
+    {
+        Added.InvokeAsync(args);
+    }
+
+    private void OnUpdated(ArticleUpdatedInfo args)
+    {
+        Updated.InvokeAsync(args);
+    }
+
+    private void OnRemoved(ArticleRemovedInfo args)
+    {
+        Removed.InvokeAsync(args);
+    }
+
+    private void OnStatusChanged(ArticleStatusChangedInfo args)
+    {
+        StatusChanged.InvokeAsync(args);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        // _addedActionHandle.Dispose();
+        // _updatedActionHandle.Dispose();
+        // _removedActionHandle.Dispose();
+
+        await ArticleHub.StopAsync();
+    }
+
+}

@@ -2,6 +2,7 @@
 @using DeVesen.Bazaar.Client.Pages.Manufacturer.Components
 @using DeVesen.Bazaar.Client.State.Manufacturer
 @using DeVesen.Bazaar.Client.State.Title
+@using DeVesen.Bazaar.Client.Components.HubHandler
 
 @page "/article-manufacturer"
 
@@ -11,6 +12,8 @@
 @inject ManufacturerFacade ManufacturerFacade
 @inject IState<ManufacturerState> ManufacturerState
 @inject Services.DialogService DialogService
+
+<ManufacturerHubActionHandler Added="FetchManufacturerList" Updated="FetchManufacturerList" Removed="FetchManufacturerList" />
 
 <ManufacturerOverviewToolbar @bind-SearchText="@_searchText"
                              @bind-SearchText:after="@FetchManufacturerList"

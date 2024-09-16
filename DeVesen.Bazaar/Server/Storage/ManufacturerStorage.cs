@@ -1,16 +1,19 @@
 ﻿using DeVesen.Bazaar.Server.Contracts;
 using DeVesen.Bazaar.Server.Domain;
 using DeVesen.Bazaar.Server.Extensions;
+using DeVesen.Bazaar.Server.Hubs;
 
 namespace DeVesen.Bazaar.Server.Storage;
 
 public class ManufacturerStorage
 {
     private readonly IManufacturerRepository _manufacturerRepository;
+    private readonly ManufacturerHubContext _manufacturerHubContext;
 
-    public ManufacturerStorage(IManufacturerRepository manufacturerRepository)
+    public ManufacturerStorage(IManufacturerRepository manufacturerRepository, ManufacturerHubContext manufacturerHubContext)
     {
         _manufacturerRepository = manufacturerRepository;
+        _manufacturerHubContext = manufacturerHubContext;
     }
 
     public async Task<bool> ExistByIdAsync(string id)
@@ -68,6 +71,8 @@ public class ManufacturerStorage
         }
 
         await _manufacturerRepository.CreateAsync(element.ToEntity());
+
+        await _manufacturerHubContext.SendAdded();
     }
 
     public async Task UpdateAsync(Manufacturer element)
@@ -87,6 +92,8 @@ public class ManufacturerStorage
         }
 
         await _manufacturerRepository.UpdateAsync(element.ToEntity());
+
+        await _manufacturerHubContext.SendUpdated(element.Id);
     }
 
     public async Task DeleteAsync(string id)
@@ -97,5 +104,7 @@ public class ManufacturerStorage
         }
 
         await _manufacturerRepository.DeleteAsync(id);
+
+        await _manufacturerHubContext.SendRemoved(id);
     }
 }

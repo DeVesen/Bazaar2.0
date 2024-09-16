@@ -2,6 +2,7 @@
 @using DeVesen.Bazaar.Client.Pages.ArticleCategory.Components
 @using DeVesen.Bazaar.Client.State.ArticleCategory
 @using DeVesen.Bazaar.Client.State.Title
+@using DeVesen.Bazaar.Client.Components.HubHandler
 
 @page "/article-category"
 
@@ -11,6 +12,8 @@
 @inject ArticleCategoryFacade ArticleCategoryFacade
 @inject IState<ArticleCategoryState> ArticleCategoryState
 @inject Services.DialogService DialogService
+
+<ArticleCategoryHubActionHandler Added="FetchArticleCategoryList" Updated="FetchArticleCategoryList" Removed="FetchArticleCategoryList" />
 
 <ArticleCategoryOverviewToolbar @bind-SearchText="@_searchText"
                                 @bind-SearchText:after="@FetchArticleCategoryList"

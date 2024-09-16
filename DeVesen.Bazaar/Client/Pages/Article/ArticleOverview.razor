@@ -4,6 +4,8 @@
 @using DeVesen.Bazaar.Client.State.Article
 @using DeVesen.Bazaar.Client.State.Title
 @using DeVesen.Bazaar.Client.Components.Common.Buttons
+@using DeVesen.Bazaar.Client.Components.HubHandler
+@using DeVesen.Bazaar.Shared.Events
 
 @page "/articles"
 @page "/vendors/{vendorId}/articles"
@@ -16,6 +18,9 @@
 @inject IState<ArticleState> ArticleState
 
 @inject Services.DialogService DialogService;
+
+<VendorHubActionHandler Removed="OnVendorRemoved" />
+<ArticleHubActionHandler Added="OnArticleAdded" Updated="OnArticleUpdated" Removed="OnArticleRemoved" />
 
 <div class="d-flex flex-column gap-4 px-1 h-100">
 
@@ -44,31 +49,40 @@
             </MudItem>
         </MudGrid>
     </ArticleOverviewToolbar>
-
-    <MudTable T="Article"
-              FixedHeader
-              Hover
-              Loading="@(ArticleState.Value.IsLoaded is false)"
-              Items="@ArticleState.Value.Items"
-              SortLabel="Sort By"
-              OnRowClick="x => ModifyArticleAsync(x.Item!)">
-        <HeaderContent>
-            <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Number)">Nummer</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.ArticleCategory)">Kategorie</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Manufacturer)">Hersteller</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Description)">Beschreibung</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Price01)">Preis</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Status)">Status</MudTableSortLabel></MudTh>
-        </HeaderContent>
-        <RowTemplate>
-            <MudTd DataLabel="Nummer">@context.Number</MudTd>
-            <MudTd DataLabel="Kategorie">@context.ArticleCategory</MudTd>
-            <MudTd DataLabel="Hersteller">@context.Manufacturer</MudTd>
-            <MudTd DataLabel="Beschreibung">@context.Description</MudTd>
-            <MudTd DataLabel="Preis">@context.Price01</MudTd>
-            <MudTd DataLabel="Status">@context.StatusText</MudTd>
-        </RowTemplate>
-    </MudTable>
+    
+    @if (_vendorRemoved)
+    {
+        <MudAlert Variant="Variant.Filled"
+                  Severity="Severity.Error"
+                  ContentAlignment="HorizontalAlignment.Center">Händler wurde gelöscht, bitte Seite aktuallisieren.</MudAlert>
+    }
+    else
+    {
+        <MudTable T="Article"
+                  FixedHeader
+                  Hover
+                  Loading="@(ArticleState.Value.IsLoaded is false)"
+                  Items="@ArticleState.Value.Items"
+                  SortLabel="Sort By"
+                  OnRowClick="x => ModifyArticleAsync(x.Item!)">
+            <HeaderContent>
+                <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Number)">Nummer</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.ArticleCategory)">Kategorie</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Manufacturer)">Hersteller</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Description)">Beschreibung</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Price01)">Preis</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Status)">Status</MudTableSortLabel></MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Nummer">@context.Number</MudTd>
+                <MudTd DataLabel="Kategorie">@context.ArticleCategory</MudTd>
+                <MudTd DataLabel="Hersteller">@context.Manufacturer</MudTd>
+                <MudTd DataLabel="Beschreibung">@context.Description</MudTd>
+                <MudTd DataLabel="Preis">@context.Price01</MudTd>
+                <MudTd DataLabel="Status">@context.StatusText</MudTd>
+            </RowTemplate>
+        </MudTable>
+    }
 </div>
 
 @code {
@@ -79,6 +93,7 @@
     private Vendor? _vendor;
     private string? _number;
     private string? _searchText;
+    private bool _vendorRemoved;
 
     protected override async Task OnInitializedAsync()
     {
@@ -107,7 +122,7 @@
     private async Task ModifyArticleAsync(Article article)
     {
         await DialogService.ModifyArticleAsync(article);
-        
+
         FetchArticleList();
     }
 
@@ -141,4 +156,44 @@
 
         TitleFacade.SetCaption(caption);
     }
+
+
+
+    private void OnArticleAdded(ArticleAddedInfo args)
+    {
+        if (_vendor == null)
+        {
+            FetchArticleList();
+        }
+    }
+
+    private void OnArticleUpdated(ArticleUpdatedInfo args)
+    {
+        if (_vendor == null)
+        {
+            FetchArticleList();
+        }
+        if (_vendor?.Id == args.VendorId)
+        {
+            FetchArticleList();
+        }
+    }
+
+    private void OnArticleRemoved(ArticleRemovedInfo args)
+    {
+        if (_vendor == null)
+        {
+            FetchArticleList();
+        }
+        if (_vendor?.Id == args.VendorId)
+        {
+            FetchArticleList();
+        }
+    }
+
+    private void OnVendorRemoved(string vendorId)
+    {
+        _vendorRemoved = _vendor?.Id == vendorId;
+    }
+
 }

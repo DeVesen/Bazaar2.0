@@ -1,8 +1,10 @@
 ﻿using DeVesen.Bazaar.Server.Contracts;
 using DeVesen.Bazaar.Server.Domain;
 using DeVesen.Bazaar.Server.Extensions;
+using DeVesen.Bazaar.Server.Hubs;
 using DeVesen.Bazaar.Shared.Services;
 using FluentResults;
+using static MudBlazor.CategoryTypes;
 
 namespace DeVesen.Bazaar.Server.Storage;
 
@@ -10,13 +12,15 @@ public class ArticleStorage
 {
     private readonly IVendorRepository _vendorRepository;
     private readonly IArticleRepository _articleRepository;
+    private readonly ArticleHubContext _articleHubContext;
     private readonly SystemClock _systemClock;
 
-    public ArticleStorage(IVendorRepository vendorRepository, IArticleRepository articleRepository, SystemClock systemClock)
+    public ArticleStorage(IVendorRepository vendorRepository, IArticleRepository articleRepository, ArticleHubContext articleHubContext, SystemClock systemClock)
     {
         _vendorRepository = vendorRepository;
         _articleRepository = articleRepository;
         _systemClock = systemClock;
+        _articleHubContext = articleHubContext;
     }
 
     public async Task<bool> ExistByIdAsync(string id)
@@ -117,6 +121,8 @@ public class ArticleStorage
         }
 
         await _articleRepository.CreateAsync(element.ToEntity());
+
+        await _articleHubContext.SendAdded(element.VendorId, element.Id, element.Number);
     }
 
     public async Task UpdateAsync(Article element)
@@ -142,16 +148,22 @@ public class ArticleStorage
         }
 
         await _articleRepository.UpdateAsync(element.ToEntity());
+
+        await _articleHubContext.SendUpdated(element.VendorId, element.Id, element.Number);
     }
 
     public async Task DeleteByIdAsync(string id)
     {
-        if (await ExistByIdAsync(id) is false)
+        var response = await _articleRepository.TryGetByIdAsync(id);
+
+        if (response.Exist is false)
         {
             throw new InvalidDataException($"Id '{id}' not found!");
         }
 
         await _articleRepository.DeleteAsync(id);
+
+        await _articleHubContext.SendRemoved(response.Entity!.VendorId, response.Entity!.Id, response.Entity!.Number);
     }
 
     public async Task DeleteByNumberAsync(long number)
@@ -177,7 +189,9 @@ public class ArticleStorage
             element.Sold = soldTime;
             element.SoldAt = item.Price;
 
-            await _articleRepository.UpdateAsync(element.ToEntity());
+            await UpdateAsync(element);
+
+            await _articleHubContext.SendSold(element.VendorId, element.Id, element.Number);
         }
     }
 
@@ -188,36 +202,38 @@ public class ArticleStorage
             return Result.Fail($"Artikel {number} nicht gefunden!");
         }
 
-        var article = await GetByNumberAsync(number);
+        var element = await GetByNumberAsync(number);
 
-        if (article.VendorId != vendorId)
+        if (element.VendorId != vendorId)
         {
             return Result.Fail($"Artikel {number} gehört nicht zu diesem Händler!");
         }
 
-        if (article.Settled.HasValue)
+        if (element.Settled.HasValue)
         {
             return Result.Fail($"Artikel {number} ist bereits abgerechnet!");
         }
 
-        if (article.Returned.HasValue)
+        if (element.Returned.HasValue)
         {
             return Result.Fail($"Artikel {number} ist zurückgegeben!");
         }
 
-        if (article.SoldAt.HasValue)
+        if (element.SoldAt.HasValue)
         {
             return Result.Fail($"Artikel {number} wurde bereits verkauft!");
         }
 
-        if (article.ApprovedForSale.HasValue)
+        if (element.ApprovedForSale.HasValue)
         {
             return Result.Ok();
         }
 
-        article.ApprovedForSale = _systemClock.GetNow();
+        element.ApprovedForSale = _systemClock.GetNow();
 
-        await UpdateAsync(article);
+        await UpdateAsync(element);
+
+        await _articleHubContext.SendApproved(element.VendorId, element.Id, element.Number);
 
         return Result.Ok();
     }
@@ -229,55 +245,59 @@ public class ArticleStorage
             return Result.Fail($"Artikel {number} nicht gefunden!");
         }
 
-        var article = await GetByNumberAsync(number);
+        var element = await GetByNumberAsync(number);
 
-        if (article.VendorId != vendorId)
+        if (element.VendorId != vendorId)
         {
             return Result.Fail($"Artikel {number} gehört nicht zu diesem Händler!");
         }
 
-        if (article.Settled.HasValue)
+        if (element.Settled.HasValue)
         {
             return Result.Fail($"Artikel {number} ist bereits abgerechnet!");
         }
 
-        if (article.Returned.HasValue)
+        if (element.Returned.HasValue)
         {
             return Result.Fail($"Artikel {number} ist zurückgegeben!");
         }
 
-        if (article.SoldAt.HasValue)
+        if (element.SoldAt.HasValue)
         {
             return Result.Fail($"Artikel {number} wurde bereits verkauft!");
         }
 
-        if (article.ApprovedForSale.HasValue is false)
+        if (element.ApprovedForSale.HasValue is false)
         {
             return Result.Fail($"Artikel {number} war noch nicht übernommen!");
         }
 
-        if (article.Returned.HasValue)
+        if (element.Returned.HasValue)
         {
             return Result.Ok();
         }
 
-        article.Returned = _systemClock.GetNow();
+        element.Returned = _systemClock.GetNow();
 
-        await UpdateAsync(article);
+        await UpdateAsync(element);
+
+        await _articleHubContext.SendReturned(element.VendorId, element.Id, element.Number);
 
         return Result.Ok();
     }
 
     public async Task<Result> SettleArticleAsync(params string[] actionArticleIds)
     {
-        var articles = await GetAllAsync();
-        articles = articles.Where(p => actionArticleIds.Contains(p.Id));
+        var elements = await GetAllAsync();
+        elements = elements.Where(p => actionArticleIds.Contains(p.Id));
 
-        foreach (var article in articles)
+        foreach (var element in elements)
         {
-            article.Settled = _systemClock.GetNow();
+            element.Settled = _systemClock.GetNow();
 
-            await UpdateAsync(article);
+            await UpdateAsync(element);
+
+            await _articleHubContext.SendReturned(element.VendorId, element.Id, element.Number);
         }
 
         return Result.Ok();

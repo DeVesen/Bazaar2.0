@@ -45,7 +45,7 @@
                 {
                     <MudIconButton Size="Size.Small"
                                    Icon="@Icons.Material.TwoTone.Delete"
-                                   OnClick="ResetSoldAsync"></MudIconButton>
+                                   OnClick="ResetReturnedAsync"></MudIconButton>
                 }
             </MudPaper>
         }
@@ -110,6 +110,15 @@
     }
 
     private async Task ResetSoldAsync()
+    {
+        Item.Sold = null;
+        Item.SoldAt = null;
+
+        await SetTouchedAsync();
+        await ItemChanged.InvokeAsync(Item);
+    }
+
+    private async Task ResetReturnedAsync()
     {
         Item.Returned = null;
 
