@@ -161,10 +161,10 @@
 
     private void OnArticleAdded(ArticleAddedInfo args)
     {
-        if (_vendor == null)
-        {
-            FetchArticleList();
-        }
+        // if (_vendor == null)
+        // {
+        //     FetchArticleList();
+        // }
     }
 
     private void OnArticleUpdated(ArticleUpdatedInfo args)
@@ -193,7 +193,14 @@
 
     private void OnVendorRemoved(string vendorId)
     {
-        _vendorRemoved = _vendor?.Id == vendorId;
+        if (_vendor == null)
+        {
+            FetchArticleList();
+        }
+        if (_vendor?.Id == vendorId)
+        {
+            _vendorRemoved = true;
+        }
     }
 
 }
