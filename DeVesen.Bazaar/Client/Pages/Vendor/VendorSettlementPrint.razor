@@ -1,0 +1,191 @@
+﻿@using DeVesen.Bazaar.Client.Models
+@using DeVesen.Bazaar.Client.State.Settlement
+
+@layout PrintLayout
+
+@page "/vendors/{vendorId}/print"
+@page "/vendors/{vendorId}/print/settlement"
+
+@inject SettlementFacade SettlementFacade;
+@inject IState<SettlementState> SettlementState;
+@inject NavigationManager NavigationManager
+
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+
+@if (@IsLoaded)
+{
+    <div>
+
+        <div class="mb-3 d-flex justify-space-between">
+            <div>Naturfreunde Hochstadt eV</div>
+            <div>@ActualDateTime</div>
+        </div>
+
+        <div class="d-flex w-100 my-3">
+
+            <div style="width: 60%">
+                <MudText Typo="Typo.h6">@Vendor.GetTotalName()</MudText>
+                <MudText Typo="Typo.body1">@Vendor.Address</MudText>
+            </div>
+        </div>
+
+        <MudGrid Class="my-3 px-5">
+            <MudItem xs="3">
+                <MudField Label="Händlernummer">
+                    <MudText>@VendorId</MudText>
+                </MudField>
+            </MudItem>
+            <MudItem xs="3">
+                <MudField Label="im Verkauf" Adornment="Adornment.End" AdornmentText="St">
+                    <MudText>@ArticlesApprovedCount</MudText>
+                </MudField>
+            </MudItem>
+            <MudItem xs="3">
+                <MudField Label="Verkauft" Adornment="Adornment.End" AdornmentText="St">
+                    <MudText>@ArticlesSoldCount</MudText>
+                </MudField>
+            </MudItem>
+            <MudItem xs="3">
+                <MudField Label="zurück gegeben" Adornment="Adornment.End" AdornmentText="St">
+                    <MudText>@ArticlesReturnedCount</MudText>
+                </MudField>
+            </MudItem>
+
+            @if (IsSettlement)
+            {
+                <MudItem xs="3">
+                    <MudField Label="Verkaufserlös" Adornment="Adornment.End" AdornmentText="€">
+                        <MudText>@SalesProceeds</MudText>
+                    </MudField>
+                </MudItem>
+
+                <MudItem xs="3">
+                    <MudField Label="Verkaufprovision" Adornment="Adornment.End" AdornmentText="€">
+                        <MudText>@SalesCommission</MudText>
+                    </MudField>
+                </MudItem>
+
+                <MudItem xs="3">
+                    <MudField Label="Aufwandsanteil" Adornment="Adornment.End" AdornmentText="€">
+                        <MudText>@AllowanceForExpenses</MudText>
+                    </MudField>
+                </MudItem>
+
+                <MudItem xs="3">
+                    <MudField Label="Händlerverdienst" Adornment="Adornment.End" AdornmentText="€">
+                        <MudText>@DealerShare</MudText>
+                    </MudField>
+                </MudItem>
+            }
+        </MudGrid>
+
+        <div class="w-100 mud-elevation-1 my-3">
+
+            <div class="d-flex w-100 mud-elevation-1">
+                <div class="p-1 d-flex justify-center flex-shrink-1 w-100">
+                    <div>Artikel</div>
+                </div>
+                <div class="p-1 d-flex justify-center mud-elevation-1" style="width: 110px;">Status</div>
+                <div class="p-1 d-flex justify-center mud-elevation-1" style="width: 140px;">
+                    <div>Verkauft für</div>
+                </div>
+            </div>
+
+            @foreach (var article in Articles)
+            {
+                <div class="mt-1 d-flex w-100">
+                    <div class="p-1 flex-shrink-1 w-100 mud-elevation-1">
+                        <div class="d-flex align-center">
+                            <div class="w-20 px-4 d-flex">
+                                <div>@article.Number</div>
+                            </div>
+                            <div class="flex-shrink-1 w-100">
+                                <MudGrid Spacing="0" Class="pl-4">
+                                    <MudItem xs="12">@($"Beschreibung: {article.Description}")</MudItem>
+                                    <MudItem xs="6">@($"Ketegorie: {article.ArticleCategory}")</MudItem>
+                                    <MudItem xs="6">@($"Hersteller: {article.Manufacturer}")</MudItem>
+                                    <MudItem xs="6">@(GetPrice(article.Price01, "Preis: "))</MudItem>
+                                    <MudItem xs="6">@(GetPrice(article.Price02, "Preis 2: "))</MudItem>
+                                </MudGrid>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-1 d-flex justify-center align-center mud-elevation-1" style="width: 110px;">
+                        <div>@(GetArticleStateText(article))</div>
+                    </div>
+                    <div class="p-1 d-flex justify-end align-center mud-elevation-1" style="width: 140px;">
+                        <div class="pl-8">@(GetPrice(article.SoldAt))</div>
+                    </div>
+                </div>
+            }
+        </div>
+
+    </div>
+}
+else
+{
+    <div class="d-flex justify-center">
+        <MudProgressCircular Color="Color.Primary" Style="height:70px; width:70px;" Indeterminate="true" />
+    </div>
+}
+
+@code {
+
+    [Parameter]
+    public string VendorId { get; set; } = string.Empty;
+
+    private bool IsSettlement => NavigationManager.Uri.EndsWith("/settlement");
+
+    private string ActualDateTime => DateTime.Now.ToShortDateString();
+    private bool IsLoaded => SettlementState.Value.IsLoaded;
+    private Vendor Vendor => SettlementState.Value.Vendor!.Item;
+    private IEnumerable<Article> Articles => SettlementState.Value.Articles;
+
+    private long ArticlesApprovedCount => SettlementState.Value.Articles.Count(p => p.IsApprovedForSale());
+    private long ArticlesSoldCount => SettlementState.Value.Articles.Count(p => p.IsSold());
+    private long ArticlesReturnedCount => SettlementState.Value.Articles.Count(p => p.IsReturned());
+
+    private double SalesProceeds => SettlementState.Value.Articles.Where(p => p.IsSold()).Sum(p => p.SoldAt!.Value);
+    private double SalesCommission => SalesProceeds * Vendor.SalesShare;
+    private double AllowanceForExpenses => SettlementState.Value.Articles.Count(p => p.IsApprovedForSale() && p.IsSold() is false) * Vendor.OfferUnitPrice;
+    private double DealerShare => SalesProceeds - SalesCommission - AllowanceForExpenses;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            SettlementFacade.Fetch(VendorId);
+        }
+    }
+
+    private static string GetArticleStateText(Article article)
+    {
+        if (article.IsSettled())
+        {
+            return "verrechnet";
+        }
+
+        if (article.IsReturned())
+        {
+            return "zurück gegeben";
+        }
+        if (article.IsSold())
+        {
+            return "verkauft";
+        }
+
+        if (article.IsApprovedForSale())
+        {
+            return "im Verkauf";
+        }
+
+        return string.Empty;
+    }
+
+    private static string GetPrice(double? value, string textLeft = "")
+    {
+        return value.HasValue ? $"{textLeft}{value:0.00} €" : string.Empty;
+    }
+}

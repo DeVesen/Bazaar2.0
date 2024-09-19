@@ -1,0 +1,105 @@
+﻿@using DeVesen.Bazaar.Client.Components.Common
+@inherits LayoutComponentBase
+
+@inject IJSRuntime JsRuntime
+
+<script>
+    function closeBlazorWindow() {
+        window.close();
+    }
+</script>
+
+<style>
+    .demo-screen-page {
+        background-color: gray;
+        height: 100vh;
+    }
+
+    .demo-screen-area {
+        background-color: #FFFFFF;
+    }
+
+    .demo-screen-area-width {
+        max-width: 790px;
+    }
+</style>
+
+<MudThemeProvider IsDarkMode="false" />
+
+<PrintCallback @ref="_printCallback" OnPrintOpen="SetPrintModeAsync" OnPrintClose="SetNonePrintModeAsync" />
+
+<div class="@AllOverPageClasses">
+    
+    @if (_isPrintActive is false)
+    {
+        <div class="d-flex gap-6 p-3 demo-screen-area-width">
+            <MudButton Variant="Variant.Filled"
+                       StartIcon="@Icons.Material.TwoTone.Close"
+                       IconSize="Size.Large"
+                       Size="Size.Large"
+                       Color="Color.Secondary"
+                       OnClick="OnCancelPrintAsync">Abbruch</MudButton>
+            <MudButton Variant="Variant.Filled"
+                       StartIcon="@Icons.Material.TwoTone.Print"
+                       IconSize="Size.Large"
+                       Size="Size.Large"
+                       Color="Color.Secondary"
+                       OnClick="OnPrintAsync">Drucken</MudButton>
+        </div>
+    }
+
+    <div class="@AllOverDivClasses">
+        @Body
+    </div>
+</div>
+
+@code {
+    private PrintCallback _printCallback = null!;
+    private bool _isPrintActive;
+
+    private string AllOverPageClasses => _isPrintActive ? string.Empty : "p-2 demo-screen-page";
+    private string AllOverDivClasses => _isPrintActive ? string.Empty : "p-3 demo-screen-area demo-screen-area-width";
+
+
+    private async Task OnPrintAsync()
+    {
+        await SetPrintModeAsync();
+
+        await JsRuntime.InvokeVoidAsync("window.print");
+
+        await SetNonePrintModeAsync();
+    }
+
+    private async Task OnCancelPrintAsync()
+    {
+        await JsRuntime.InvokeVoidAsync("closeBlazorWindow");
+    }
+
+    private async Task SetPrintModeAsync()
+    {
+        _isPrintActive = true;
+
+        StateHasChanged();
+        await Task.Delay(5);
+    }
+
+    private async Task SetNonePrintModeAsync()
+    {
+        _isPrintActive = false;
+
+        StateHasChanged();
+        await Task.Delay(5);
+    }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            await _printCallback.InitDNetHandler();
+        }
+    }
+
+}

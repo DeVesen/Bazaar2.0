@@ -2,6 +2,7 @@
 @using DeVesen.Bazaar.Client.Pages.Article.Components
 @using DeVesen.Bazaar.Client.State.Title
 @using DeVesen.Bazaar.Client.Components.Common.Buttons
+@using DeVesen.Bazaar.Client.Services
 @using DeVesen.Bazaar.Client.State.Settlement
 @using DeVesen.Bazaar.Shared.Extensions
 
@@ -11,6 +12,7 @@
 
 @inject TitleFacade TitleFacade
 @inject SettlementFacade SettlementFacade
+@inject NavigationService NavigationService
 @inject IState<SettlementState> SettlementState
 
 @inject Services.DialogService DialogService;
@@ -24,7 +26,8 @@
                             @bind-Vendor:after="@FetchVendorSettlement">
         <MudGrid Spacing="1">
             <MudItem xs="6" sm="4" md="12">
-                <DvButtonPrint Disabled="@(HasArticlesToGiveBack is false)" />
+                <DvButtonPrint Disabled="@(HasVendorSelected is false)"
+                               OnClick="OnPrintOverviewAsync" />
             </MudItem>
             <MudItem xs="6" sm="4" md="12">
                 <DvButtonGiveBack Disabled="@(HasArticlesToGiveBack is false)"
@@ -96,6 +99,8 @@
 </div>
 
 @code {
+    private bool HasVendorSelected => _vendor != null;
+
     private bool HasArticlesToGiveBack
     {
         get
@@ -168,6 +173,11 @@
                searchText.BiContainsIgnoreCase(article.Description);
     }
 
+    private async Task OnPrintOverviewAsync()
+    {
+        await NavigationService.ToVendorPrintSettlement(_vendor!.Id);
+    }
+
     private async Task OnGiveBackAsync()
     {
         await DialogService.GiveBackArticleAsync(_vendor!.Id).ConfigureAwait(false);
@@ -189,6 +199,8 @@
                                                            .Select(p => p.Id);
 
             SettlementFacade.PayOut(_vendor!.Id, articleIds);
+            
+            await NavigationService.ToVendorPrintSettlement(_vendor!.Id);
         }
         else
         {

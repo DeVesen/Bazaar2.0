@@ -15,6 +15,7 @@
 @inject TitleFacade TitleFacade
 @inject ArticleFacade ArticleFacade
 @inject VendorService VendorService
+@inject NavigationService NavigationService
 @inject IState<ArticleState> ArticleState
 
 @inject Services.DialogService DialogService;
@@ -45,7 +46,8 @@
                                  OnClick="ApproveArticleAsync" />
             </MudItem>
             <MudItem xs="6" md="12" lg="6">
-                <DvButtonPrint Disabled="@(_vendor == null)" />
+                <DvButtonPrint Disabled="@(_vendor == null)"
+                               OnClick="PrintOverviewAsync" />
             </MudItem>
         </MudGrid>
     </ArticleOverviewToolbar>
@@ -138,6 +140,11 @@
         await DialogService.ApproveArticleAsync(_vendor!.Id);
 
         FetchArticleList();
+    }
+
+    private async Task PrintOverviewAsync()
+    {
+        await NavigationService.ToVendorPrint(_vendor!.Id);
     }
 
     private void FetchArticleList()

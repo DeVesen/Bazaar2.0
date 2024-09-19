@@ -1,0 +1,76 @@
+﻿
+@implements IDisposable
+
+@inject IJSRuntime JsRuntime
+
+<script>
+    function onBeforePrint(dotNetObject) {
+        console.log("This document is starting to print");
+        console.log(dotNetObject);
+    }
+    function onAfterBodyPrint() {
+        console.log("This document is now being printed");
+    }
+</script>
+
+@code {
+    private bool _isInitialized = false;
+    private DotNetObjectReference<PrintCallback>? _objectReference;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            _objectReference = DotNetObjectReference.Create(this);
+
+            await InitDNetHandler();
+        }
+    }
+
+    [JSInvokable("startPrint")]
+    public async Task StartPrintCallback(string text)
+    {
+        await OnPrintOpen.InvokeAsync();
+    }
+
+    [JSInvokable("finishedPrint")]
+    public async Task FinishedPrintCallback(string text)
+    {
+        await OnPrintClose.InvokeAsync();
+    }
+
+    [Parameter]
+    public EventCallback OnPrintOpen { get; set; }
+
+    [Parameter]
+    public EventCallback OnPrintClose { get; set; }
+
+    public async Task<bool> InitDNetHandler()
+    {
+        try
+        {
+            if (_isInitialized is false)
+            {
+                await JsRuntime.InvokeVoidAsync("BazaarPrintCallBack.initJsCallBack", _objectReference);
+
+                _isInitialized = true;
+            }
+        }
+        catch
+        {
+            _isInitialized = false;
+        }
+
+        return _isInitialized;
+    }
+
+    public void Dispose()
+    {
+        GC.SuppressFinalize(this);
+
+        _objectReference?.Dispose();
+    }
+
+}

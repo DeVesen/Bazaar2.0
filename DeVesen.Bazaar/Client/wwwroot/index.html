@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>DeVesen.Bazaar</title>
     <base href="/" />
+    <script src="scripts/NetPrintEnv.js"></script>
     <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
     <link href="css/app.css" rel="stylesheet" />
     <link rel="icon" type="image/png" href="favicon.png" />
@@ -14,11 +15,11 @@
     <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
 </head>
 
-<body>
+<body onbeforeprint="BazaarPrintCallBack.startPrint()" onafterprint="BazaarPrintCallBack.finishedPrint()">
     <div id="app">
         <svg class="loading-progress">
-            <circle r="40%" cx="50%" cy="50%"/>
-            <circle r="40%" cx="50%" cy="50%"/>
+            <circle r="40%" cx="50%" cy="50%" />
+            <circle r="40%" cx="50%" cy="50%" />
         </svg>
         <div class="loading-progress-text"></div>
     </div>

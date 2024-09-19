@@ -82,13 +82,13 @@
 
     private async Task OnViewVendorArticleAsync(VendorView args)
     {
-        NavigationService.Vendor.ToArticle(args.Item.Id);
+        NavigationService.ToArticleOverview(args.Item.Id);
         await Task.CompletedTask;
     }
 
     private async Task OnViewVendorModifyAsync(VendorView args)
     {
-        NavigationService.Vendor.ToModify(args.Item.Id);
+        NavigationService.ToModifyOverview(args.Item.Id);
         await Task.CompletedTask;
     }
 

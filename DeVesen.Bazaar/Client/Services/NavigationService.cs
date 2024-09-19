@@ -1,52 +1,44 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 
 namespace DeVesen.Bazaar.Client.Services;
 
-public class NavigationService
+public class NavigationService(NavigationManager navigationManager, IJSRuntime jsRuntime)
 {
-    private readonly NavigationManager _navigationManager;
+    public string Uri => navigationManager.Uri;
+    public string BaseUri => navigationManager.BaseUri;
 
-    public NavigationService(NavigationManager navigationManager)
+    public void ToArticleOverview(string vendorId)
     {
-        _navigationManager = navigationManager;
+        navigationManager.NavigateTo($"vendors/{vendorId}/articles");
     }
 
-    public SalesNavigationService Sales => new(_navigationManager);
-    public VendorNavigationService Vendor => new(_navigationManager);
-
-
-    public class SalesNavigationService : ChildNavigationService
+    public async Task ToVendorPrint(string vendorId)
     {
-        public SalesNavigationService(NavigationManager navigationManager) : base(navigationManager) { }
-
-        public void ToTheSale()
+        try
         {
-            NavigationManager.NavigateTo("Sales");
+            await jsRuntime.InvokeAsync<object>("open", $"{BaseUri}vendors/{vendorId}/print", "_blank");
         }
-    }
-
-    public class VendorNavigationService : ChildNavigationService
-    {
-        public VendorNavigationService(NavigationManager navigationManager) : base(navigationManager) { }
-
-        public void ToArticle(string vendorId)
+        catch
         {
-            NavigationManager.NavigateTo($"vendors/{vendorId}/articles");
-        }
-
-        public void ToModify(string vendorId)
-        {
-            NavigationManager.NavigateTo($"vendors/{vendorId}/modify");
+            // ignored
         }
     }
 
-    public abstract class ChildNavigationService
+    public async Task ToVendorPrintSettlement(string vendorId)
     {
-        protected readonly NavigationManager NavigationManager;
-
-        protected ChildNavigationService(NavigationManager navigationManager)
+        try
         {
-            NavigationManager = navigationManager;
+            await jsRuntime.InvokeAsync<object>("open", $"{BaseUri}vendors/{vendorId}/print/settlement", "_blank");
         }
+        catch
+        {
+            // ignored
+        }
+    }
+
+    public void ToModifyOverview(string vendorId)
+    {
+        navigationManager.NavigateTo($"vendors/{vendorId}/modify");
     }
 }
