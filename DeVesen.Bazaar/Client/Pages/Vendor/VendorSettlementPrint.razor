@@ -12,7 +12,7 @@
 
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 
-@if (@IsLoaded)
+@if (IsLoaded)
 {
     <div>
 
@@ -31,49 +31,81 @@
 
         <MudGrid Class="my-3 px-5">
             <MudItem xs="3">
-                <MudField Label="Händlernummer">
-                    <MudText>@VendorId</MudText>
+                <MudField Label="Händlernummer"
+                          Margin="Margin.Dense"
+                          Variant="Variant.Filled">
+                    <div class="d-flex justify-center">
+                        <MudText>@VendorId.ToUpper()</MudText>
+                    </div>
                 </MudField>
             </MudItem>
             <MudItem xs="3">
-                <MudField Label="im Verkauf" Adornment="Adornment.End" AdornmentText="St">
-                    <MudText>@ArticlesApprovedCount</MudText>
+                <MudField Label="im Verkauf"
+                          Margin="Margin.Dense"
+                          Variant="Variant.Filled">
+                    <div class="d-flex justify-end">
+                        <MudText>@($"{ArticlesApprovedCount} St")</MudText>
+                    </div>
                 </MudField>
             </MudItem>
             <MudItem xs="3">
-                <MudField Label="Verkauft" Adornment="Adornment.End" AdornmentText="St">
-                    <MudText>@ArticlesSoldCount</MudText>
+                <MudField Label="Verkauft"
+                          Margin="Margin.Dense"
+                          Variant="Variant.Filled">
+                    <div class="d-flex justify-end">
+                        <MudText>@($"{ArticlesSoldCount} St")</MudText>
+                    </div>
                 </MudField>
             </MudItem>
             <MudItem xs="3">
-                <MudField Label="zurück gegeben" Adornment="Adornment.End" AdornmentText="St">
-                    <MudText>@ArticlesReturnedCount</MudText>
+                <MudField Label="zurück gegeben"
+                          Margin="Margin.Dense"
+                          Variant="Variant.Filled">
+                    <div class="d-flex justify-end">
+                        <MudText>@($"{ArticlesReturnedCount} St")</MudText>
+                    </div>
                 </MudField>
             </MudItem>
 
             @if (IsSettlement)
             {
                 <MudItem xs="3">
-                    <MudField Label="Verkaufserlös" Adornment="Adornment.End" AdornmentText="€">
-                        <MudText>@SalesProceeds</MudText>
+                    <MudField Label="Verkaufserlös"
+                              Margin="Margin.Dense"
+                              Variant="Variant.Filled">
+                        <div class="d-flex justify-end">
+                            <MudText>@($"{SalesProceeds} €")</MudText>
+                        </div>
                     </MudField>
                 </MudItem>
 
                 <MudItem xs="3">
-                    <MudField Label="Verkaufprovision" Adornment="Adornment.End" AdornmentText="€">
-                        <MudText>@SalesCommission</MudText>
+                    <MudField Label="Verkaufprovision"
+                              Margin="Margin.Dense"
+                              Variant="Variant.Filled">
+                        <div class="d-flex justify-end">
+                            <MudText>@($"{SalesCommission} €")</MudText>
+                        </div>
                     </MudField>
                 </MudItem>
 
                 <MudItem xs="3">
-                    <MudField Label="Aufwandsanteil" Adornment="Adornment.End" AdornmentText="€">
-                        <MudText>@AllowanceForExpenses</MudText>
+                    <MudField Label="Aufwandsanteil"
+                              Margin="Margin.Dense"
+                              Variant="Variant.Filled">
+                        <div class="d-flex justify-end">
+                            <MudText>@($"{AllowanceForExpenses} €")</MudText>
+                        </div>
                     </MudField>
                 </MudItem>
 
                 <MudItem xs="3">
-                    <MudField Label="Händlerverdienst" Adornment="Adornment.End" AdornmentText="€">
-                        <MudText>@DealerShare</MudText>
+                    <MudField Label="Händlerverdienst"
+                              Margin="Margin.Dense"
+                              Variant="Variant.Filled">
+                        <div class="d-flex justify-end">
+                            <MudText>@($"{DealerShare} €")</MudText>
+                        </div>
                     </MudField>
                 </MudItem>
             }
@@ -96,7 +128,7 @@
                 <div class="mt-1 d-flex w-100">
                     <div class="p-1 flex-shrink-1 w-100 mud-elevation-1">
                         <div class="d-flex align-center">
-                            <div class="w-20 px-4 d-flex">
+                            <div class="px-4 d-flex justify-center" style="width: 100px; min-width: 100px">
                                 <div>@article.Number</div>
                             </div>
                             <div class="flex-shrink-1 w-100">
