@@ -20,7 +20,8 @@
                                @bind-Item:after="@OnItemChanged"
                                @bind-IsTouched="@_isStatisticsTouched"
                                @bind-IsTouched:after="@OnStatusChanged"
-                               OnDeleted="@OnDeleted" />
+                               OnDeleted="@OnDeleted"
+                               DisableStateChange="@DisableStateChange" />
     </MudTabPanel>
 </MudTabs>
 
@@ -34,6 +35,12 @@
 
     [Parameter]
     public bool IsValid { get; set; }
+
+    [Parameter]
+    public bool DisableAutoApprove { get; set; } = false;
+
+    [Parameter]
+    public bool DisableStateChange { get; set; } = false;
 
     [Parameter]
     public EventCallback<bool> IsValidChanged { get; set; }

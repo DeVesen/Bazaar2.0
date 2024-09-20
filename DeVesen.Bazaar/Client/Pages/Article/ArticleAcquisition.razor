@@ -4,62 +4,43 @@
 @using DeVesen.Bazaar.Client.State.Article
 @using DeVesen.Bazaar.Client.State.Title
 @using DeVesen.Bazaar.Client.Components.Common.Buttons
-@using DeVesen.Bazaar.Client.Components.HubHandler
-@using DeVesen.Bazaar.Shared.Events
 
-@page "/YXBw/articles"
-@page "/YXBw/vendors/{vendorId}/articles"
+@page "/acquisition/{vendorId}"
+@layout AcquisitionLayout
 
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 
 @inject TitleFacade TitleFacade
 @inject ArticleFacade ArticleFacade
 @inject VendorService VendorService
-@inject NavigationService NavigationService
 @inject IState<ArticleState> ArticleState
 
 @inject Services.DialogService DialogService;
 
-<VendorHubActionHandler Removed="OnVendorRemoved" />
-<ArticleHubActionHandler Added="OnArticleAdded" Updated="OnArticleUpdated" Removed="OnArticleRemoved" />
+@if (_vendor != null)
+{
+    <div class="d-flex flex-column gap-4 px-1 h-100">
 
-<div class="d-flex flex-column gap-4 px-1 h-100">
+        <ArticleOverviewToolbar @bind-Vendor="@_vendor"
+                                @bind-Number="@_number"
+                                @bind-SearchText="@_searchText"
+                                @bind-Vendor:after="@OnArticleFilterChange"
+                                @bind-Number:after="@OnArticleFilterChange"
+                                @bind-SearchText:after="@OnArticleFilterChange"
+                                DisableVendorSelection="@(string.IsNullOrWhiteSpace(VendorId) is false)"
+                                ShowVendorSelection="false">
+            <MudGrid Spacing="1">
+                <MudItem xs="6" md="12" lg="6">
+                    <DvButtonNeu Disabled="@(_vendor == null)"
+                                 OnClick="CreateArticleAsync" />
+                </MudItem>
+                <MudItem xs="6" md="12" lg="6">
+                    <DvButtonImport Disabled="@(_vendor == null)"
+                                    OnClick="ImportArticleAsync" />
+                </MudItem>
+            </MudGrid>
+        </ArticleOverviewToolbar>
 
-    <ArticleOverviewToolbar @bind-Vendor="@_vendor"
-                            @bind-Number="@_number"
-                            @bind-SearchText="@_searchText"
-                            @bind-Vendor:after="@OnArticleFilterChange"
-                            @bind-Number:after="@OnArticleFilterChange"
-                            @bind-SearchText:after="@OnArticleFilterChange"
-                            DisableVendorSelection="@(string.IsNullOrWhiteSpace(VendorId) is false)">
-        <MudGrid Spacing="1">
-            <MudItem xs="6" md="12" lg="6">
-                <DvButtonNeu Disabled="@(_vendor == null)"
-                             OnClick="CreateArticleAsync" />
-            </MudItem>
-            <MudItem xs="6" md="12" lg="6">
-                <DvButtonImport Disabled="@(_vendor == null)"
-                                OnClick="ImportArticleAsync" />
-            </MudItem>
-            <MudItem xs="6" md="12" lg="6">
-                <DvButtonApprove Disabled="@(_vendor == null)"
-                                 OnClick="ApproveArticleAsync" />
-            </MudItem>
-            <MudItem xs="6" md="12" lg="6">
-                <DvButtonPrint Disabled="@(_vendor == null)"
-                               OnClick="PrintOverviewAsync" />
-            </MudItem>
-        </MudGrid>
-    </ArticleOverviewToolbar>
-    
-    @if (_vendorRemoved)
-    {
-        <MudAlert Variant="Variant.Filled"
-                  Severity="Severity.Error"
-                  ContentAlignment="HorizontalAlignment.Center">Händler wurde gelöscht, bitte Seite aktuallisieren.</MudAlert>
-    }
-    else
-    {
         <MudTable T="Article"
                   FixedHeader
                   Hover
@@ -84,8 +65,12 @@
                 <MudTd DataLabel="Status">@context.StatusText</MudTd>
             </RowTemplate>
         </MudTable>
-    }
-</div>
+    </div>
+}
+else
+{
+    <MudAlert Severity="Severity.Error"><MudText>Händler wurde nicht gefunden, bitte wenden Sie sich an den Verein für den korrekten Link.</MudText></MudAlert>
+}
 
 @code {
 
@@ -95,7 +80,6 @@
     private Vendor? _vendor;
     private string? _number;
     private string? _searchText;
-    private bool _vendorRemoved;
 
     protected override async Task OnInitializedAsync()
     {
@@ -116,14 +100,14 @@
 
     private async Task CreateArticleAsync()
     {
-        await DialogService.CreateArticleAsync(_vendor!.Id);
+        await DialogService.CreateArticleAsync(_vendor!.Id, true);
 
         FetchArticleList();
     }
 
     private async Task ModifyArticleAsync(Article article)
     {
-        await DialogService.ModifyArticleAsync(article);
+        await DialogService.ModifyArticleAsync(article, true);
 
         FetchArticleList();
     }
@@ -133,18 +117,6 @@
         await DialogService.ImportArticleAsync(_vendor!.Id);
 
         FetchArticleList();
-    }
-
-    private async Task ApproveArticleAsync()
-    {
-        await DialogService.ApproveArticleAsync(_vendor!.Id);
-
-        FetchArticleList();
-    }
-
-    private async Task PrintOverviewAsync()
-    {
-        await NavigationService.ToVendorPrint(_vendor!.Id);
     }
 
     private void FetchArticleList()
@@ -162,52 +134,6 @@
         }
 
         TitleFacade.SetCaption(caption);
-    }
-
-
-
-    private void OnArticleAdded(ArticleAddedInfo args)
-    {
-        // if (_vendor == null)
-        // {
-        //     FetchArticleList();
-        // }
-    }
-
-    private void OnArticleUpdated(ArticleUpdatedInfo args)
-    {
-        if (_vendor == null)
-        {
-            FetchArticleList();
-        }
-        if (_vendor?.Id == args.VendorId)
-        {
-            FetchArticleList();
-        }
-    }
-
-    private void OnArticleRemoved(ArticleRemovedInfo args)
-    {
-        if (_vendor == null)
-        {
-            FetchArticleList();
-        }
-        if (_vendor?.Id == args.VendorId)
-        {
-            FetchArticleList();
-        }
-    }
-
-    private void OnVendorRemoved(string vendorId)
-    {
-        if (_vendor == null)
-        {
-            FetchArticleList();
-        }
-        if (_vendor?.Id == vendorId)
-        {
-            _vendorRemoved = true;
-        }
     }
 
 }

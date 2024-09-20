@@ -1,5 +1,4 @@
 ﻿@using DeVesen.Bazaar.Client.Components.Common.MainLayout
-
 @inherits LayoutComponentBase
 
 @* Required *@
@@ -24,7 +23,7 @@
     <div Class="d-flex flex-row flex-grow-1">
         <div Class="flex-grow-0 sidebar sidebar-toggler">
             <MudPaper Outlined Class="m-1 p-2 rounded-lg" Elevation="2">
-                <NavMenu />
+                <NavMenu HideNavigation />
             </MudPaper>
         </div>
         <MudPaper Outlined Class="m-1 p-2 rounded-lg flex-grow-1" Elevation="2">
@@ -34,7 +33,7 @@
 </div>
 
 <MudDrawer @bind-Open="@_showSidebar" Anchor="@Anchor.Left" Elevation="1" Variant="@DrawerVariant.Temporary" OverlayAutoClose="true">
-    <NavMenu />
+    <NavMenu HideNavigation />
 </MudDrawer>
 
 @code {

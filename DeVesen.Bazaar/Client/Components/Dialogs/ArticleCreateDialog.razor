@@ -39,6 +39,8 @@
 
     [Parameter] public required string VendorId { get; set; }
 
+    [Parameter] public bool DisableAutoApprove { get; set; } = false;
+
     private Article? _item;
     private bool _isValid;
 
@@ -52,7 +54,10 @@
 
     private async Task SubmitAsync()
     {
-        _item!.ApprovedForSale = SystemClock.GetNow();
+        if (DisableAutoApprove is false)
+        {
+            _item!.ApprovedForSale = SystemClock.GetNow();
+        }
 
         await ArticleService.CreateAsync(_item);
 

@@ -58,7 +58,7 @@ public class DialogService(IDialogService dialogService)
     }
 
 
-    public async Task CreateArticleAsync(string vendorId)
+    public async Task CreateArticleAsync(string vendorId, bool disableAutoApprove = false)
     {
         var options = GetDefaultOptions();
         var forceNext = false;
@@ -68,7 +68,8 @@ public class DialogService(IDialogService dialogService)
             var parameters = new DialogParameters<ArticleCreateDialog>
             {
                 { x => x.ForceNext, forceNext },
-                { x => x.VendorId, vendorId }
+                { x => x.VendorId, vendorId },
+                { x => x.DisableAutoApprove, disableAutoApprove }
             };
 
             var dlg = await dialogService.ShowAsync<ArticleCreateDialog>("Artikel anlegen", parameters, options);
@@ -79,12 +80,13 @@ public class DialogService(IDialogService dialogService)
         } while (forceNext);
     }
 
-    public async Task ModifyArticleAsync(Article article)
+    public async Task ModifyArticleAsync(Article article, bool disableStateChange = false)
     {
         var options = GetDefaultOptions();
         var parameters = new DialogParameters<ArticleEditDialog>
         {
-            { x => x.Item, article }
+            { x => x.Item, article },
+            { x => x.DisableStateChange, disableStateChange }
         };
 
         await dialogService.ShowAsync<ArticleEditDialog>("Artikel ändern", parameters, options)

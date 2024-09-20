@@ -2,17 +2,19 @@
 @page "/"
 
 @using DeVesen.Bazaar.Client.State.Title
-@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+
+@layout AcquisitionLayout
 
 @inject TitleFacade TitleFacade
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Bazaar App</PageTitle>
 
-<h1>Hello, world!</h1>
+<MudText Typo="Typo.h5">Willkommen zum Ski-Basar</MudText>
+<MudText Typo="Typo.h6">Veranstaltet der Fachgruppe Wintersport der Naturfreunde Hochstadt</MudText>
 
-Welcome to your new app.
-
-<SurveyPrompt Title="How is Blazor working for you?" />
+<MudAlert Variant="Variant.Filled" Severity="Severity.Info">
+    <MudText>Als Händler, bitte wenden Sie sich bei uns damit wir Ihnen einen Link zukommen lassen können. Mit diesem Sie Ihre Artikel im vorveld anlegen können.</MudText>
+</MudAlert>
 
 @code {
 

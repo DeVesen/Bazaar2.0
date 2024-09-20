@@ -11,6 +11,7 @@
         <ArticleForm IsValid="@_isValid"
                      IsValidChanged="@(x => _isValid = x)"
                      OnDeleted="DeleteAsync"
+                     DisableStateChange="@DisableStateChange"
                      @bind-Item="Item" />
     </DialogContent>
     <DialogActions>
@@ -23,6 +24,8 @@
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
 
     [Parameter] public Article Item { get; set; } = null!;
+
+    [Parameter] public bool DisableStateChange { get; set; } = false;
 
     private bool _isValid;
 

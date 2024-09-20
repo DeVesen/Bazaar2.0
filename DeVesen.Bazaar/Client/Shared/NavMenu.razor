@@ -9,16 +9,19 @@
 <div class="@NavMenuCssClass nav-scrollable">
     
     <MudNavMenu Dense Rounded="true" Margin="Margin.Normal" Class="pa-2">
+        
+        @if (HideNavigation is false)
+        {
+            <MudNavLink Href="/articles" Icon="@Icons.Material.TwoTone.Article">Annahme</MudNavLink>
+            <MudNavLink Href="/sales" Icon="@Icons.Material.TwoTone.ShoppingCart">Verkauf</MudNavLink>
+            <MudNavLink Href="/GiveBack" Icon="@Icons.Material.TwoTone.ShoppingCart">Rückgabe</MudNavLink>
 
-        <MudNavLink Href="/articles" Icon="@Icons.Material.TwoTone.Article">Annahme</MudNavLink>
-        <MudNavLink Href="/sales" Icon="@Icons.Material.TwoTone.ShoppingCart">Verkauf</MudNavLink>
-        <MudNavLink Href="/GiveBack" Icon="@Icons.Material.TwoTone.ShoppingCart">Rückgabe</MudNavLink>
+            <MudDivider />
 
-        <MudDivider />
-
-        <MudNavLink Href="/vendors" Icon="@Icons.Material.TwoTone.PersonSearch">Verkäufer</MudNavLink>
-        <MudNavLink Href="/article-category" Icon="@Icons.Material.TwoTone.Category">Artikel Kategorieren</MudNavLink>
-        <MudNavLink Href="/article-manufacturer" Icon="@Icons.Material.TwoTone.Build">Artikel Hersteller</MudNavLink>
+            <MudNavLink Href="/vendors" Icon="@Icons.Material.TwoTone.PersonSearch">Verkäufer</MudNavLink>
+            <MudNavLink Href="/article-category" Icon="@Icons.Material.TwoTone.Category">Artikel Kategorieren</MudNavLink>
+            <MudNavLink Href="/article-manufacturer" Icon="@Icons.Material.TwoTone.Build">Artikel Hersteller</MudNavLink>
+        }
 
     </MudNavMenu>
 
@@ -28,6 +31,9 @@
     private bool _collapseNavMenu = false;
 
     private string? NavMenuCssClass => _collapseNavMenu ? "collapse" : null;
+
+    [Parameter]
+    public bool HideNavigation { get; set; } = false;
 
     private void ToggleNavMenu()
     {

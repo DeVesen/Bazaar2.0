@@ -7,60 +7,63 @@
 
     <div class="d-flex flex-column gap-4 h-100">
         
-        <MudPaper Class="d-flex p-4 justify-space-between">
-            @if (IsApprovedForSale)
-            {
-                <MudText>@($"Freigegeben um {Item.ApprovedForSale:HH:mm} Uhr am {Item.ApprovedForSale:dd.MM.yyyy}")</MudText>
-                @if (IsApprovedForSaleResetPossible)
-                {
-                    <MudIconButton Size="Size.Small"
-                                   Icon="@Icons.Material.TwoTone.Delete"
-                                   OnClick="ResetApprovedForSaleAsync"></MudIconButton>
-                }
-            }
-            else
-            {
-                <MudButton FullWidth OnClick="ApproveForSaleAsync">Jetzt freigeben</MudButton>
-            }
-        </MudPaper>
-    
-        @if (IsSold)
+        @if (DisableStateChange is false)
         {
             <MudPaper Class="d-flex p-4 justify-space-between">
-                <MudText>@($"Verkauft für {Item.SoldAt:#.##} € um {Item.Sold:HH:mm} Uhr am {Item.Sold:dd.MM.yyyy}")</MudText>
-                @if (IsSoldResetPossible)
+                @if (IsApprovedForSale)
                 {
-                    <MudIconButton Size="Size.Small"
-                                   Icon="@Icons.Material.TwoTone.Delete"
-                                   OnClick="ResetSoldAsync"></MudIconButton>
+                    <MudText>@($"Freigegeben um {Item.ApprovedForSale:HH:mm} Uhr am {Item.ApprovedForSale:dd.MM.yyyy}")</MudText>
+                    @if (IsApprovedForSaleResetPossible)
+                    {
+                        <MudIconButton Size="Size.Small"
+                                       Icon="@Icons.Material.TwoTone.Delete"
+                                       OnClick="ResetApprovedForSaleAsync"></MudIconButton>
+                    }
+                }
+                else
+                {
+                    <MudButton FullWidth OnClick="ApproveForSaleAsync">Jetzt freigeben</MudButton>
                 }
             </MudPaper>
-        }
 
-        @if (IsReturned)
-        {
-            <MudPaper Class="d-flex p-4 justify-space-between">
-                <MudText>@($"Zurückgegeben um {Item.Returned:dd.MM.yyyy}")</MudText>
-                @if (IsReturnedResetPossible)
-                {
+            @if (IsSold)
+            {
+                <MudPaper Class="d-flex p-4 justify-space-between">
+                    <MudText>@($"Verkauft für {Item.SoldAt:#.##} € um {Item.Sold:HH:mm} Uhr am {Item.Sold:dd.MM.yyyy}")</MudText>
+                    @if (IsSoldResetPossible)
+                    {
+                        <MudIconButton Size="Size.Small"
+                                       Icon="@Icons.Material.TwoTone.Delete"
+                                       OnClick="ResetSoldAsync"></MudIconButton>
+                    }
+                </MudPaper>
+            }
+
+            @if (IsReturned)
+            {
+                <MudPaper Class="d-flex p-4 justify-space-between">
+                    <MudText>@($"Zurückgegeben um {Item.Returned:dd.MM.yyyy}")</MudText>
+                    @if (IsReturnedResetPossible)
+                    {
+                        <MudIconButton Size="Size.Small"
+                                       Icon="@Icons.Material.TwoTone.Delete"
+                                       OnClick="ResetReturnedAsync"></MudIconButton>
+                    }
+                </MudPaper>
+            }
+
+            @if (IsSettled)
+            {
+                <MudPaper Class="d-flex p-4 justify-space-between">
+                    <MudText>@($"Abgerechnet um {Item.Settled:HH:mm} Uhr am {Item.Settled:dd.MM.yyyy}")</MudText>
                     <MudIconButton Size="Size.Small"
                                    Icon="@Icons.Material.TwoTone.Delete"
-                                   OnClick="ResetReturnedAsync"></MudIconButton>
-                }
-            </MudPaper>
+                                   OnClick="ResetSettledAsync"></MudIconButton>
+                </MudPaper>
+            }
+
+            <MudDivider />
         }
-    
-        @if (IsSettled)
-        {
-            <MudPaper Class="d-flex p-4 justify-space-between">
-                <MudText>@($"Abgerechnet um {Item.Settled:HH:mm} Uhr am {Item.Settled:dd.MM.yyyy}")</MudText>
-                <MudIconButton Size="Size.Small"
-                               Icon="@Icons.Material.TwoTone.Delete"
-                               OnClick="ResetSettledAsync"></MudIconButton>
-            </MudPaper>
-        }
-        
-        <MudDivider />
         
         <DvButtonDelete OnClick="DeleteAsync" />
 
@@ -83,6 +86,9 @@
 
     [Parameter]
     public EventCallback OnDeleted { get; set; }
+
+    [Parameter]
+    public bool DisableStateChange { get; set; } = false;
 
     private bool IsApprovedForSale => Item.ApprovedForSale.HasValue;
     private bool IsSold => Item.Sold.HasValue;
