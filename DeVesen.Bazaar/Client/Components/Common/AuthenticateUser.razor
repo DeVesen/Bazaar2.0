@@ -1,0 +1,104 @@
+﻿@using DeVesen.Bazaar.Client.Services
+@using DeVesen.Bazaar.Shared
+
+@inject HttpClient Http
+@inject IJSRuntime JsRuntime
+@inject TokenAuthenticationStateProvider AuthenticationStateProvider
+
+<MudCard Class="p-3 pt-5">
+    @if (_hasAuth)
+    {
+        <MudButton OnClick="DisconnectUserAsync">Abmelden</MudButton>
+    }
+    else
+    {
+        <MudTextField T="string"
+                      Clearable
+                      FullWidth
+                      ShrinkLabel
+                      Label="Benutzername"
+                      Margin="Margin.Dense"
+                      @bind-Value="@_loginModel.Username"/>
+        <MudTextField T="string"
+                      Clearable
+                      FullWidth
+                      ShrinkLabel
+                      Label="Passwort"
+                      Margin="Margin.Dense"
+                      InputType="@_passwordInput"
+                      @bind-Value="@_loginModel.Password"
+                      Adornment="Adornment.End"
+                      AdornmentIcon="@_passwordInputIcon"
+                      OnAdornmentClick="ButtonTestclick"
+                      AdornmentAriaLabel="Show Password"/>
+
+        <MudButton OnClick="SubmitAsync">Login</MudButton>
+    }
+</MudCard>
+
+@code {
+    private LoginModel _loginModel = new();
+
+    private bool _isPasswordShow = false;
+    private InputType _passwordInput = InputType.Password;
+    private string _passwordInputIcon = Icons.Material.Filled.VisibilityOff;
+    private bool _hasAuth = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        await VerityAuthenticatedAsync();
+    }
+
+    private async Task SubmitAsync(MouseEventArgs arg)
+    {
+        var result = await Http.PostAsJsonAsync("api/v1/Authentication/login", _loginModel);
+
+        if (result.IsSuccessStatusCode)
+        {
+            var token = await result.Content.ReadAsStringAsync();
+            await JsRuntime.InvokeVoidAsync("localStorage.setItem", "authToken", token);
+            AuthenticationStateProvider.MarkUserAsAuthenticated(token);
+        }
+
+        await VerityAuthenticatedAsync();
+    }
+
+    private async Task DisconnectUserAsync(MouseEventArgs arg)
+    {
+        await JsRuntime.InvokeVoidAsync("localStorage.removeItem", "authToken");
+        AuthenticationStateProvider.MarkUserAsLoggedOut();
+
+        await VerityAuthenticatedAsync();
+    }
+
+    private async Task VerityAuthenticatedAsync()
+    {
+        var newState = await AuthenticationStateProvider.HasAuthenticationAsync();
+
+        if (_hasAuth == newState)
+        {
+            return;
+        }
+
+        _hasAuth = newState;
+        StateHasChanged();
+    }
+
+    private void ButtonTestclick()
+    {
+        @if (_isPasswordShow)
+        {
+            _isPasswordShow = false;
+            _passwordInputIcon = Icons.Material.Filled.VisibilityOff;
+            _passwordInput = InputType.Password;
+        }
+        else
+        {
+            _isPasswordShow = true;
+            _passwordInputIcon = Icons.Material.Filled.Visibility;
+            _passwordInput = InputType.Text;
+        }
+    }
+}

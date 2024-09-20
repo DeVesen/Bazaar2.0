@@ -7,8 +7,9 @@
 @using DeVesen.Bazaar.Client.Components.HubHandler
 @using DeVesen.Bazaar.Shared.Events
 
-@page "/YXBw/articles"
-@page "/YXBw/vendors/{vendorId}/articles"
+@page "/articles"
+@page "/vendors/{vendorId}/articles"
+@attribute [Authorize]
 
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 

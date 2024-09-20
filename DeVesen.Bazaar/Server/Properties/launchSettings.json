@@ -13,7 +13,7 @@
     "https": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "acquisition/4f137710",
+      "launchUrl": "articles",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },

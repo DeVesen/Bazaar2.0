@@ -3,8 +3,9 @@
 
 @layout PrintLayout
 
-@page "/YXBw/vendors/{vendorId}/print"
-@page "/YXBw/vendors/{vendorId}/print/settlement"
+@page "/vendors/{vendorId}/print"
+@page "/vendors/{vendorId}/print/settlement"
+@attribute [Authorize]
 
 @inject SettlementFacade SettlementFacade;
 @inject IState<SettlementState> SettlementState;

@@ -10,14 +10,14 @@ public class NavigationService(NavigationManager navigationManager, IJSRuntime j
 
     public void ToArticleOverview(string vendorId)
     {
-        navigationManager.NavigateTo($"YXBw/vendors/{vendorId}/articles");
+        navigationManager.NavigateTo($"vendors/{vendorId}/articles");
     }
 
     public async Task ToVendorPrint(string vendorId)
     {
         try
         {
-            await jsRuntime.InvokeAsync<object>("open", $"{BaseUri}YXBw/vendors/{vendorId}/print", "_blank");
+            await jsRuntime.InvokeAsync<object>("open", $"{BaseUri}vendors/{vendorId}/print", "_blank");
         }
         catch
         {
@@ -29,7 +29,7 @@ public class NavigationService(NavigationManager navigationManager, IJSRuntime j
     {
         try
         {
-            await jsRuntime.InvokeAsync<object>("open", $"{BaseUri}YXBw/vendors/{vendorId}/print/settlement", "_blank");
+            await jsRuntime.InvokeAsync<object>("open", $"{BaseUri}vendors/{vendorId}/print/settlement", "_blank");
         }
         catch
         {
@@ -39,6 +39,6 @@ public class NavigationService(NavigationManager navigationManager, IJSRuntime j
 
     public void ToModifyOverview(string vendorId)
     {
-        navigationManager.NavigateTo($"YXBw/vendors/{vendorId}/modify");
+        navigationManager.NavigateTo($"vendors/{vendorId}/modify");
     }
 }

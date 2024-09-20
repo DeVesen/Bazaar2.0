@@ -17,7 +17,7 @@
     }
 
     .nav-scrollable {
-        max-height: 40vh;
+        max-height: 80vh;
         overflow-y: auto;
     }
 }

@@ -70,6 +70,4 @@ public record VendorArticleStatisticDto
     public long Sold { get; init; } = 0;
     public long Settled { get; init; } = 0;
     public double Turnover { get; init; } = 0;
-
-
 }

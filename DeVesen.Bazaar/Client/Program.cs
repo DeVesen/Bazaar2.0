@@ -11,6 +11,7 @@ using DeVesen.Bazaar.Client.State.Title;
 using DeVesen.Bazaar.Client.State.VendorView;
 using DeVesen.Bazaar.Client.Validator;
 using DeVesen.Bazaar.Shared.Services;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor.Services;
@@ -22,6 +23,10 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddMudServices()
                 .ConfigureFluxor();
+
+builder.Services.AddAuthorizationCore();
+builder.Services.AddScoped<TokenAuthenticationStateProvider>();
+builder.Services.AddScoped<AuthenticationStateProvider>(provider => provider.GetRequiredService<TokenAuthenticationStateProvider>());
 
 builder.Services.AddTransient<ManufacturerFacade>();
 builder.Services.AddTransient<ArticleCategoryFacade>();
@@ -40,6 +45,7 @@ builder.Services.AddTransient(HubConnectionProviderExtensions.CreateVendorHubCon
                 .AddTransient(HubConnectionProviderExtensions.CreateManufacturerHubConnectionService)
                 .AddTransient(HubConnectionProviderExtensions.CreateArticleCategoryHubConnectionService);
 
+builder.Services.AddTransient<AuthService>();
 builder.Services.AddTransient<NavigationService>();
 builder.Services.AddTransient<DialogService>();
 builder.Services.AddTransient<SystemClock>();
