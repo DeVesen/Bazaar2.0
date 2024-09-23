@@ -30,28 +30,23 @@ public class AuthenticationController(IVendorRepository vendorRepository) : Cont
 
     private async Task<(bool Found, VendorEntity Entity)> TryGetVendor(string userName, string password)
     {
-        var vendorElement = await GetAllVendors();
-        var vendorEntity = vendorElement.FirstOrDefault(p =>
-            $"{p.LastName}.{p.FirstName}".Equals(userName, StringComparison.OrdinalIgnoreCase));
-
-        if (vendorEntity == null)
+        var adminEntity = new VendorEntity
         {
-            return (false, null!);
+            Id = "cc322bf4",
+            FirstName = "Hochstadt",
+            LastName = "Wintersport"
+        };
+
+        var adminUserName = $"{adminEntity.LastName}.{adminEntity.FirstName}";
+        var adminPassword = (adminEntity.LastName + "-" + adminEntity.Id).ToShortHash();
+
+        if (adminUserName.Equals(userName, StringComparison.OrdinalIgnoreCase) &&
+            adminPassword.Equals(password, StringComparison.Ordinal))
+        {
+            return (true, adminEntity);
         }
 
-        var vendorPassword = (vendorEntity.LastName + "-" + vendorEntity.Id).ToShortHash();
-        return vendorPassword.Equals(password, StringComparison.OrdinalIgnoreCase)
-            ? (true, vendorEntity)
-            : (false, null!);
-    }
-
-    private async Task<IEnumerable<VendorEntity>> GetAllVendors()
-    {
-        var result = new List<VendorEntity> { GetMasterEntity() };
-
-        result.AddRange(await vendorRepository.GetAllAsync());
-
-        return result;
+        return (false, null!);
     }
 
     private static string GenerateJwtToken(VendorEntity vendorEntity)
@@ -79,12 +74,4 @@ public class AuthenticationController(IVendorRepository vendorRepository) : Cont
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
-
-    private static VendorEntity GetMasterEntity()
-        => new()
-        {
-            Id = "cc322bf4",
-            FirstName = "Hochstadt",
-            LastName = "Wintersport"
-        };
 }

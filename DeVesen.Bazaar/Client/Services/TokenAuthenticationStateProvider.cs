@@ -6,28 +6,21 @@ using System.Text.Json;
 
 namespace DeVesen.Bazaar.Client.Services
 {
-    public class TokenAuthenticationStateProvider : AuthenticationStateProvider
+    public class TokenAuthenticationStateProvider(IJSRuntime jsRuntime, HttpClient httpClient)
+        : AuthenticationStateProvider
     {
-        private readonly IJSRuntime _jsRuntime;
-        private readonly HttpClient _httpClient;
-        private const string _tokenKey = "authToken";
-
-        public TokenAuthenticationStateProvider(IJSRuntime jsRuntime, HttpClient httpClient)
-        {
-            _jsRuntime = jsRuntime;
-            _httpClient = httpClient;
-        }
+        private const string TokenKey = "authToken";
 
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
-            var token = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", _tokenKey);
+            var token = await jsRuntime.InvokeAsync<string>("localStorage.getItem", TokenKey);
 
             if (string.IsNullOrWhiteSpace(token))
             {
                 return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
             }
 
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             var claims = ParseClaimsFromJwt(token);
             var identity = new ClaimsIdentity(claims, "jwtAuthType");
@@ -38,7 +31,7 @@ namespace DeVesen.Bazaar.Client.Services
 
         public async Task<bool> HasAuthenticationAsync()
         {
-            var token = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", _tokenKey);
+            var token = await jsRuntime.InvokeAsync<string>("localStorage.getItem", TokenKey);
 
             return !string.IsNullOrWhiteSpace(token);
         }

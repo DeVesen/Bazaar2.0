@@ -1,4 +1,8 @@
 ﻿@using DeVesen.Bazaar.Client.Components.Common
+@using DeVesen.Bazaar.Client.Services
+
+@inject TokenAuthenticationStateProvider AuthenticationStateProvider
+
 <style>
     .nav-scrollable-content {
         height: calc(100vh - 90px);
@@ -7,11 +11,13 @@
     }
 </style>
 
+<AuthNotification AuthenticationChanged="OnAuthenticationChanged" />
+
 <div class="@NavMenuCssClass nav-scrollable">
     
     <MudNavMenu Dense Rounded="true" Margin="Margin.Normal" Class="pa-2">
         
-        @if (HideNavigation is false)
+        @if (_isAuthenticated)
         {
             <MudNavLink Href="/articles" Icon="@Icons.Material.TwoTone.Article">Annahme</MudNavLink>
             <MudNavLink Href="/sales" Icon="@Icons.Material.TwoTone.ShoppingCart">Verkauf</MudNavLink>
@@ -34,14 +40,17 @@
 
 @code {
     private bool _collapseNavMenu = false;
+    private bool _isAuthenticated = false;
 
     private string? NavMenuCssClass => _collapseNavMenu ? "collapse" : null;
-
-    [Parameter]
-    public bool HideNavigation { get; set; } = false;
 
     private void ToggleNavMenu()
     {
         _collapseNavMenu = !_collapseNavMenu;
+    }
+
+    private void OnAuthenticationChanged(bool isAuthenticated)
+    {
+        _isAuthenticated = isAuthenticated;
     }
 }

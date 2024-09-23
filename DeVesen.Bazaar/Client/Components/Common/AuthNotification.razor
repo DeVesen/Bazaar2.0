@@ -1,0 +1,43 @@
+﻿@using DeVesen.Bazaar.Client.Services
+@implements IDisposable
+
+@inject TokenAuthenticationStateProvider AuthenticationStateProvider
+
+@code {
+
+    [Parameter]
+    public EventCallback<bool> AuthenticationChanged { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            AuthenticationStateProvider.AuthenticationStateChanged += AuthenticationStateProviderOnAuthenticationStateChanged;
+
+            await InitialAuthenticationCheckAsync();
+        }
+    }
+
+    private async Task InitialAuthenticationCheckAsync()
+    {
+        var actualState = await AuthenticationStateProvider.HasAuthenticationAsync();
+
+        await AuthenticationChanged.InvokeAsync(actualState);
+    }
+
+    private void AuthenticationStateProviderOnAuthenticationStateChanged(Task<AuthenticationState> task)
+    {
+        var authState = task.GetAwaiter().GetResult();
+
+        var isAuthenticated = authState.User.Identity?.IsAuthenticated ?? false;
+
+        AuthenticationChanged.InvokeAsync(isAuthenticated);
+    }
+
+    public void Dispose()
+    {
+        AuthenticationStateProvider.AuthenticationStateChanged -= AuthenticationStateProviderOnAuthenticationStateChanged;
+    }
+}
