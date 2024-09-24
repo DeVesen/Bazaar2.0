@@ -1,7 +1,6 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using DeVesen.Bazaar.Server.Contracts;
 using DeVesen.Bazaar.Server.Infrastructure;
 using DeVesen.Bazaar.Shared;
 using DeVesen.Bazaar.Shared.Basics;
@@ -12,23 +11,22 @@ namespace DeVesen.Bazaar.Server.Controllers;
 
 [ApiController]
 [Route("api/v1/[controller]")]
-public class AuthenticationController(IVendorRepository vendorRepository) : ControllerBase
+public class AuthenticationController : ControllerBase
 {
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginModel loginModel)
+    public IActionResult Login([FromBody] LoginModel loginModel)
     {
-        var vendorResult = await TryGetVendor(loginModel.Username, loginModel.Password);
-        if (vendorResult.Found is false)
+        if (TryGetVendor(loginModel.Username, loginModel.Password, out var vendorEntity) is false)
         {
             return Unauthorized();
         }
 
-        var token = GenerateJwtToken(vendorResult.Entity);
+        var token = GenerateJwtToken(vendorEntity);
 
         return Ok(token);
     }
 
-    private async Task<(bool Found, VendorEntity Entity)> TryGetVendor(string userName, string password)
+    private static bool TryGetVendor(string userName, string password, out VendorEntity entity)
     {
         var adminEntity = new VendorEntity
         {
@@ -43,10 +41,14 @@ public class AuthenticationController(IVendorRepository vendorRepository) : Cont
         if (adminUserName.Equals(userName, StringComparison.OrdinalIgnoreCase) &&
             adminPassword.Equals(password, StringComparison.Ordinal))
         {
-            return (true, adminEntity);
+            entity = adminEntity;
+
+            return true;
         }
 
-        return (false, null!);
+        entity = null!;
+
+        return false;
     }
 
     private static string GenerateJwtToken(VendorEntity vendorEntity)
