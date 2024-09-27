@@ -8,31 +8,44 @@
 <MudCard Class="p-3 pt-5">
     @if (_hasAuth)
     {
-        <MudButton OnClick="DisconnectUserAsync">Abmelden</MudButton>
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Dark"
+                   Size="Size.Small"
+                   OnClick="DisconnectUserAsync">Abmelden</MudButton>
     }
     else
     {
         <MudTextField T="string"
-                      Clearable
                       FullWidth
                       ShrinkLabel
                       Label="Benutzername"
                       Margin="Margin.Dense"
+                      DebounceInterval="900"
                       @bind-Value="@_loginModel.Username"/>
+
         <MudTextField T="string"
-                      Clearable
                       FullWidth
                       ShrinkLabel
                       Label="Passwort"
                       Margin="Margin.Dense"
                       InputType="@_passwordInput"
-                      @bind-Value="@_loginModel.Password"
                       Adornment="Adornment.End"
                       AdornmentIcon="@_passwordInputIcon"
                       OnAdornmentClick="ButtonTestclick"
-                      AdornmentAriaLabel="Show Password"/>
+                      AdornmentAriaLabel="Show Password"
+                      DebounceInterval="900"
+                      @bind-Value="@_loginModel.Password" />
 
-        <MudButton OnClick="SubmitAsync">Login</MudButton>
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   Class="mt-3"
+                   OnClick="SubmitAsync">Login</MudButton>
+
+        @if (string.IsNullOrWhiteSpace(_authFailedMessage) is false)
+        {
+            <MudAlert Variant="Variant.Filled"
+                      Severity="Severity.Error">@_authFailedMessage</MudAlert>
+        }
     }
 </MudCard>
 
@@ -43,6 +56,10 @@
     private InputType _passwordInput = InputType.Password;
     private string _passwordInputIcon = Icons.Material.Filled.VisibilityOff;
     private bool _hasAuth = false;
+    private string _authFailedMessage = string.Empty;
+
+    private bool MinimumInputGiven => string.IsNullOrWhiteSpace(_loginModel.Username) is false &&
+                                      string.IsNullOrWhiteSpace(_loginModel.Password) is false;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -53,6 +70,13 @@
 
     private async Task SubmitAsync(MouseEventArgs arg)
     {
+        _authFailedMessage = string.Empty;
+
+        if (MinimumInputGiven is false)
+        {
+            return;
+        }
+
         var result = await Http.PostAsJsonAsync("api/v1/Authentication/login", _loginModel);
 
         if (result.IsSuccessStatusCode)
@@ -60,6 +84,10 @@
             var token = await result.Content.ReadAsStringAsync();
             await JsRuntime.InvokeVoidAsync("localStorage.setItem", "authToken", token);
             AuthenticationStateProvider.MarkUserAsAuthenticated(token);
+        }
+        else
+        {
+            _authFailedMessage = "Benutzername oder Passwort sind nicht korrekt!";
         }
 
         await VerityAuthenticatedAsync();
