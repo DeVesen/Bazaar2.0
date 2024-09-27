@@ -32,7 +32,7 @@ public record Article
     public DateTime? Returned { get; set; }
     public DateTime? Settled { get; set; }
 
-    public static Article CreateNew(string vendorId, long? number) => new()
+    public static Article CreateNew(string vendorId, long? number = null) => new()
     {
         VendorId = vendorId,
         Number = number ?? default

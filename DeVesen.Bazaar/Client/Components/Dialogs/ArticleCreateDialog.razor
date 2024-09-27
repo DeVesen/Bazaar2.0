@@ -48,8 +48,7 @@
     {
         await base.OnParametersSetAsync();
 
-        var numberResponse = await ArticleService.GetNextNumber();
-        _item = Article.CreateNew(VendorId, numberResponse.Value);
+        _item = Article.CreateNew(VendorId);
     }
 
     private async Task SubmitAsync()

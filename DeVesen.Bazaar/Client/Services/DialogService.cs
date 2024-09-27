@@ -194,12 +194,13 @@ public class DialogService(IDialogService dialogService)
     }
 
 
-    private static DialogOptions GetDefaultOptions(bool? fullWidth = null)
+    private static DialogOptions GetDefaultOptions(bool? fullWidth = null, bool? fullScreen = null)
         => new()
         {
-            CloseOnEscapeKey = true,
+            CloseOnEscapeKey = false,
             BackdropClick = false,
-            FullWidth = fullWidth
+            FullWidth = fullWidth,
+            FullScreen = fullScreen
         };
 }
 
