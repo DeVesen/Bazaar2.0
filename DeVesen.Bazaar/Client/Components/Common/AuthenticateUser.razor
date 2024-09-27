@@ -21,6 +21,7 @@
                       Label="Benutzername"
                       Margin="Margin.Dense"
                       DebounceInterval="900"
+                      OnKeyUp="OnKeyUpAsync"
                       @bind-Value="@_loginModel.Username"/>
 
         <MudTextField T="string"
@@ -31,9 +32,10 @@
                       InputType="@_passwordInput"
                       Adornment="Adornment.End"
                       AdornmentIcon="@_passwordInputIcon"
-                      OnAdornmentClick="ButtonTestclick"
+                      OnAdornmentClick="OnPasswordToggle"
                       AdornmentAriaLabel="Show Password"
                       DebounceInterval="900"
+                      OnKeyUp="OnKeyUpAsync"
                       @bind-Value="@_loginModel.Password" />
 
         <MudButton Variant="Variant.Filled"
@@ -68,7 +70,7 @@
         await VerityAuthenticatedAsync();
     }
 
-    private async Task SubmitAsync(MouseEventArgs arg)
+    private async Task SubmitAsync()
     {
         _authFailedMessage = string.Empty;
 
@@ -114,7 +116,7 @@
         StateHasChanged();
     }
 
-    private void ButtonTestclick()
+    private void OnPasswordToggle()
     {
         @if (_isPasswordShow)
         {
@@ -128,5 +130,15 @@
             _passwordInputIcon = Icons.Material.Filled.Visibility;
             _passwordInput = InputType.Text;
         }
+    }
+
+    private async Task OnKeyUpAsync(KeyboardEventArgs args)
+    {
+        if (args.Key != "Enter")
+        {
+            return;
+        }
+
+        await SubmitAsync();
     }
 }
