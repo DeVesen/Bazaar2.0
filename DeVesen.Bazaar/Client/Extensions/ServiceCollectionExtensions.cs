@@ -1,4 +1,5 @@
 ﻿using Fluxor;
+using Fluxor.Blazor.Web.ReduxDevTools;
 
 namespace DeVesen.Bazaar.Client.Extensions;
 

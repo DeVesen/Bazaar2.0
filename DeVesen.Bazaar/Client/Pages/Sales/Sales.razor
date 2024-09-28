@@ -155,13 +155,11 @@
         SalesCartFacade.ClearCart();
     }
 
-    protected override void Dispose(bool disposing)
+    protected override ValueTask DisposeAsyncCore(bool disposing)
     {
-        base.Dispose(disposing);
-
         SalesCartFacade.ClearCart();
+        return base.DisposeAsyncCore(disposing);
     }
-
 
     private async Task OnArticleSearchKeyUpAsync(KeyboardEventArgs args)
     {
