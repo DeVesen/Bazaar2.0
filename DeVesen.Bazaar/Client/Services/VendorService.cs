@@ -50,13 +50,12 @@ public class VendorService
         }
     }
 
-    public async Task<Response<IEnumerable<VendorView>>> GetAllAsync(string? id = null, string? salutation = null, string? searchText = null)
+    public async Task<Response<IEnumerable<VendorView>>> GetAllAsync(string? id = null, string? searchText = null)
     {
         try
         {
             var requestUri = new UriBuilder(_httpClient.BaseAddress)
                 .SetQueryItem("Id", id)
-                .SetQueryItem("Salutation", salutation)
                 .SetQueryItem("SearchText", searchText)
                 .Build();
 

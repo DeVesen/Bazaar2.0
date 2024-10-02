@@ -8,7 +8,7 @@ public class VendorViewEffects(VendorService vendorService)
     [EffectMethod]
     public async Task FetchVendors(VendorViewActions.Fetch action, IDispatcher dispatcher)
     {
-        var response = await vendorService.GetAllAsync(action.Id, action.Salutation, action.SearchText);
+        var response = await vendorService.GetAllAsync(action.Id, action.SearchText);
 
         if (response.IsValid is false)
         {
