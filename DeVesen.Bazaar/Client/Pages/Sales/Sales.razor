@@ -3,9 +3,7 @@
 @using DeVesen.Bazaar.Client.State.SalesCart
 @using DeVesen.Bazaar.Client.Pages.Sales.Components
 @using DeVesen.Bazaar.Client.State.Title
-@using DeVesen.Bazaar.Client.Components.Common.Buttons
 @using DeVesen.Bazaar.Client.Components.Common
-@using DeVesen.Bazaar.Client.Components.Common.TextField
 @using DeVesen.Bazaar.Client.Components.HubHandler
 @using DeVesen.Bazaar.Shared.Events
 
@@ -18,6 +16,17 @@
 @inject ArticleService ArticleService;
 @inject SalesCartFacade SalesCartFacade;
 @inject IState<SalesCartState> SalesCartState;
+
+<style>
+    @@media (max-width: 576px) {
+        .ptsm {
+            padding-top: 0.5rem;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+    }
+</style>
 
 <ArticleHubActionHandler Updated="OnArticleUpdated" Removed="OnArticleRemoved" StatusChanged="OnStatusChanged" />
 
@@ -43,42 +52,40 @@
     {
         <MudGrid>
             <MudItem xs="12" md="6">
-                <MudGrid Spacing="2">
-                    <MudItem xs="12" sm="6">
-                        <DvTextField @ref="_articleNumberRef"
-                                     T="long?"
-                                     Label="Nummer"
-                                     InputMode="InputMode.numeric"
-                                     Margin="Margin.None"
-                                     DebounceInterval="0"
-                                     @bind-Value="_articleNumber"
-                                     @bind-Value:after="@OnArticleSearchAsync"
-                                     OnKeyUp="@OnArticleSearchKeyUpAsync"/>
-                    </MudItem>
-                    <MudItem xs="6" sm="3">
-                        <DvButtonSalesPrice Disabled="@Price01BtnDisabled"
-                                            Value="_article?.Price01"
-                                            Style="min-height: 62px; font-size: 26px"
-                                            Color="@Color.Primary"
-                                            OnClick="() => OnArticlePriceClickAsync(_article!, _article!.Price01)"/>
-                    </MudItem>
-                    <MudItem xs="6" sm="3">
-                        <DvButtonSalesPrice Disabled="@Price02BtnDisabled"
-                                            Value="_article?.Price02"
-                                            Style="min-height: 62px; font-size: 20px"
-                                            Color="@Color.Primary"
-                                            Variant="@Variant.Outlined"
-                                            OnClick="() => OnArticlePriceClickAsync(_article!, _article!.Price02!.Value)"/>
-                    </MudItem>
-                    <MudItem xs="12">
-                        <MudAlert Dense
-                                  Square
-                                  NoIcon="@_articleAlertNoIcon"
-                                  Variant="@_articleAlertVariant"
-                                  Severity="@_articleAlertSeverity"
-                                  ContentAlignment="HorizontalAlignment.Center">@_articleAlertText</MudAlert>
-                    </MudItem>
-                </MudGrid>
+
+                <MudPaper Class="d-flex flex-column gap-4">
+                    <div class="d-sm-flex justify-start gap-4">
+                        <MudTextField @ref="_articleNumberRef"
+                                      T="long?"
+                                      FullWidth="true"
+                                      Label="Nummer"
+                                      InputMode="InputMode.numeric"
+                                      Margin="Margin.None"
+                                      DebounceInterval="0"
+                                      Style="min-width: 160px"
+                                      Adornment="Adornment.End"
+                                      AdornmentIcon="@BazaarIcons.Enter"
+                                      @bind-Value="_articleNumber"
+                                      @bind-Value:after="@OnArticleSearchAsync"
+                                      OnKeyUp="@OnArticleSearchKeyUpAsync" />
+                        <MudButtonGroup OverrideStyles="false" Class="ptsm">
+                            <SalesPriceBtn Value="@_article?.Price01"
+                                           Color="Color.Primary"
+                                           Disabled="@(ArticleValidForSale is false)"
+                                           OnClick="() => OnArticlePriceClickAsync(_article!, _article!.Price01)" />
+                            <SalesPriceBtn Value="@_article?.Price02"
+                                           Color="Color.Secondary"
+                                           Disabled="@(ArticleValidForSale is false)"
+                                           OnClick="() => OnArticlePriceClickAsync(_article!, _article!.Price02!.Value)" />
+                        </MudButtonGroup>
+                    </div>
+                    <MudAlert Dense
+                              Square
+                              NoIcon="@_articleAlertNoIcon"
+                              Variant="@_articleAlertVariant"
+                              Severity="@_articleAlertSeverity"
+                              ContentAlignment="HorizontalAlignment.Center">@_articleAlertText</MudAlert>
+                </MudPaper>
             </MudItem>
 
             @if (HasItemsInCart)
@@ -128,8 +135,6 @@
     private bool ArticleValidForSale => _article != null &&
                                         _article.IsValidForSale() &&
                                         ArticleAlreadyInCart(_article.Number) is false;
-    private bool Price01BtnDisabled => ArticleValidForSale is false;
-    private bool Price02BtnDisabled => _article == null || _article!.Price02.HasValue is false;
 
     private bool HasItemsInCart => ItemsInCart.Any();
     private IEnumerable<PurchaseItem> ItemsInCart => SalesCartState.Value.PurchaseItems.OrderBy(p => p.ArticleNumber);
@@ -137,7 +142,7 @@
 
     private IEnumerable<CriticalWarning> CriticalWarnings => SalesCartState.Value.CriticalWarnings;
 
-    private DvTextField<long?>? _articleNumberRef;
+    private MudTextField<long?>? _articleNumberRef;
 
     private long? _articleNumber;
     private Article? _article;
@@ -273,10 +278,10 @@
 
     private void ShowNeutralArticleSelectionMessage(string message)
     {
-        _articleAlertSeverity = Severity.Normal;
-        _articleAlertVariant = Variant.Text;
+        _articleAlertSeverity = Severity.Error;
+        _articleAlertVariant = Variant.Filled;
         _articleAlertText = message;
-        _articleAlertNoIcon = true;
+        _articleAlertNoIcon = false;
     }
 
     private async Task SelectArticleNumberInput()

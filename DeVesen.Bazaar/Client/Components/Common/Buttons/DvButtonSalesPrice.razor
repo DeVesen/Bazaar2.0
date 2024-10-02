@@ -8,7 +8,7 @@
           EndIcon="@EndIcon"
           OnClick="@OnClick"
           Style="@Style">
-    @Value
+    <MudText>@(Value.HasValue ? Value : "-")</MudText>
 </DvButton>
 
 @code {

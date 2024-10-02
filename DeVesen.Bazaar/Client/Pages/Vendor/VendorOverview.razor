@@ -32,7 +32,7 @@
                      ValueChanged="@OnSearchChanged" />
     </MudToolBar>
 
-    <MudGrid Spacing="1">
+    <MudGrid Spacing="3">
         @if (VendorState.Value.IsLoaded)
         {
             @foreach (var element in @VendorState.Value.Vendors)

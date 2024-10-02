@@ -1,11 +1,18 @@
-﻿@using DeVesen.Bazaar.Client.Components.Common.IconButton
+﻿@using System.Text
+@using DeVesen.Bazaar.Client.Components.Common
+@using DeVesen.Bazaar.Client.Components.Common.IconButton
 @using DeVesen.Bazaar.Client.Components.Common.ListingElement
 @using DeVesen.Bazaar.Client.Models
 @using DeVesen.Bazaar.Client.Services
 
 @inject NavigationService NavigationService
+@inject Services.DialogService DialogService
+@inject ArticleService ArticleService
+@inject ImportExportService ImportExportService
 
-<MudCard Elevation="2">
+<FileDownloadActions @ref="_downloadActions" />
+
+<MudCard Elevation="2" Class="m-2 rounded" Style="background-color: #575766">
     <MudCardHeader>
         <CardHeaderAvatar>
             <MudAvatar Color="Color.Primary">
@@ -17,6 +24,7 @@
             <MudText Typo="Typo.body2">@VendorItem.Item.Id</MudText>
         </CardHeaderContent>
         <CardHeaderActions>
+            <DvIconButtonEdit OnClick="DoEdit"/>
         </CardHeaderActions>
     </MudCardHeader>
     <MudCardContent>
@@ -24,8 +32,10 @@
         <ListingElementText Icon="@Icons.Material.TwoTone.Info" Value="@VendorItem.Item.Note" />
     </MudCardContent>
     <MudCardActions Class="d-flex justify-space-between">
-        <DvIconButtonEdit OnClick="DoEdit"/>
         <DvIconButtonArticles OnClick="GoToArticles"/>
+        <DvIconButtonImport OnClick="OnArticleImport" />
+        <DvIconButtonDownload OnClick="OnArticleDownload" />
+        <DvIconButtonApprove OnClick="OnArticleApprove" />
     </MudCardActions>
 </MudCard>
 
@@ -37,6 +47,8 @@
     [Parameter]
     public EventCallback<VendorView> OnEdit { get; set; }
 
+    private FileDownloadActions _downloadActions = null!;
+
     private async Task DoEdit()
     {
         await OnEdit.InvokeAsync(VendorItem);
@@ -45,5 +57,31 @@
     private void GoToArticles()
     {
         NavigationService.ToArticleOverview(VendorItem.Item.Id);
+    }
+
+    private async Task OnArticleImport()
+    {
+        await DialogService.ImportArticleAsync(VendorItem.Item.Id);
+    }
+
+    private async Task OnArticleDownload()
+    {
+        var articles = await ArticleService.GetAllAsync(VendorItem.Item.Id);
+        
+        var exportBuilder = new StringBuilder();
+
+        exportBuilder.AppendLine(ImportExportService.ArticleToDataLineTitle());
+
+        foreach (var article in articles.Value)
+        {
+            exportBuilder.AppendLine(ImportExportService.ArticleToDataLine(article));
+        }
+
+        await _downloadActions.TriggerDownload(exportBuilder.ToString(), $"Articles_{VendorItem.Item.GetTotalName()}.txt");
+    }
+
+    private async Task OnArticleApprove()
+    {
+        await DialogService.ApproveArticleAsync(VendorItem.Item.Id);
     }
 }
