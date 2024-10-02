@@ -1,5 +1,5 @@
 ﻿<MudButton FullWidth="@FullWidth"
-           StartIcon="@IconPath"
+           StartIcon="@BazaarIcons.Close"
            IconSize="@(IconSize ?? Size)"
            Size="@Size"
            Variant="@Variant"
@@ -9,8 +9,6 @@
            Style="@Style">Schließen</MudButton>
 
 @code {
-    const string IconPath = Icons.Material.TwoTone.Close;
-
     [Parameter]
     public bool Disabled { get; set; }
 

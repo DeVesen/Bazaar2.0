@@ -1,6 +1,6 @@
 ﻿
 <MudButton FullWidth="@FullWidth"
-           StartIcon="@IconPath"
+           StartIcon="@BazaarIcons.Save"
            IconSize="@(IconSize ?? Size)"
            Size="@Size"
            Variant="@Variant"
@@ -10,8 +10,6 @@
            Style="@Style">Speichern</MudButton>
 
 @code {
-    const string IconPath = Icons.Material.Filled.Save;
-
     [Parameter]
     public bool Disabled { get; set; }
 

@@ -1,6 +1,6 @@
 ﻿
 <DvButton FullWidth="@FullWidth"
-          StartIcon="@IconPath"
+          StartIcon="@BazaarIcons.Add"
           IconSize="@(IconSize ?? Size)"
           Size="@Size"
           Variant="@Variant"
@@ -10,8 +10,6 @@
           Style="@Style">Neu</DvButton>
 
 @code {
-    const string IconPath = Icons.Material.TwoTone.Add;
-
     [Parameter]
     public bool Disabled { get; set; }
 

@@ -12,7 +12,7 @@
 </DvButton>
 
 @code {
-    private string? EndIcon => Value.HasValue ? @Icons.Material.TwoTone.Euro : null;
+    private string? EndIcon => Value.HasValue ? BazaarIcons.SalesPrice : null;
 
     [Parameter]
     public double? Value { get; set; }
