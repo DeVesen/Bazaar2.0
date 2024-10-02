@@ -1,5 +1,4 @@
-﻿@using DeVesen.Bazaar.Client.Services
-@using DeVesen.Bazaar.Client.Components.Common.ToolBar
+﻿@using DeVesen.Bazaar.Client.Components.Common.ToolBar
 @using DeVesen.Bazaar.Client.Components.Common.TextField
 @using DeVesen.Bazaar.Client.Models
 @using DeVesen.Bazaar.Client.Pages.Vendor.Components
@@ -13,7 +12,6 @@
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 
 @inject Services.DialogService DialogService
-@inject NavigationService NavigationService
 
 @inject TitleFacade TitleFacade
 @inject VendorViewFacade VendorFacade
@@ -41,9 +39,7 @@
             {
                 <MudItem xs="12" md="4" lg="3">
                     <VendorCard VendorItem="@element"
-                                OnEdit="x => ModifyVendorAsync(x.Item)"
-                                OnArticle="OnViewVendorArticleAsync"
-                                OnModify="OnViewVendorModifyAsync" />
+                                OnEdit="x => ModifyVendorAsync(x.Item)" />
                 </MudItem>
             }
         }
@@ -77,19 +73,6 @@
 
         FetchVendorList();
     }
-
-    private async Task OnViewVendorArticleAsync(VendorView args)
-    {
-        NavigationService.ToArticleOverview(args.Item.Id);
-        await Task.CompletedTask;
-    }
-
-    private async Task OnViewVendorModifyAsync(VendorView args)
-    {
-        NavigationService.ToModifyOverview(args.Item.Id);
-        await Task.CompletedTask;
-    }
-
 
     private void OnSearchChanged(string newValue)
     {

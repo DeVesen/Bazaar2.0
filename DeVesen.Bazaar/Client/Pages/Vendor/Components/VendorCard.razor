@@ -1,6 +1,9 @@
 ﻿@using DeVesen.Bazaar.Client.Components.Common.IconButton
 @using DeVesen.Bazaar.Client.Components.Common.ListingElement
 @using DeVesen.Bazaar.Client.Models
+@using DeVesen.Bazaar.Client.Services
+
+@inject NavigationService NavigationService
 
 <MudCard Elevation="2">
     <MudCardHeader>
@@ -23,7 +26,6 @@
     <MudCardActions Class="d-flex justify-space-between">
         <DvIconButtonEdit OnClick="DoEdit"/>
         <DvIconButtonArticles OnClick="GoToArticles"/>
-        <DvIconButtonGears OnClick="GoToModify" />
     </MudCardActions>
 </MudCard>
 
@@ -35,25 +37,13 @@
     [Parameter]
     public EventCallback<VendorView> OnEdit { get; set; }
 
-    [Parameter]
-    public EventCallback<VendorView> OnArticle { get; set; }
-
-    [Parameter]
-    public EventCallback<VendorView> OnModify { get; set; }
-
     private async Task DoEdit()
     {
         await OnEdit.InvokeAsync(VendorItem);
     }
 
-    private async Task GoToArticles()
+    private void GoToArticles()
     {
-        await OnArticle.InvokeAsync(VendorItem);
+        NavigationService.ToArticleOverview(VendorItem.Item.Id);
     }
-
-    private async Task GoToModify()
-    {
-        await OnModify.InvokeAsync(VendorItem);
-    }
-
 }
