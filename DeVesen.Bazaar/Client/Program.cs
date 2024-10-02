@@ -46,6 +46,7 @@ builder.Services.AddTransient(HubConnectionProviderExtensions.CreateVendorHubCon
                 .AddTransient(HubConnectionProviderExtensions.CreateArticleCategoryHubConnectionService);
 
 builder.Services.AddTransient<AuthService>();
+builder.Services.AddTransient<ImportExportService>();
 builder.Services.AddTransient<NavigationService>();
 builder.Services.AddTransient<DialogService>();
 builder.Services.AddTransient<SystemClock>();

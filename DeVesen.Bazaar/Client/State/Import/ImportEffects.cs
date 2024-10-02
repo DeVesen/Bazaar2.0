@@ -1,5 +1,4 @@
 ﻿using DeVesen.Bazaar.Client.Services;
-using DeVesen.Bazaar.Shared.Services;
 using Fluxor;
 
 namespace DeVesen.Bazaar.Client.State.Import;
@@ -7,12 +6,12 @@ namespace DeVesen.Bazaar.Client.State.Import;
 public class ImportEffects
 {
     private readonly ArticleService _articleService;
-    private readonly SystemClock _systemClock;
+    private readonly ImportExportService _importExportService;
 
-    public ImportEffects(ArticleService articleService, SystemClock systemClock)
+    public ImportEffects(ArticleService articleService, ImportExportService importExportService)
     {
         _articleService = articleService;
-        _systemClock = systemClock;
+        _importExportService = importExportService;
     }
 
     [EffectMethod]
@@ -25,7 +24,7 @@ public class ImportEffects
             return Task.CompletedTask;
         }
 
-        var isValidLine = TryMapToArticle(action.VendorId, lineData, out var article);
+        var isValidLine = _importExportService.TrySplitToArticle(action.VendorId, lineData, out var article);
 
         var importInfo = new ImportInfo
         {
@@ -71,31 +70,5 @@ public class ImportEffects
         var result = await _articleService.CreateAsync(action.Article, false);
 
         dispatcher.Dispatch(new ImportActions.DataLineImported(action.LineIndex, result.IsValid, result.ErrorMessages));
-    }
-
-    private bool TryMapToArticle(string vendorId, string line, out Models.Article? value)
-    {
-        var lineParts = line.Split([";"], StringSplitOptions.None);
-
-        if (lineParts.Length < 5)
-        {
-            value = null!;
-            return false;
-        }
-
-        value = new Models.Article
-        {
-            VendorId = vendorId,
-            Number = int.Parse(lineParts[0]),
-            Description = lineParts[1],
-            ArticleCategory = lineParts[2],
-            Manufacturer = lineParts[3],
-
-            Price01 = double.Parse(lineParts[4]),
-            Price02 = lineParts.Length == 6 && double.TryParse(lineParts[5], out var price02Val) ? price02Val : null,
-            Created = _systemClock.GetNow()
-        };
-
-        return true;
     }
 }

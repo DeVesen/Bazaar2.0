@@ -2,52 +2,72 @@
 @using DeVesen.Bazaar.Client.Components.Common.TextField
 @using DeVesen.Bazaar.Client.Pages.Vendor.Components
 
-<MudGrid Spacing="2">
-        
-    <MudItem xs="12" md="9" lg="8" xl="6">
-            
-        <MudGrid Spacing="2">
-            
-            <MudItem xs="12">
-                @if (ShowVendorSelection)
-                {
-                    <VendorSelector Item="Vendor"
-                                    ItemChanged="@VendorChanged"
-                                    Disabled="@DisableVendorSelection"
-                                    DisableNewItem="@DisableNewItem" />
-                }
-                else
-                {
-                    <MudText Typo="Typo.h3">@Vendor?.GetTotalName()</MudText>
-                }
-            </MudItem>
+<style>
 
-            <MudItem xs="3">
-                <DvTextField T="string"
-                             Label="Nummer"
-                             DebounceInterval="500"
-                             Value="@Number"
-                             ValueChanged="@NumberChanged" />
-            </MudItem>
+    .to-action-left {
+        padding-left: .5rem;
+    }
+    .to-action-right {
+        padding-left: .5rem;
+    }
 
-            <MudItem xs="9">
-                <DvTextField T="string"
-                             Label="Freitextsuche"
-                             DebounceInterval="500"
-                             Value="@SearchText"
-                             ValueChanged="@SearchTextChanged" />
-            </MudItem>
+    @@media (max-width: 550px) {
+        .wrap-overview {
+            flex-wrap: wrap;
+            gap: 6px;
+        }
 
-        </MudGrid>
+        .to-action-left {
+            padding-left: 0;
+        }
 
-    </MudItem>
+        .to-action-right {
+            padding-left: 0;
+        }
+        .action-short-content {
+            width: 100% !important;
+            justify-content: center !important;
+            padding-bottom: .5rem;
+        }
+    }
+</style>
+
+<MudPaper Class="d-flex wrap-overview flex-grow-1 to-action-right">
+    <MudGrid Spacing="2" Class="flex-shrink-1">
+        <MudItem xs="12">
+            @if (ShowVendorSelection)
+            {
+                <VendorSelector Item="Vendor"
+                                ItemChanged="@VendorChanged"
+                                Disabled="@DisableVendorSelection"
+                                DisableNewItem="@DisableNewItem" />
+            }
+            else
+            {
+                <MudText Typo="Typo.h3">@Vendor?.GetTotalName()</MudText>
+            }
+        </MudItem>
+        <MudItem xs="3">
+            <DvTextField T="string"
+                         Label="Nummer"
+                         DebounceInterval="500"
+                         Value="@Number"
+                         ValueChanged="@NumberChanged" />
+        </MudItem>
+        <MudItem xs="9">
+            <DvTextField T="string"
+                         Label="Freitextsuche"
+                         DebounceInterval="500"
+                         Value="@SearchText"
+                         ValueChanged="@SearchTextChanged" />
+        </MudItem>
+    </MudGrid>
     
-    <MudItem xs="12" md="3" lg="4" xl="6"
-             Class="d-flex justify-end gap-3 m-10 p-10">
+    <div class="d-flex to-action-left action-short-content">
         @ChildContent
-    </MudItem>
+    </div>
         
-</MudGrid>
+</MudPaper>
 
 @code {
     [Parameter]

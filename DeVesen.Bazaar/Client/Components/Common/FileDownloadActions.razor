@@ -1,0 +1,27 @@
+﻿@inject IJSRuntime JsRuntime
+
+@code {
+
+    public async Task TriggerDownload(string content, string fileName)
+    {
+        var stream = new MemoryStream();
+        var writer = new StreamWriter(stream);
+
+        await writer.WriteAsync(content);
+        await writer.FlushAsync();
+
+        stream.Position = 0;
+
+        await TriggerDownload(stream, fileName);
+    }
+
+    public async Task TriggerDownload(Stream content, string fileName)
+    {
+        var module = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./Components/Common/FileDownloadActions.razor.js");
+
+        using var streamRef = new DotNetStreamReference(stream: content);
+        await module.InvokeVoidAsync("triggerDownloadFromStream", fileName, streamRef);
+
+        await module.DisposeAsync();
+    }
+}

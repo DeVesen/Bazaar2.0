@@ -1,5 +1,4 @@
 ﻿using Fluxor;
-using static DeVesen.Bazaar.Client.State.SalesCart.SalesCartActions;
 
 namespace DeVesen.Bazaar.Client.State.SalesCart;
 
