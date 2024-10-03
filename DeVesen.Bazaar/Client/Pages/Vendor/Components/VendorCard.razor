@@ -77,7 +77,7 @@
             exportBuilder.AppendLine(ImportExportService.ArticleToDataLine(article));
         }
 
-        await _downloadActions.TriggerDownload(exportBuilder.ToString(), $"Articles_{VendorItem.Item.GetTotalName()}.txt");
+        await _downloadActions.TriggerDownload(exportBuilder.ToString(), $"Articles_{VendorItem.Item.GetTotalName()}.csv");
     }
 
     private async Task OnArticleApprove()

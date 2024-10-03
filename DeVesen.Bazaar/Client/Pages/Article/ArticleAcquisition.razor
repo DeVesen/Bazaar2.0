@@ -1,4 +1,6 @@
-﻿@using DeVesen.Bazaar.Client.Models
+﻿@using System.Text
+@using DeVesen.Bazaar.Client.Components.Common
+@using DeVesen.Bazaar.Client.Models
 @using DeVesen.Bazaar.Client.Pages.Article.Components
 @using DeVesen.Bazaar.Client.Services
 @using DeVesen.Bazaar.Client.State.Article
@@ -15,8 +17,23 @@
 @inject ArticleFacade ArticleFacade
 @inject VendorService VendorService
 @inject IState<ArticleState> ArticleState
+@inject ImportExportService ImportExportService
 
 @inject Services.DialogService DialogService;
+
+<style>
+    @@media (max-width: 550px) {
+        .action-short-button {
+            width: 100px;
+        }
+
+            .action-short-button button {
+                width: 100px;
+            }
+    }
+</style>
+
+<FileDownloadActions @ref="_downloadActions" />
 
 @if (_vendor != null)
 {
@@ -30,16 +47,28 @@
                                 @bind-SearchText:after="@OnArticleFilterChange"
                                 DisableVendorSelection="@(string.IsNullOrWhiteSpace(VendorId) is false)"
                                 ShowVendorSelection="false">
-            <MudGrid Spacing="1">
-                <MudItem xs="6" md="12" lg="6">
-                    <DvButtonNeu Disabled="@(_vendor == null)"
-                                 OnClick="CreateArticleAsync" />
-                </MudItem>
-                <MudItem xs="6" md="12" lg="6">
-                    <DvButtonImport Disabled="@(_vendor == null)"
-                                    OnClick="ImportArticleAsync" />
-                </MudItem>
-            </MudGrid>
+            <MudButtonGroup Color="Color.Surface"
+                            Variant="Variant.Filled"
+                            Size="Size.Large">
+                <MudIconButton Icon="@Icons.Material.TwoTone.Add"
+                               Disabled="@(_vendor == null)"
+                               Color="Color.Tertiary"
+                               Size="Size.Large"
+                               Class="action-short-button"
+                               OnClick="CreateArticleAsync"/>
+                <MudMenu Icon="@Icons.Material.Filled.ArrowDropDown"
+                         Disabled="@(_vendor == null)"
+                         Size="Size.Large"
+                         Class="h-100 action-short-button"
+                         AnchorOrigin="Origin.BottomRight"
+                         TransformOrigin="Origin.TopRight">
+                    <MudMenuItem Icon="@BazaarIcons.Import"
+                                 OnClick="ImportArticleAsync">Import</MudMenuItem>
+                    <MudMenuItem Icon="@BazaarIcons.Download"
+                                 OnClick="ExportArticlesAsync">Export</MudMenuItem>
+                    <MudDivider />
+                </MudMenu>
+            </MudButtonGroup>
         </ArticleOverviewToolbar>
 
         <MudTable T="Article"
@@ -78,6 +107,7 @@ else
     [Parameter]
     public string VendorId { get; set; } = string.Empty;
 
+    private FileDownloadActions _downloadActions = null!;
     private Vendor? _vendor;
     private string? _number;
     private string? _searchText;
@@ -118,6 +148,20 @@ else
         await DialogService.ImportArticleAsync(_vendor!.Id);
 
         FetchArticleList();
+    }
+
+    private async Task ExportArticlesAsync()
+    {
+        var exportBuilder = new StringBuilder();
+
+        exportBuilder.AppendLine(ImportExportService.ArticleToDataLineTitle());
+
+        foreach (var article in ArticleState.Value.Items)
+        {
+            exportBuilder.AppendLine(ImportExportService.ArticleToDataLine(article));
+        }
+
+        await _downloadActions.TriggerDownload(exportBuilder.ToString(), $"Articles_{_vendor?.GetTotalName()}.csv");
     }
 
     private void FetchArticleList()
