@@ -54,6 +54,7 @@ builder.Services.AddTransient<SnackBarService>();
 
 builder.Services.AddHttpClient<ArticleCategoryService>();
 builder.Services.AddHttpClient<ManufacturerService>();
+builder.Services.AddHttpClient<StatisticService>();
 builder.Services.AddHttpClient<VendorService>();
 builder.Services.AddHttpClient<ArticleService>();
 

@@ -4,6 +4,7 @@ using DeVesen.Bazaar.Client.Extensions;
 using DeVesen.Bazaar.Client.Models;
 using DeVesen.Bazaar.Shared;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using MudBlazor;
 
 namespace DeVesen.Bazaar.Client.Services;
 
@@ -202,4 +203,38 @@ public class VendorService
                 Turnover = dtoElement.Statistic.Turnover
             }
         };
+}
+
+public class StatisticService
+{
+    private readonly HttpClient _httpClient;
+
+    public StatisticService(IWebAssemblyHostEnvironment hostEnvironment, HttpClient httpClient, SnackBarService snackBarService)
+    {
+        _httpClient = httpClient;
+        _httpClient.BaseAddress = hostEnvironment.GetApiEndpointUrl("api/v1/Statistic");
+    }
+
+    public async Task<Response<StatisticSummeryView>> Get()
+    {
+        try
+        {
+            var requestUri = new UriBuilder(_httpClient.BaseAddress)
+                .Build();
+
+            var domainElement =
+                await _httpClient.GetFromJsonAsync<StatisticSummeryView>(requestUri);
+
+            if (domainElement == null)
+            {
+                return Response<StatisticSummeryView>.Invalid("No data reseived!");
+            }
+
+            return Response<StatisticSummeryView>.Valid(domainElement);
+        }
+        catch (Exception ex)
+        {
+            return Response<StatisticSummeryView>.Invalid(ex.Message);
+        }
+    }
 }

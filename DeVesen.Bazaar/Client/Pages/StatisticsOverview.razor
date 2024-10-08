@@ -1,0 +1,132 @@
+﻿@using DeVesen.Bazaar.Client.Models
+@using DeVesen.Bazaar.Client.Services
+@using DeVesen.Bazaar.Client.Components.Statistics
+
+@page "/statistics"
+
+@attribute [Authorize]
+
+@inject StatisticService StatisticService
+
+<MudGrid Class="p-2">
+
+    <MudItem xs="12" sm="6" lg="4">
+        <MudPaper Class="p-3 d-flex flex-column gap-4">
+            <ListingElement01 Title="Artikel im Verkauf"
+                              Value="@_articleOnSaleCount"
+                              TopValue="@_articleCount"
+                              Surfix="St."
+                              ProgressLinearColor="Color.Tertiary" />
+
+            <ListingElement01 Title="Artikel verkauft"
+                              Value="@_articlesSoldCount"
+                              TopValue="@_articleOnSaleCount"
+                              Surfix="St."
+                              ProgressLinearColor="Color.Success" />
+
+            <ListingElement01 Title="Artikel rückgegeben"
+                              Value="@_articlesReturnedCount"
+                              TopValue="@_articleOnSaleCount"
+                              Surfix="St."
+                              ProgressLinearColor="Color.Secondary" />
+
+            <ListingElement01 Title="Artikel abgerechnet"
+                              Value="@_articlesSettlementCount"
+                              TopValue="@_articleOnSaleCount"
+                              Surfix="St."
+                              ProgressLinearColor="Color.Primary" />
+        </MudPaper>
+    </MudItem>
+
+    <MudItem xs="12" sm="6" lg="4">
+        <MudPaper Class="p-3 d-flex flex-column gap-4">
+            <ListingElement01 Title="Umsatz"
+                              Value="@_turnover"
+                              TopValue="@_valueOfFoods"
+                              Surfix="€"
+                              ProgressLinearColor="Color.Tertiary" />
+
+            <ListingElement01 Title="Händleranteil"
+                              Value="@_vendorShare"
+                              TopValue="@_turnover"
+                              Surfix="€"
+                              ProgressLinearColor="Color.Secondary" />
+
+            <ListingElement01 Title="Clubanteil"
+                              Value="@_clubShare"
+                              TopValue="@_turnover"
+                              Surfix="€"
+                              ProgressLinearColor="Color.Primary" />
+        </MudPaper>
+    </MudItem>
+
+    <MudItem xs="12" sm="6" lg="4">
+        <MudPaper Class="p-3 d-flex flex-column gap-4">
+            <ListingElement01 Title="Provision"
+                              Value="@_clubShare"
+                              TopValue="@_totalClubIncome"
+                              Surfix="€"
+                              ProgressLinearColor="Color.Primary" />
+
+            <ListingElement01 Title="Aufwandsentschädigung"
+                              Value="@_administrativeCharge"
+                              TopValue="@_totalClubIncome"
+                              Surfix="€"
+                              ProgressLinearColor="Color.Secondary" />
+        </MudPaper>
+    </MudItem>
+
+</MudGrid>
+
+
+@code {
+    private double _articleCount;
+    private double _articleOnSaleCount;
+    private double _articlesSoldCount;
+    private double _articlesReturnedCount;
+    private double _articlesSettlementCount;
+
+    private double _valueOfFoods;
+    private double _turnover;
+    private double _vendorShare;
+    private double _clubShare;
+    private double _administrativeCharge;
+    private double _totalClubIncome;
+
+    private IEnumerable<StatisticSummeryView.GraphDataModel> _offersGraphData = [];
+    private IEnumerable<StatisticSummeryView.GraphDataModel> _salesGraphData = [];
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            await RefreshData();
+        }
+    }
+
+    private async Task RefreshData()
+    {
+        var response = await StatisticService.Get();
+        var statisticInfo = response.Value;
+
+        _articleCount = statisticInfo.Articles.ApprovedCount;
+        _articleOnSaleCount = statisticInfo.ActualStock.IsOnSaleCount;
+        _articlesSoldCount = statisticInfo.ActualStock.IsSoldCount;
+        _articlesReturnedCount = statisticInfo.ActualStock.IsReturnedCount;
+        _articlesSettlementCount = statisticInfo.ActualStock.IsSettledCount;
+
+        _valueOfFoods = statisticInfo.Articles.ApprovedValue;
+        _turnover = statisticInfo.Income.Turnover;
+        _vendorShare = statisticInfo.Income.TurnoverVendorShare;
+        _clubShare = statisticInfo.Income.TurnoverClubShare;
+        _administrativeCharge = statisticInfo.Income.WorkingFee;
+        _totalClubIncome = statisticInfo.Income.TurnoverClubShare + statisticInfo.Income.WorkingFee;
+
+        _offersGraphData = statisticInfo.OffersGraphData;
+        _salesGraphData = statisticInfo.SalesGraphData;
+
+        StateHasChanged();
+    }
+}

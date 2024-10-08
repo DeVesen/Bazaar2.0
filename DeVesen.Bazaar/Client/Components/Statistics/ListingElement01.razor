@@ -1,0 +1,30 @@
+﻿<div class="d-flex flex-column gap-1">
+    <div class="d-flex flex-row justify-space-between">
+        <MudText Typo="Typo.body1">@Title</MudText>
+        <MudText Typo="Typo.body2">@($"{Value:###}{SurfixDisplayValue} / {TopValue:###}{SurfixDisplayValue} ({ValueProcedural:##0} %)")</MudText>
+    </div>
+    <MudProgressLinear Color="@ProgressLinearColor" Size="@ProgressLinearSize" Value="@ValueProcedural" />
+</div>
+
+@code {
+    public double ValueProcedural => Value * 100 / TopValue;
+    public string SurfixDisplayValue => string.IsNullOrWhiteSpace(Surfix) ? string.Empty : $" {Surfix}";
+
+    [Parameter]
+    public string Title { get; set; }
+
+    [Parameter]
+    public double Value { get; set; } = 0;
+
+    [Parameter]
+    public double TopValue { get; set; } = 0;
+
+    [Parameter]
+    public string Surfix { get; set; }
+
+    [Parameter]
+    public Color ProgressLinearColor { get; set; } = Color.Default;
+
+    [Parameter]
+    public Size ProgressLinearSize { get; set; } = Size.Medium;
+}
