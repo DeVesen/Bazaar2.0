@@ -1,6 +1,7 @@
 ﻿@using DeVesen.Bazaar.Client.Components.Common.TextField
 @using DeVesen.Bazaar.Client.Components.Common.Buttons
 @using DeVesen.Bazaar.Client.Services
+@using DeVesen.Bazaar.Client.Components.Common
 
 @inject VendorService VendorService
 
@@ -11,10 +12,21 @@
                          @ref="_articleNumberRef"
                          @bind-Value="@_articleNumber"
                          FullWidth
-                         OnKeyUp="OnArticleNumberKeyUpAsync"/>
+                         OnKeyUp="OnArticleNumberKeyUpAsync"
+                         Adornment="Adornment.End"
+                         AdornmentIcon="@Icons.Material.TwoTone.QrCodeScanner"
+                         OnAdornmentClick="OnAdornmentClick" />
             
-            <MudAlert Severity="@_releaseSeverityStatus"
-                      Variant="@_releaseVariant">@_releaseSeverityText</MudAlert>
+            @if (_scanIsActive)
+            {
+                <DeVesScanner OnBarcodeReceived="OnBarcodeReceivedAsync" />
+            }
+            
+            @if (string.IsNullOrWhiteSpace(_releaseSeverityText) is false)
+            {
+                <MudAlert Severity="@_releaseSeverityStatus"
+                          Variant="@_releaseVariant">@_releaseSeverityText</MudAlert>
+            }
         </div>
     </DialogContent>
     <DialogActions>
@@ -31,6 +43,7 @@
     private long? _articleNumber;
     private Severity _releaseSeverityStatus = Severity.Normal;
     private Variant _releaseVariant = Variant.Text;
+    private bool _scanIsActive = false;
     private string _releaseSeverityText = "Bitte Artickelnummer eingeben ...";
 
     private void OnCloseAsync() => MudDialog.Close();
@@ -86,4 +99,34 @@
         await _articleNumberRef.FocusAsync();
         await _articleNumberRef.SelectAsync();
     }
+
+    private void OnAdornmentClick()
+    {
+        _scanIsActive = !_scanIsActive;
+
+        if (_scanIsActive)
+        {
+            _articleNumber = null;
+
+            _releaseSeverityStatus = Severity.Success;
+            _releaseVariant = Variant.Filled;
+            _releaseSeverityText = string.Empty;
+        }
+    }
+
+    private async Task OnBarcodeReceivedAsync(string obj)
+    {
+        _scanIsActive = false;
+
+        if (long.TryParse(obj, out var value))
+        {
+            _articleNumber = value;
+            await ApproveArticleAsync(value);
+        }
+        else
+        {
+            SetReleaseError($"'{obj}' ist kein erlaubter Wert!");
+        }
+    }
+
 }

@@ -1,0 +1,44 @@
+﻿
+<BlazorBarcodeScanner.ZXing.JS.BarcodeReader @ref="_barcodeReader"
+                                             Title="Scan Barcode from Camera"
+                                             StartCameraAutomatically="true"
+                                             ShowStart="false"
+                                             ShowStop="false"
+                                             ShowReset="false"
+                                             ShowToggleTorch="false"
+                                             ShowVideoDeviceList="false"
+                                             OnBarcodeReceived="OnBarcodeReceivedAsync"
+                                             OnErrorReceived="OnErrorReceivedAsync" />
+                                             
+@if (string.IsNullOrWhiteSpace(_errorMessage) is false)
+{
+    <MudAlert Dense="true"
+              Severity="Severity.Error"
+              Variant="Variant.Filled">@_errorMessage</MudAlert>
+}
+
+@code {
+    [Parameter]
+    public EventCallback<string> OnBarcodeReceived { get; set; }
+
+    private BarcodeReader _barcodeReader = null!;
+    private string _errorMessage = string.Empty;
+
+    private async Task OnBarcodeReceivedAsync(BarcodeReceivedEventArgs arg)
+    {
+        await _barcodeReader.StopDecoding();
+        await _barcodeReader.DisposeAsync();
+
+        _errorMessage = string.Empty;
+
+        await OnBarcodeReceived.InvokeAsync(arg.BarcodeText);
+    }
+
+    private async Task OnErrorReceivedAsync(ErrorReceivedEventArgs arg)
+    {
+        await _barcodeReader.StopDecoding();
+        await _barcodeReader.DisposeAsync();
+
+        _errorMessage = arg.Message;
+    }
+}
