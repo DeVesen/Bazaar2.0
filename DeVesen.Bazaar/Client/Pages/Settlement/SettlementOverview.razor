@@ -182,6 +182,8 @@
             result = result.Where(p => MatchArticle(p, _searchText));
         }
 
+        result = result.OrderBy(p => p.Number);
+
         return result;
     }
 

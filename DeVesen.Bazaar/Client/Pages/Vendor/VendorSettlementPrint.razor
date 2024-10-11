@@ -75,7 +75,7 @@
                               Margin="Margin.Dense"
                               Variant="Variant.Filled">
                         <div class="d-flex justify-end">
-                            <MudText>@($"{SalesProceeds} €")</MudText>
+                            <MudText>@($"{SalesProceeds:##0.00} €")</MudText>
                         </div>
                     </MudField>
                 </MudItem>
@@ -85,7 +85,7 @@
                               Margin="Margin.Dense"
                               Variant="Variant.Filled">
                         <div class="d-flex justify-end">
-                            <MudText>@($"{SalesCommission} €")</MudText>
+                            <MudText>@($"{SalesCommission:##0.00} €")</MudText>
                         </div>
                     </MudField>
                 </MudItem>
@@ -95,7 +95,7 @@
                               Margin="Margin.Dense"
                               Variant="Variant.Filled">
                         <div class="d-flex justify-end">
-                            <MudText>@($"{AllowanceForExpenses} €")</MudText>
+                            <MudText>@($"{AllowanceForExpenses:##0.00} €")</MudText>
                         </div>
                     </MudField>
                 </MudItem>
@@ -105,7 +105,7 @@
                               Margin="Margin.Dense"
                               Variant="Variant.Filled">
                         <div class="d-flex justify-end">
-                            <MudText>@($"{DealerShare} €")</MudText>
+                            <MudText>@($"{DealerShare:##0.00} €")</MudText>
                         </div>
                     </MudField>
                 </MudItem>
@@ -168,11 +168,11 @@ else
     public string VendorId { get; set; } = string.Empty;
 
     private bool IsSettlement => NavigationManager.Uri.EndsWith("/settlement");
+    private string ActualDateTime => DateTime.Now.ToString("dd-MM-yyyy");
 
-    private string ActualDateTime => DateTime.Now.ToShortDateString();
     private bool IsLoaded => SettlementState.Value.IsLoaded;
     private Vendor Vendor => SettlementState.Value.Vendor!.Item;
-    private IEnumerable<Article> Articles => SettlementState.Value.Articles;
+    private IEnumerable<Article> Articles => SettlementState.Value.Articles.OrderBy(p => p.Number);
 
     private long ArticlesApprovedCount => SettlementState.Value.Articles.Count(p => p.IsApprovedForSale());
     private long ArticlesSoldCount => SettlementState.Value.Articles.Count(p => p.IsSold());
