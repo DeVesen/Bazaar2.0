@@ -1,12 +1,14 @@
 ﻿
 <BlazorBarcodeScanner.ZXing.JS.BarcodeReader @ref="_barcodeReader"
-                                             Title="Scan Barcode from Camera"
+                                             Title=""
                                              StartCameraAutomatically="true"
                                              ShowStart="false"
                                              ShowStop="false"
                                              ShowReset="false"
+                                             ShowResult="false"
                                              ShowToggleTorch="false"
                                              ShowVideoDeviceList="false"
+                                             FullWidthVideo="@FullWidthVideo"
                                              OnBarcodeReceived="OnBarcodeReceivedAsync"
                                              OnErrorReceived="OnErrorReceivedAsync" />
                                              
@@ -18,6 +20,9 @@
 }
 
 @code {
+    [Parameter]
+    public bool FullWidthVideo { get; set; }
+
     [Parameter]
     public EventCallback<string> OnBarcodeReceived { get; set; }
 

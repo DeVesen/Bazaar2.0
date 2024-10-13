@@ -43,7 +43,7 @@
     private long? _articleNumber;
     private Severity _releaseSeverityStatus = Severity.Normal;
     private Variant _releaseVariant = Variant.Text;
-    private bool _scanIsActive = false;
+    private bool _scanIsActive;
     private string _releaseSeverityText = "Bitte Artickelnummer eingeben ...";
 
     private void OnCloseAsync() => MudDialog.Close();
