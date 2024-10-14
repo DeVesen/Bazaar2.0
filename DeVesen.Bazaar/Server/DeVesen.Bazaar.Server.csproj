@@ -11,10 +11,15 @@
 
   <ItemGroup>
     <None Remove="certificate.crt" />
+    <None Remove="Cert\certificate.crt" />
+    <None Remove="Cert\private.key" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="certificate.crt">
+    <Content Include="Cert\certificate.crt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Cert\private.key">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

@@ -7,10 +7,31 @@ using DeVesen.Bazaar.Server.Services;
 using DeVesen.Bazaar.Server.Storage;
 using DeVesen.Bazaar.Server.Validator;
 using DeVesen.Bazaar.Shared.Services;
+using System.Security.Cryptography.X509Certificates;
 
 var builder = WebApplication.CreateBuilder(args);
+var sslCert = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "./Cert/certificate.crt");
+var sslKey = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "./Cert/private.key");
 
 // Add services to the container.
+
+if (Environment.GetEnvironmentVariable("HTTPS_ACTIVE") == "true")
+{
+    builder.WebHost.UseKestrel(options =>
+    {
+        options.ListenAnyIP(8080); // Standard HTTP-Port
+        options.ListenAnyIP(443, listenOptions =>
+        {
+            listenOptions.UseHttps(httpsOptions =>
+            {
+                httpsOptions.ServerCertificate = X509Certificate2.CreateFromPemFile(
+                    sslCert,
+                    sslKey
+                );
+            });
+        });
+    });
+}
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
