@@ -10,6 +10,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="certificate.crt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="certificate.crt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="FluentResults" Version="3.16.0" />
     <PackageReference Include="FluentValidation" Version="11.10.0" />
     <PackageReference Include="LiteDB" Version="5.0.21" />
