@@ -1,6 +1,10 @@
 ﻿@using DeVesen.Bazaar.Client.Models
 @using DeVesen.Bazaar.Client.Components.Common.TextField
 @using DeVesen.Bazaar.Client.Pages.Vendor.Components
+@using DeVesen.Bazaar.Client.Services
+
+@inject Services.DialogService DialogService;
+@inject VendorService VendorService
 
 <style>
 
@@ -34,13 +38,17 @@
 
 <MudPaper Class="d-flex wrap-overview flex-grow-1 to-action-right">
     <MudGrid Spacing="2" Class="flex-shrink-1">
-        <MudItem xs="12">
+        <MudItem xs="12" Class="d-flex flex-grow-1 gap-3">
             @if (ShowVendorSelection)
             {
                 <VendorSelector Item="Vendor"
                                 ItemChanged="@VendorChanged"
                                 Disabled="@DisableVendorSelection"
-                                DisableNewItem="@DisableNewItem" />
+                                DisableNewItem="@DisableNewItem"
+                                OuterClass="flex-grow-1" />
+
+                <MudIconButton Icon="@Icons.Material.TwoTone.QrCodeScanner"
+                               OnClick="OnBcScanner"/>
             }
             else
             {
@@ -99,4 +107,32 @@
 
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
+
+    private async Task OnBcScanner(MouseEventArgs arg)
+    {
+        var bcInput = await DialogService.ScanBarcodeAsync();
+
+        if (bcInput.Canceled)
+        {
+            await SetNewVendor(null);
+            return;
+        }
+
+        var scannedVendor = await VendorService.GetByIdAsync(bcInput.Data);
+
+        if (scannedVendor.IsValid is false)
+        {
+            await SetNewVendor(null);
+            return;
+        }
+        
+        await SetNewVendor(scannedVendor.Value.Item);
+    }
+
+    private async Task SetNewVendor(Vendor? newItem)
+    {
+        Vendor = newItem;
+        await VendorChanged.InvokeAsync(newItem);
+    }
+
 }

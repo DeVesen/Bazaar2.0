@@ -120,6 +120,15 @@ public class DialogService(IDialogService dialogService)
             .WaitForResult();
     }
 
+    public async Task<(bool Canceled, string Data)> ScanBarcodeAsync()
+    {
+        var options = GetDefaultOptions();
+        var parameters = new DialogParameters<ArticleGiveBackDialog>();
+
+        return await dialogService.ShowAsync<BcScanDialog>("Barcode Scan", parameters, options)
+            .WaitForResult<string>();
+    }
+
 
     public async Task CreateArticleCategoryAsync()
     {

@@ -1,0 +1,24 @@
+﻿@using DeVesen.Bazaar.Client.Components.Common.Buttons
+@using DeVesen.Bazaar.Client.Components.Common
+
+<MudDialog>
+    <DialogContent>
+        <DeVesScanner OnBarcodeReceived="OnBarcodeReceivedAsync" />
+    </DialogContent>
+    <DialogActions>
+        <DvButtonCancel OnClick="Cancel" />
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
+
+    private Task OnBarcodeReceivedAsync(string arg)
+    {
+        MudDialog.Close(DialogResult.Ok(arg));
+
+        return Task.CompletedTask;
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+}
