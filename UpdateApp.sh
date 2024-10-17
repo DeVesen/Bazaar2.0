@@ -1,3 +1,5 @@
+clear
+
 echo "GIT-Repository"
 
 echo "  -->> git fetch"
