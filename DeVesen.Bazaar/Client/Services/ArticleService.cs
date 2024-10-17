@@ -137,6 +137,7 @@ public class ArticleService
         return Response.Invalid();
     }
 
+
     public async Task<Response> BookOrderAsync(IEnumerable<SalesOrderDto.Position> soldItems)
     {
         var soldItemArray = soldItems.ToArray();
@@ -149,6 +150,21 @@ public class ArticleService
             var itemsTotal = soldItemArray.Sum(p => p.Price);
 
             _snackBarService.AddInfo($"{itemsCount} Artikel für {itemsTotal} € erfolgreich verkauft.");
+            return Response.Valid();
+        }
+
+        var message = await response.Content.ReadFromJsonAsync<FailedRequestMessage>();
+
+        return Response.Invalid(message!.Message);
+    }
+
+    public async Task<Response> ApproveAsync(long articleNumber, string vendorId)
+    {
+        var requestUri = _httpClient.BaseAddress + $"/{articleNumber}/approve-for/{vendorId}";
+        var response = await _httpClient.PostAsync(requestUri, null);
+
+        if (response.IsSuccessStatusCode)
+        {
             return Response.Valid();
         }
 

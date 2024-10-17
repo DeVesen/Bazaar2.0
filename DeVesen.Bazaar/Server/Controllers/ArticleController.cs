@@ -29,18 +29,6 @@ public class ArticleController(ArticleStorage articleStorage, ArticleValidator a
         return elements.Select(p => p.ToDto());
     }
 
-    [HttpPost("book-sale")]
-    public async Task<ActionResult> BookOrderAsync([FromBody] SalesOrderDto dto)
-    {
-        var orderArticles = dto.Positions
-            .Select(p => p.ToDomain())
-            .ToArray();
-
-        await articleStorage.BookOrderAsync(orderArticles);
-
-        return Ok();
-    }
-
     [HttpPost]
     public async Task<ActionResult> CreateAsync([FromBody] ArticleCreateDto dto)
     {
@@ -89,5 +77,28 @@ public class ArticleController(ArticleStorage articleStorage, ArticleValidator a
         await articleStorage.DeleteByIdAsync(id);
 
         return Ok();
+    }
+
+
+    [HttpPost("book-sale")]
+    public async Task<ActionResult> BookOrderAsync([FromBody] SalesOrderDto dto)
+    {
+        var orderArticles = dto.Positions
+            .Select(p => p.ToDomain())
+            .ToArray();
+
+        await articleStorage.BookOrderAsync(orderArticles);
+
+        return Ok();
+    }
+
+    [HttpPost("{number:long}/approve-for/{vendorId}")]
+    public async Task<ActionResult> ApproveArticleAsync(long number, string vendorId)
+    {
+        var result = await articleStorage.ApproveArticleAsync(number, vendorId);
+
+        return result.IsSuccess
+            ? Ok()
+            : BadRequest(new FailedRequestMessage(result.Errors.First().Message));
     }
 }

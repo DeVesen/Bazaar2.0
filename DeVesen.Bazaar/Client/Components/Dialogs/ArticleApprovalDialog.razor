@@ -3,7 +3,7 @@
 @using DeVesen.Bazaar.Client.Services
 @using DeVesen.Bazaar.Client.Components.Common
 
-@inject VendorService VendorService
+@inject ArticleService ArticleService
 
 <MudDialog>
     <DialogContent>
@@ -77,7 +77,7 @@
 
     private async Task ApproveArticleAsync(long articleNumber)
     {
-        var result = await VendorService.ApproveAsync(VendorId, articleNumber);
+        var result = await ArticleService.ApproveAsync(articleNumber, VendorId);
 
         if (result.IsValid)
         {

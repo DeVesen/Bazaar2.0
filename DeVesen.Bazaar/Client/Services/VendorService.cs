@@ -125,20 +125,4 @@ public class VendorService
         _snackBarService.AddError($"Ausnahmefehler {response.StatusCode}");
         return Response.Invalid();
     }
-
-
-    public async Task<Response> ApproveAsync(string vendorId, long articleNumber)
-    {
-        var requestUri = _httpClient.BaseAddress + $"/{vendorId}/approve/{articleNumber}";
-        var response = await _httpClient.PostAsync(requestUri, null);
-
-        if (response.IsSuccessStatusCode)
-        {
-            return Response.Valid();
-        }
-
-        var message = await response.Content.ReadFromJsonAsync<FailedRequestMessage>();
-
-        return Response.Invalid(message!.Message);
-    }
 }

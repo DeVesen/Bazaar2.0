@@ -66,16 +66,6 @@ public class VendorController(VendorStorage vendorStorage, ArticleStorage articl
         return Ok(element);
     }
 
-    [HttpPost("{vendorId}/approve/{number:long}")]
-    public async Task<ActionResult> ApproveArticleAsync(string vendorId, long number)
-    {
-        var result = await articleStorage.ApproveArticleAsync(number, vendorId);
-
-        return result.IsSuccess
-            ? Ok()
-            : BadRequest(new FailedRequestMessage(result.Errors.First().Message));
-    }
-
     [HttpPut("{id}")]
     public async Task<ActionResult> UpdateAsync(string id, [FromBody] VendorUpdateDto dto)
     {
