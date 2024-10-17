@@ -211,7 +211,7 @@
     {
         var openSales = SettlementState.Value.GetOpenSales();
         var shareOfSales = SettlementState.Value.GetShareOfSales();
-        var articleCommission = SettlementState.Value.GetArticleCommission();
+        var articleCommission = SettlementState.Value.GetHandlingFee();
 
         var payedOut = await DialogService.PayOutVendorAsync(openSales, shareOfSales, articleCommission).ConfigureAwait(false);
 

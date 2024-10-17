@@ -1,0 +1,42 @@
+﻿        
+<div class="w-100 mud-elevation-1 my-3 p-2">
+    <MudText Typo="Typo.subtitle2">@_title</MudText>
+    @foreach (var condition in _conditions)
+    {
+        <div class="d-flex w-100">
+            <MudIcon Size="Size.Small" Icon="@Icons.Material.TwoTone.ArrowRight"/>
+            <MudText Typo="Typo.body2">@condition</MudText>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public double OfferUnitPrice { get; set; }
+
+    [Parameter]
+    public double SalesShare { get; set; }
+
+    private string _title = string.Empty;
+    private IEnumerable<string> _conditions = [];
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        _title = "Mit der Abgabe der Ware auf dem Skibasar der Naturfreunde Hochstadt erkläre ich mit den folgenden Bedingungen einverstanden.";
+
+        _conditions = new string[]
+        {
+            $"Pro abgegebenen Artikel berechnen wir eine Bearbeitungsgebühr von {OfferUnitPrice} \u20ac. Zusätzlich gehen {SalesShare * 100} % vom Verkaufspreis an die Fachgruppe Schneesport der Naturfreunde Hochstadt.",
+            "Die abgegebene Ware muss den aktuellen Sicherheitsstandards entsprechen.",
+            "Skibekleidung wird nur in gutem Zustand und es wird keine Unterwäsche angenommen.",
+            "Wir behalten uns vor, Ware nicht anzunehmen, wenn Sie diesen Anforderungen nicht entspricht.",
+            "Für den Zeitraum des Skibasars wird die Halle überwacht, es wird ab keine Haftung für die abgegebene Ware übernommen.",
+            "Wir übernehmen keine Gewährleistung oder Garantie für gekaufte Ware.",
+            "Abholen der übrig gebliebenen Sachen und der Einnahmen am Ende des Basars zwischen 16.00 Uhr und 17.00 Uhr.",
+            "Nicht abgeholte Ware wird nach dem Skibasar entsorgt, es erfolgt keine Entschädigung / Auszahlung der nicht abgeholten Artikel."
+        };
+    }
+
+}

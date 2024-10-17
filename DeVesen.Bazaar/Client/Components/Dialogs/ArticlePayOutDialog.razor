@@ -5,7 +5,7 @@
     <DialogContent>
         <OverviewOfRefundsTable OpenSales="@OpenSales"
                                 ShareOfSales="@ShareOfSales"
-                                ArticleCommission="@ArticleCommission" />
+                                HandlingFee="@HandlingFee" />
     </DialogContent>
     <DialogActions>
         <DvButtonPayOut OnClick="OnPayOutAsync" />
@@ -23,7 +23,7 @@
     public double ShareOfSales { get; set; }
 
     [Parameter]
-    public double ArticleCommission { get; set; }
+    public double HandlingFee { get; set; }
 
     private void OnPayOutAsync() => MudDialog.Close(DialogResult.Ok(true));
 

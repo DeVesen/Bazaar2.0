@@ -1,5 +1,6 @@
 ﻿@using DeVesen.Bazaar.Client.Models
 @using DeVesen.Bazaar.Client.State.Settlement
+@using DeVesen.Bazaar.Client.Pages.Vendor.Components
 
 @layout PrintLayout
 
@@ -98,7 +99,7 @@
                 </MudItem>
 
                 <MudItem xs="3">
-                    <MudField Label="Aufwandsanteil"
+                    <MudField Label="Bearbeitungsgebühr"
                               Margin="Margin.Dense"
                               Variant="Variant.Filled">
                         <div class="d-flex justify-end">
@@ -118,6 +119,8 @@
                 </MudItem>
             }
         </MudGrid>
+
+        <TermsConditions OfferUnitPrice="@Vendor.OfferUnitPrice" SalesShare="@Vendor.SalesShare" />
 
         <div class="w-100 mud-elevation-1 my-3">
 
@@ -142,7 +145,7 @@
                             <div class="flex-shrink-1 w-100">
                                 <MudGrid Spacing="0" Class="pl-4">
                                     <MudItem xs="12">@($"Beschreibung: {article.Description}")</MudItem>
-                                    <MudItem xs="6">@($"Ketegorie: {article.ArticleCategory}")</MudItem>
+                                    <MudItem xs="6">@($"Kategorie: {article.ArticleCategory}")</MudItem>
                                     <MudItem xs="6">@($"Hersteller: {article.Manufacturer}")</MudItem>
                                     <MudItem xs="6">@(GetPrice(article.Price01, "Preis: "))</MudItem>
                                     <MudItem xs="6">@(GetPrice(article.Price02, "Preis 2: "))</MudItem>

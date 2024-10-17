@@ -35,6 +35,6 @@ public record SettlementState(Models.VendorView? Vendor, Models.Article[] Articl
     public double GetShareOfSales()
         => GetOpenSales() * (Vendor?.Item.SalesShare ?? 0.0d);
 
-    public double GetArticleCommission()
-        => Articles.Count(p => p.IsReturned() && p.IsSettled() is false) * (Vendor?.Item.OfferUnitPrice ?? 0.0d);
+    public double GetHandlingFee()
+        => Articles.Count(p => p.IsApprovedForSale()) * (Vendor?.Item.OfferUnitPrice ?? 0.0d);
 }
