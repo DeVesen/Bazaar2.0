@@ -12,7 +12,7 @@ git pull
 echo "Docker"
 
 echo "  -->> docker build bazaar-app-arm"
-docker build -t bazaar-app-arm -f ./Dockerfile . >> docker-build.log
+docker build -t bazaar-app-arm -f ./Dockerfile . &> docker-build.log
 
 echo "  -->> Stop 'bazaar-app' Container"
 docker stop bazaar-app
