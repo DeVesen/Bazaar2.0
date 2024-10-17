@@ -32,39 +32,6 @@ public class ArticleStorage
         return await _articleRepository.ExistByNumberAsync(number);
     }
 
-    public async Task<bool> ExistByNumberAsync(long number, string? allowedId)
-    {
-        return await _articleRepository.ExistByNumberAsync(number, allowedId);
-    }
-
-    public async Task<Article> GetByIdAsync(string id)
-    {
-        var element = await _articleRepository.TryGetByIdAsync(id);
-
-        if (element.Exist is false)
-        {
-            throw new InvalidDataException($"Id '{id}' not found!");
-        }
-
-        return element.Entity!.ToDomain();
-    }
-
-    public async Task<IEnumerable<VendorArticleStatistic>> GetStatisticPerVendor()
-    {
-        var articles = await GetAllAsync(new ArticleFilter());
-        var groupedByVendor = articles.GroupBy(p => p.VendorId);
-
-        return groupedByVendor.Select(p => new VendorArticleStatistic
-        {
-            VendorId = p.Key,
-            NotOpen = p.Count(x => x.ApprovedForSale.HasValue is false),
-            Open = p.Count(x => x.ApprovedForSale.HasValue),
-            Sold = p.Count(x => x.Sold.HasValue),
-            Settled = p.Count(x => x.Settled.HasValue),
-            Turnover = p.Where(x => x.SoldAt.HasValue).Sum(y => y.SoldAt!.Value)
-        });
-    }
-
     public async Task<Article> GetByNumberAsync(long number)
     {
         var element = await _articleRepository.TryGetByNumberAsync(number);
@@ -92,7 +59,7 @@ public class ArticleStorage
         }
         if (articleFilter.Number != null)
         {
-            elements = elements.Where(p => p.Number.ToString().Contains(articleFilter.Number.ToString()!));
+            elements = elements.Where(p => p.Number.ToString().Contains(articleFilter.Number!));
         }
         if (articleFilter.SearchText != null)
         {
@@ -163,18 +130,6 @@ public class ArticleStorage
         await _articleRepository.DeleteAsync(id);
 
         await _articleHubContext.SendRemoved(response.Entity!.VendorId, response.Entity!.Id, response.Entity!.Number);
-    }
-
-    public async Task DeleteByNumberAsync(long number)
-    {
-        var element = await _articleRepository.TryGetByNumberAsync(number);
-
-        if (element.Exist is false)
-        {
-            throw new InvalidDataException($"Number '{number}' not found!");
-        }
-
-        await _articleRepository.DeleteAsync(element.Entity!.Id);
     }
 
     public async Task BookOrderAsync(IEnumerable<SalesOrder.Position> positions)
@@ -285,12 +240,11 @@ public class ArticleStorage
         return Result.Ok();
     }
 
-    public async Task<Result> SettleArticleAsync(params string[] actionArticleIds)
+    public async Task<Result> SettleArticlesAsync(string vendorId)
     {
-        var elements = await GetAllAsync();
-        elements = elements.Where(p => actionArticleIds.Contains(p.Id));
+        var elements = await GetAllAsync(new ArticleFilter { VendorId = vendorId });
 
-        foreach (var element in elements)
+        foreach (var element in elements.Where(p => p.IsSettled() is false))
         {
             element.Settled = _systemClock.GetNow();
 

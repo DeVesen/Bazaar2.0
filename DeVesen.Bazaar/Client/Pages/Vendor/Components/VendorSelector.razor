@@ -72,13 +72,13 @@
 
         if (string.IsNullOrWhiteSpace(value) is false)
         {
-            elements = elements.Where(p => p.Item.Contains(value));
+            elements = elements.Where(p => p.Vendor.Contains(value));
         }
 
-        elements = elements.OrderBy(p => p.Item.LastName)
-            .ThenBy(p => p.Item.FirstName);
+        elements = elements.OrderBy(p => p.Vendor.LastName)
+            .ThenBy(p => p.Vendor.FirstName);
 
-        var finalList = elements.Select(VendorSelectBase (p) => VendorSelectItem.Create(p.Item))
+        var finalList = elements.Select(VendorSelectBase (p) => VendorSelectItem.Create(p.Vendor))
                                 .ToList();
 
         if (string.IsNullOrWhiteSpace(value) is false &&

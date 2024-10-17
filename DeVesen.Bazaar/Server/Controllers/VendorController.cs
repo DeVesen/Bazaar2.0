@@ -2,7 +2,6 @@
 using DeVesen.Bazaar.Server.Domain;
 using DeVesen.Bazaar.Server.Extensions;
 using DeVesen.Bazaar.Server.Storage;
-using DeVesen.Bazaar.Server.Validator;
 using DeVesen.Bazaar.Shared;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,7 +9,7 @@ namespace DeVesen.Bazaar.Server.Controllers;
 
 [ApiController]
 [Route("api/v1/[controller]")]
-public class VendorController(VendorStorage vendorStorage, ArticleStorage articleStorage, VendorValidator vendorValidator) : ControllerBase
+public class VendorController(VendorStorage vendorStorage, ArticleStorage articleStorage) : ControllerBase
 {
     [HttpGet("{id}")]
     public async Task<IActionResult> GetByIdAsync(string id)
@@ -28,33 +27,39 @@ public class VendorController(VendorStorage vendorStorage, ArticleStorage articl
     }
 
     [HttpGet]
-    public async Task<IEnumerable<VendorViewDto>> GetAllAsync([FromQuery] VendorFilter? parameters)
+    public async Task<IList<VendorOverviewItemDto>> GetAllAsync([FromQuery] VendorFilter? parameters)
     {
-        var allVendors = (await vendorStorage.GetAllAsync(parameters ?? new VendorFilter())).ToArray();
-        var allVendorArticleStats = (await articleStorage.GetStatisticPerVendor()).ToArray();
+        var vendors = (await vendorStorage.GetAllAsync(parameters ?? new VendorFilter())).ToArray();
+        var articles = (await articleStorage.GetAllAsync()).ToArray();
 
-        var groupedItems = from vendor in allVendors
-                           join statistic in allVendorArticleStats on vendor.Id equals statistic.VendorId into gj
-            from subVendor2 in gj.DefaultIfEmpty(new VendorArticleStatistic{VendorId = vendor.Id})
-            select new VendorViewDto
+        var vendorView =
+            from vendor in vendors
+            let vendorArticles = articles.Where(p => p.VendorId == vendor.Id).ToArray()
+            select new { Vendor = vendor, Articles = vendorArticles };
+
+        return vendorView.Select(vendor =>
+        {
+            var articleStock = new VendorArticleStockDto
             {
-                Item = vendor.ToDto(),
-                Statistic = subVendor2.ToDto()
+                Recorded = vendor.Articles.Length,
+                OnSale = vendor.Articles.Count(p => p.IsOnSale()),
+                Sold = vendor.Articles.Count(p => p.IsSold()),
+                Returned = vendor.Articles.Count(p => p.IsReturned()),
+                Settled = vendor.Articles.Count(p => p.IsSettled())
             };
 
-        return groupedItems;
+            return new VendorOverviewItemDto
+            {
+                Vendor = vendor.Vendor.ToDto(),
+                ArticleStock = articleStock
+            };
+        }).ToList();
     }
 
     [HttpPost]
     public async Task<ActionResult> CreateAsync([FromBody] VendorCreateDto dto)
     {
         var element = dto.ToDomain();
-        var result = await vendorValidator.ValidateAsync(element);
-
-        if (result.IsValid is false)
-        {
-            return BadRequest(result.Errors.First().ErrorMessage);
-        }
 
         await vendorStorage.CreateAsync(element);
 
@@ -71,26 +76,6 @@ public class VendorController(VendorStorage vendorStorage, ArticleStorage articl
             : BadRequest(new FailedRequestMessage(result.Errors.First().Message));
     }
 
-    [HttpPost("{vendorId}/giveback/{number:long}")]
-    public async Task<ActionResult> GiveBackArticleAsync(string vendorId, long number)
-    {
-        var result = await articleStorage.GiveBackArticleAsync(number, vendorId);
-
-        return result.IsSuccess
-            ? Ok()
-            : BadRequest(new FailedRequestMessage(result.Errors.First().Message));
-    }
-
-    [HttpPost("{vendorId}/settle")]
-    public async Task<ActionResult> SettleAsync(string vendorId, [FromBody] IEnumerable<string> actionArticleIds)
-    {
-        var result = await articleStorage.SettleArticleAsync(actionArticleIds.ToArray());
-
-        return result.IsSuccess
-            ? Ok()
-            : BadRequest(new FailedRequestMessage(result.Errors.First().Message));
-    }
-
     [HttpPut("{id}")]
     public async Task<ActionResult> UpdateAsync(string id, [FromBody] VendorUpdateDto dto)
     {
@@ -100,12 +85,6 @@ public class VendorController(VendorStorage vendorStorage, ArticleStorage articl
         }
 
         var element = (id, dto).ToDomain();
-        var result = await vendorValidator.ValidateAsync(element);
-
-        if (result.IsValid is false)
-        {
-            return BadRequest(result.Errors.First().ErrorMessage);
-        }
 
         await vendorStorage.UpdateAsync(element);
 

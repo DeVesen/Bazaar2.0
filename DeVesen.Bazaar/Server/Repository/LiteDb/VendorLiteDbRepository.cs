@@ -23,6 +23,12 @@ public class VendorLiteDbRepository : IVendorRepository
         return await Task.FromResult(element != null);
     }
 
+    public async Task<VendorEntity> GetAsync(string id)
+    {
+        var element = _dbCollection.FindById(id);
+        return await Task.FromResult(element);
+    }
+
     public async Task<IEnumerable<VendorEntity>> GetAllAsync()
     {
         var element = _dbCollection.FindAll();

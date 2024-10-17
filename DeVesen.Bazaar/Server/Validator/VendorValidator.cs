@@ -1,11 +1,11 @@
 ﻿using DeVesen.Bazaar.Server.Basics;
-using DeVesen.Bazaar.Server.Domain;
+using DeVesen.Bazaar.Server.Infrastructure;
 using DeVesen.Bazaar.Shared.Basics;
 using FluentValidation;
 
 namespace DeVesen.Bazaar.Server.Validator;
 
-public class VendorValidator : BaseValidator<Vendor>
+public class VendorValidator : BaseValidator<VendorEntity>
 {
     public VendorValidator()
     {

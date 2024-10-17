@@ -4,11 +4,17 @@ public class SettlementActions
 {
     public record FetchSettlement(string VendorId);
 
-    public record SetSettlement(Models.VendorView VendorView, Models.Article[] Articles);
+    public record SetSettlement
+    {
+        public required Models.Vendor Vendor { get; set; }
+        public required Models.VendorArticleStock ArticleStock { get; set; }
+        public required Models.VendorArticleValue ArticleValue { get; set; }
+        public required Models.Article[] Articles { get; set; }
+    }
 
     public record SettlementFetchFailed;
 
-    public record PayOut(string VendorId, IEnumerable<string> ArticleIds);
+    public record PayOut(string VendorId);
 
     public record ResetSelection;
 }

@@ -20,16 +20,16 @@
             </MudAvatar>
         </CardHeaderAvatar>
         <CardHeaderContent>
-            <MudText Typo="Typo.body1">@VendorItem.Item.GetTotalName()</MudText>
-            <MudText Typo="Typo.body2">@VendorItem.Item.Id</MudText>
+            <MudText Typo="Typo.body1">@VendorItem.Vendor.GetTotalName()</MudText>
+            <MudText Typo="Typo.body2">@VendorItem.Vendor.Id</MudText>
         </CardHeaderContent>
         <CardHeaderActions>
             <DvIconButtonEdit OnClick="DoEdit"/>
         </CardHeaderActions>
     </MudCardHeader>
     <MudCardContent>
-        <ListingElementText Icon="@Icons.Material.TwoTone.AreaChart" Value="@VendorItem.Statistic.ToString()" />
-        <ListingElementText Icon="@Icons.Material.TwoTone.Info" Value="@VendorItem.Item.Note" />
+        <ListingElementText Icon="@Icons.Material.TwoTone.AreaChart" Value="@VendorItem.ArticleStock.ToString()" />
+        <ListingElementText Icon="@Icons.Material.TwoTone.Info" Value="@VendorItem.Vendor.Note" />
     </MudCardContent>
     <MudCardActions Class="d-flex justify-space-between">
         <DvIconButtonArticles OnClick="GoToArticles"/>
@@ -42,10 +42,10 @@
 @code {
 
     [Parameter]
-    public required VendorView VendorItem { get; set; }
+    public required VendorOverviewItem VendorItem { get; set; }
 
     [Parameter]
-    public EventCallback<VendorView> OnEdit { get; set; }
+    public EventCallback<VendorOverviewItem> OnEdit { get; set; }
 
     private FileDownloadActions _downloadActions = null!;
 
@@ -56,17 +56,17 @@
 
     private void GoToArticles()
     {
-        NavigationService.ToArticleOverview(VendorItem.Item.Id);
+        NavigationService.ToArticleOverview(VendorItem.Vendor.Id);
     }
 
     private async Task OnArticleImport()
     {
-        await DialogService.ImportArticleAsync(VendorItem.Item.Id);
+        await DialogService.ImportArticleAsync(VendorItem.Vendor.Id);
     }
 
     private async Task OnArticleDownload()
     {
-        var articles = await ArticleService.GetAllAsync(VendorItem.Item.Id);
+        var articles = await ArticleService.GetAllAsync(VendorItem.Vendor.Id);
         
         var exportBuilder = new StringBuilder();
 
@@ -77,11 +77,11 @@
             exportBuilder.AppendLine(ImportExportService.ArticleToDataLine(article));
         }
 
-        await _downloadActions.TriggerDownload(exportBuilder.ToString(), $"Articles_{VendorItem.Item.GetTotalName()}.csv");
+        await _downloadActions.TriggerDownload(exportBuilder.ToString(), $"Articles_{VendorItem.Vendor.GetTotalName()}.csv");
     }
 
     private async Task OnArticleApprove()
     {
-        await DialogService.ApproveArticleAsync(VendorItem.Item.Id);
+        await DialogService.ApproveArticleAsync(VendorItem.Vendor.Id);
     }
 }

@@ -10,7 +10,14 @@ public static class SettlementReducer
 
     [ReducerMethod]
     public static SettlementState SettlementFetched(SettlementState state, SettlementActions.SetSettlement action)
-        => state with { Vendor = action.VendorView, Articles = action.Articles, State = SettlementState.LoadingState.Loaded };
+        => state with
+        {
+            Vendor = action.Vendor,
+            ArticleStock = action.ArticleStock,
+            ArticleValue = action.ArticleValue,
+            Articles = action.Articles,
+            State = SettlementState.LoadingState.Loaded
+        };
 
     [ReducerMethod(typeof(SettlementActions.SettlementFetchFailed))]
     public static SettlementState SettlementFetchFailed(SettlementState state)

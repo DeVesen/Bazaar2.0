@@ -24,10 +24,38 @@ public record VendorDto
 }
 
 [ExcludeFromCodeCoverage]
-public record VendorViewDto
+public record VendorOverviewItemDto
 {
-    public required VendorDto Item { get; init; }
-    public required VendorArticleStatisticDto Statistic { get; init; }
+    public required VendorDto Vendor { get; init; }
+    public required VendorArticleStockDto ArticleStock { get; init; }
+}
+
+[ExcludeFromCodeCoverage]
+public record VendorSettlementDto
+{
+    public required VendorDto Vendor { get; init; }
+    public required VendorArticleStockDto ArticleStock { get; init; }
+    public required VendorArticleValueDto ArticleValue { get; init; }
+    public required IEnumerable<ArticleDto> Articles { get; set; }
+}
+
+[ExcludeFromCodeCoverage]
+public record VendorArticleStockDto
+{
+    public long Recorded { get; set; } = 0;
+    public long OnSale { get; init; } = 0;
+    public long Sold { get; init; } = 0;
+    public long Returned { get; init; } = 0;
+    public long Settled { get; init; } = 0;
+}
+
+[ExcludeFromCodeCoverage]
+public record VendorArticleValueDto
+{
+    public double TotalArticleValue { get; set; } = 0;
+    public double TotalSalesValue { get; init; } = 0;
+    public double TotalHandlingFee { get; init; } = 0;
+    public double TotalSalesCommission { get; init; } = 0;
 }
 
 [ExcludeFromCodeCoverage]
@@ -60,14 +88,4 @@ public record VendorUpdateDto
 public record VendorCreatedDto
 {
     public required string Id { get; init; }
-}
-
-[ExcludeFromCodeCoverage]
-public record VendorArticleStatisticDto
-{
-    public long NotOpen { get; set; } = 0;
-    public long Open { get; init; } = 0;
-    public long Sold { get; init; } = 0;
-    public long Settled { get; init; } = 0;
-    public double Turnover { get; init; } = 0;
 }

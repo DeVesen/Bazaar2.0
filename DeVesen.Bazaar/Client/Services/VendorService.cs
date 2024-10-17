@@ -4,7 +4,6 @@ using DeVesen.Bazaar.Client.Extensions;
 using DeVesen.Bazaar.Client.Models;
 using DeVesen.Bazaar.Shared;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using MudBlazor;
 
 namespace DeVesen.Bazaar.Client.Services;
 
@@ -20,7 +19,7 @@ public class VendorService
         _httpClient.BaseAddress = hostEnvironment.GetApiEndpointUrl("api/v1/Vendor");
     }
 
-    public async Task<Response<VendorView>> GetByIdAsync(string id)
+    public async Task<Response<VendorOverviewItem>> GetByIdAsync(string id)
     {
         try
         {
@@ -30,28 +29,27 @@ public class VendorService
 
             if (string.IsNullOrWhiteSpace(id))
             {
-                return Response<VendorView>.Invalid("Verkäufer nicht gefunden!");
+                return Response<VendorOverviewItem>.Invalid("Verkäufer nicht gefunden!");
             }
 
             var response = await _httpClient.GetAsync(requestUri);
 
             if (response.IsSuccessStatusCode is false)
             {
-                return Response<VendorView>.Invalid("Verkäufer nicht gefunden!");
+                return Response<VendorOverviewItem>.Invalid("Verkäufer nicht gefunden!");
             }
 
-            var dtoElement = await response.Content.ReadFromJsonAsync<VendorViewDto>();
-            var domainElement = MapToDomain(dtoElement!);
+            var domainElement = await response.Content.ReadFromJsonAsync<VendorOverviewItem>();
 
-            return Response<VendorView>.Valid(domainElement);
+            return Response<VendorOverviewItem>.Valid(domainElement!);
         }
         catch (Exception ex)
         {
-            return Response<VendorView>.Invalid(ex.Message);
+            return Response<VendorOverviewItem>.Invalid(ex.Message);
         }
     }
 
-    public async Task<Response<IEnumerable<VendorView>>> GetAllAsync(string? id = null, string? searchText = null)
+    public async Task<Response<IEnumerable<VendorOverviewItem>>> GetAllAsync(string? id = null, string? searchText = null)
     {
         try
         {
@@ -60,16 +58,14 @@ public class VendorService
                 .SetQueryItem("SearchText", searchText)
                 .Build();
 
-            var dtoElements =
-                await _httpClient.GetFromJsonAsync<IEnumerable<VendorViewDto>>(requestUri) ?? [];
+            var elements =
+                await _httpClient.GetFromJsonAsync<IEnumerable<VendorOverviewItem>>(requestUri) ?? [];
 
-            var domainElements = MapToDomain(dtoElements);
-
-            return Response<IEnumerable<VendorView>>.Valid(domainElements.ToArray());
+            return Response<IEnumerable<VendorOverviewItem>>.Valid(elements.ToArray());
         }
         catch (Exception ex)
         {
-            return Response<IEnumerable<VendorView>>.Invalid(ex.Message);
+            return Response<IEnumerable<VendorOverviewItem>>.Invalid(ex.Message);
         }
     }
 
@@ -144,97 +140,5 @@ public class VendorService
         var message = await response.Content.ReadFromJsonAsync<FailedRequestMessage>();
 
         return Response.Invalid(message!.Message);
-    }
-
-    public async Task<Response> GiveBackArticleAsync(string vendorId, long articleNumber)
-    {
-        var requestUri = _httpClient.BaseAddress + $"/{vendorId}/giveback/{articleNumber}";
-        var response = await _httpClient.PostAsync(requestUri, null);
-
-        if (response.IsSuccessStatusCode)
-        {
-            return Response.Valid();
-        }
-
-        var message = await response.Content.ReadFromJsonAsync<FailedRequestMessage>();
-
-        return Response.Invalid(message!.Message);
-    }
-
-    public async Task<Response> SettleAsync(string vendorId, IEnumerable<string> actionArticleIds)
-    {
-        var requestUri = _httpClient.BaseAddress + $"/{vendorId}/settle";
-        var response = await _httpClient.PostAsJsonAsync(requestUri, actionArticleIds);
-
-        if (response.IsSuccessStatusCode)
-        {
-            return Response.Valid();
-        }
-
-        var message = await response.Content.ReadFromJsonAsync<FailedRequestMessage>();
-
-        return Response.Invalid(message!.Message);
-    }
-
-
-    internal static IEnumerable<VendorView> MapToDomain(IEnumerable<VendorViewDto> elements)
-        => elements.Select(MapToDomain);
-
-    internal static VendorView MapToDomain(VendorViewDto dtoElement)
-        => new()
-        {
-            Item = new Vendor
-            {
-                Id = dtoElement.Item.Id,
-                FirstName = dtoElement.Item.FirstName,
-                LastName = dtoElement.Item.LastName,
-                Address = dtoElement.Item.Address,
-                EMail = dtoElement.Item.EMail,
-                Note = dtoElement.Item.Note,
-                OfferUnitPrice = dtoElement.Item.OfferUnitPrice,
-                SalesShare = dtoElement.Item.SalesShare
-            },
-            Statistic = new VendorArticleStatistic
-            {
-                NotOpen = dtoElement.Statistic.NotOpen,
-                Open = dtoElement.Statistic.Open,
-                Sold = dtoElement.Statistic.Sold,
-                Settled = dtoElement.Statistic.Settled,
-                Turnover = dtoElement.Statistic.Turnover
-            }
-        };
-}
-
-public class StatisticService
-{
-    private readonly HttpClient _httpClient;
-
-    public StatisticService(IWebAssemblyHostEnvironment hostEnvironment, HttpClient httpClient, SnackBarService snackBarService)
-    {
-        _httpClient = httpClient;
-        _httpClient.BaseAddress = hostEnvironment.GetApiEndpointUrl("api/v1/Statistic");
-    }
-
-    public async Task<Response<StatisticSummeryView>> Get()
-    {
-        try
-        {
-            var requestUri = new UriBuilder(_httpClient.BaseAddress)
-                .Build();
-
-            var domainElement =
-                await _httpClient.GetFromJsonAsync<StatisticSummeryView>(requestUri);
-
-            if (domainElement == null)
-            {
-                return Response<StatisticSummeryView>.Invalid("No data reseived!");
-            }
-
-            return Response<StatisticSummeryView>.Valid(domainElement);
-        }
-        catch (Exception ex)
-        {
-            return Response<StatisticSummeryView>.Invalid(ex.Message);
-        }
     }
 }

@@ -112,16 +112,6 @@ public static class ArticleExtensions
             Settled = data.Settled,
         };
 
-    public static VendorArticleStatisticDto ToDto(this VendorArticleStatistic data)
-        => new()
-        {
-            NotOpen = data.NotOpen,
-            Open = data.Open,
-            Sold = data.Sold,
-            Settled = data.Settled,
-            Turnover = data.Turnover
-        };
-
     public static SalesOrder.Position ToDomain(this SalesOrderDto.Position dto)
         => new(dto.Number, dto.Price);
 

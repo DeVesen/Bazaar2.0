@@ -209,18 +209,15 @@
 
     private async Task OnPayOutAsync()
     {
-        var openSales = SettlementState.Value.GetOpenSales();
-        var shareOfSales = SettlementState.Value.GetShareOfSales();
-        var articleCommission = SettlementState.Value.GetHandlingFee();
+        var openSales = SettlementState.Value.ArticleValue!.TotalSalesValue;
+        var shareOfSales = SettlementState.Value.ArticleValue!.TotalSalesCommission;
+        var articleCommission = SettlementState.Value.ArticleValue!.TotalHandlingFee;
 
         var payedOut = await DialogService.PayOutVendorAsync(openSales, shareOfSales, articleCommission).ConfigureAwait(false);
 
         if (payedOut)
         {
-            var articleIds = SettlementState.Value.Articles.Where(p => p.IsSettled() is false)
-                                                           .Select(p => p.Id);
-
-            SettlementFacade.PayOut(_vendor!.Id, articleIds);
+            SettlementFacade.PayOut(_vendor!.Id);
             
             await NavigationService.ToVendorPrintSettlement(_vendor!.Id);
         }

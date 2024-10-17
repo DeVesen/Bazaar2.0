@@ -79,7 +79,7 @@
             @if (IsSettlement)
             {
                 <MudItem xs="3">
-                    <MudField Label="Verkaufserlös"
+                    <MudField Label="Verkaufsumsatz"
                               Margin="Margin.Dense"
                               Variant="Variant.Filled">
                         <div class="d-flex justify-end">
@@ -181,16 +181,16 @@ else
     private string ActualDateTime => DateTime.Now.ToString("dd-MM-yyyy");
 
     private bool IsLoaded => SettlementState.Value.IsLoaded;
-    private Vendor Vendor => SettlementState.Value.Vendor!.Item;
+    private Vendor Vendor => SettlementState.Value.Vendor!;
     private IEnumerable<Article> Articles => SettlementState.Value.Articles.OrderBy(p => p.Number);
 
-    private long ArticlesApprovedCount => SettlementState.Value.Articles.Count(p => p.IsApprovedForSale());
-    private long ArticlesSoldCount => SettlementState.Value.Articles.Count(p => p.IsSold());
-    private long ArticlesReturnedCount => SettlementState.Value.Articles.Count(p => p.IsReturned());
+    private long ArticlesApprovedCount => SettlementState.Value.ArticleStock!.OnSale;
+    private long ArticlesSoldCount => SettlementState.Value.ArticleStock!.Sold;
+    private long ArticlesReturnedCount => SettlementState.Value.ArticleStock!.Returned;
 
-    private double SalesProceeds => SettlementState.Value.Articles.Where(p => p.IsSold()).Sum(p => p.SoldAt!.Value);
-    private double SalesCommission => SalesProceeds * Vendor.SalesShare;
-    private double AllowanceForExpenses => SettlementState.Value.Articles.Count(p => p.IsApprovedForSale() && p.IsSold() is false) * Vendor.OfferUnitPrice;
+    private double SalesProceeds => SettlementState.Value.ArticleValue!.TotalSalesValue;
+    private double SalesCommission => SettlementState.Value.ArticleValue!.TotalSalesCommission;
+    private double AllowanceForExpenses => SettlementState.Value.ArticleValue!.TotalHandlingFee;
     private double DealerShare => SalesProceeds - SalesCommission - AllowanceForExpenses;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

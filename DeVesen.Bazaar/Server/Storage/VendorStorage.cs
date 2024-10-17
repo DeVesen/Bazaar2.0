@@ -2,6 +2,7 @@
 using DeVesen.Bazaar.Server.Domain;
 using DeVesen.Bazaar.Server.Extensions;
 using DeVesen.Bazaar.Server.Hubs;
+using DeVesen.Bazaar.Server.Infrastructure;
 using DeVesen.Bazaar.Shared.Extensions;
 
 namespace DeVesen.Bazaar.Server.Storage;
@@ -24,7 +25,12 @@ public class VendorStorage
         return await _vendorRepository.ExistByIdAsync(id);
     }
 
-    public async Task<IEnumerable<Vendor>> GetAllAsync(VendorFilter filter)
+    public async Task<VendorEntity> GetAsync(string vendorId)
+    {
+        return await _vendorRepository.GetAsync(vendorId);
+    }
+
+    public async Task<IEnumerable<VendorEntity>> GetAllAsync(VendorFilter filter)
     {
         var elements = await _vendorRepository.GetAllAsync();
 
@@ -42,29 +48,29 @@ public class VendorStorage
                                         || p.Note.BiContainsIgnoreCase(filter.SearchText));
         }
 
-        return elements.Select(p => p.ToDomain());
+        return elements.Select(p => p);
     }
 
-    public async Task CreateAsync(Vendor element)
+    public async Task CreateAsync(VendorEntity element)
     {
         if (await _vendorRepository.ExistByIdAsync(element.Id))
         {
             throw new InvalidDataException($"Id '{element.Id}' already exist!");
         }
 
-        await _vendorRepository.CreateAsync(element.ToEntity());
+        await _vendorRepository.CreateAsync(element);
 
         await _vendorHubContext.SendAdded();
     }
 
-    public async Task UpdateAsync(Vendor element)
+    public async Task UpdateAsync(VendorEntity element)
     {
         if (await _vendorRepository.ExistByIdAsync(element.Id) is false)
         {
             throw new InvalidDataException($"Id '{element.Id}' not found!");
         }
 
-        await _vendorRepository.UpdateAsync(element.ToEntity());
+        await _vendorRepository.UpdateAsync(element);
 
         await _vendorHubContext.SendUpdated(element.Id);
     }

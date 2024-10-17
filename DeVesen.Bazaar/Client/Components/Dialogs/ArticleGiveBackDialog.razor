@@ -3,7 +3,7 @@
 @using DeVesen.Bazaar.Client.Services
 @using DeVesen.Bazaar.Client.Components.Common
 
-@inject VendorService VendorService
+@inject SettlementService SettlementService
 
 <MudDialog>
     <DialogContent>
@@ -77,7 +77,7 @@
 
     private async Task OnGiveBackArticleAsync(long articleNumber)
     {
-        var result = await VendorService.GiveBackArticleAsync(VendorId, articleNumber);
+        var result = await SettlementService.GiveBackArticleAsync(VendorId, articleNumber);
 
         if (result.IsValid)
         {

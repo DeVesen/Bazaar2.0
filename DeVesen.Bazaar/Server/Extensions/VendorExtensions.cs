@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using DeVesen.Bazaar.Server.Domain;
 using DeVesen.Bazaar.Server.Infrastructure;
 using DeVesen.Bazaar.Shared;
 using DeVesen.Bazaar.Shared.Basics;
@@ -8,35 +7,8 @@ namespace DeVesen.Bazaar.Server.Extensions;
 
 public static class VendorExtensions
 {
-    public static VendorEntity ToEntity(this Vendor entity)
-        => new()
-        {
-            Id = entity.Id,
-            FirstName = entity.FirstName,
-            LastName = entity.LastName,
-            Address = entity.Address,
-            EMail = entity.EMail,
-            Phone = entity.Phone,
-            Note = entity.Note,
-            OfferUnitPrice = entity.OfferUnitPrice,
-            SalesShare = entity.SalesShare
-        };
 
-    public static Vendor ToDomain(this VendorEntity entity)
-        => new()
-        {
-            Id = entity.Id,
-            FirstName = entity.FirstName,
-            LastName = entity.LastName,
-            Address = entity.Address,
-            EMail = entity.EMail,
-            Phone = entity.Phone,
-            Note = entity.Note,
-            OfferUnitPrice = entity.OfferUnitPrice,
-            SalesShare = entity.SalesShare
-        };
-
-    public static Vendor ToDomain(this VendorCreateDto dto)
+    public static VendorEntity ToDomain(this VendorCreateDto dto)
         => new()
         {
             Id = dto.ToShortHash(),
@@ -50,7 +22,7 @@ public static class VendorExtensions
             SalesShare = dto.SalesShare
         };
 
-    public static Vendor ToDomain(this (string id, VendorUpdateDto dto) data)
+    public static VendorEntity ToDomain(this (string id, VendorUpdateDto dto) data)
         => new()
         {
             Id = data.id,
@@ -64,7 +36,7 @@ public static class VendorExtensions
             SalesShare = data.dto.SalesShare
         };
 
-    public static VendorDto ToDto(this Vendor data)
+    public static VendorDto ToDto(this VendorEntity data)
         => new()
         {
             Id = data.Id,

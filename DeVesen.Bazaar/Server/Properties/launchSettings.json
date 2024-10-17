@@ -13,7 +13,7 @@
     "https": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "vendors/3ac2ccc0/print/settlement",
+      "launchUrl": "vendors",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },

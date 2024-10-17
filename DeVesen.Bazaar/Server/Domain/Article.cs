@@ -19,4 +19,23 @@ public record Article
     public double? SoldAt { get; set; } = null;
     public DateTime? Returned { get; set; } = null;
     public DateTime? Settled { get; set; } = null;
+
+
+    public bool IsOnSale()
+        => ApprovedForSale.HasValue &&
+           Sold.HasValue is false &&
+           Returned.HasValue is false &&
+           Settled.HasValue is false;
+
+    public bool IsSold()
+        => Sold.HasValue &&
+           Returned.HasValue is false &&
+           Settled.HasValue is false;
+
+    public bool IsReturned()
+        => Returned.HasValue &&
+           Settled.HasValue is false;
+
+    public bool IsSettled()
+        => Settled.HasValue;
 }
