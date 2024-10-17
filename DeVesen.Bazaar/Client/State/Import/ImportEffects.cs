@@ -60,15 +60,11 @@ public class ImportEffects
     {
         foreach (var line in action.Lines)
         {
-            dispatcher.Dispatch(line);
+            var result = await _articleService.CreateAsync(line.Article, false);
+
+            dispatcher.Dispatch(new ImportActions.DataLineImported(line.LineIndex, result.IsValid, result.ErrorMessages));
         }
-    }
 
-    [EffectMethod]
-    public async Task ImportDataLineAsync(ImportActions.ImportDataLine action, IDispatcher dispatcher)
-    {
-        var result = await _articleService.CreateAsync(action.Article, false);
-
-        dispatcher.Dispatch(new ImportActions.DataLineImported(action.LineIndex, result.IsValid, result.ErrorMessages));
+        dispatcher.Dispatch(new ImportActions.AllIDataLinesImported());
     }
 }

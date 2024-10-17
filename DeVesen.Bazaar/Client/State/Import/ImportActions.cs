@@ -10,9 +10,9 @@ public class ImportActions
 
     public record DataLineValidated(int LineIndex, bool Success, IEnumerable<string> ErrorMessages);
 
-    public record ImportDataLines(IEnumerable<ImportDataLine> Lines);
-
-    public record ImportDataLine(int LineIndex, Models.Article Article);
+    public record ImportDataLines(IEnumerable<(int LineIndex, Models.Article Article)> Lines);
 
     public record DataLineImported(int LineIndex, bool Success, IEnumerable<string> ErrorMessages);
+
+    public record AllIDataLinesImported;
 }

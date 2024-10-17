@@ -10,18 +10,23 @@
 <MudDialog>
     <DialogContent>
         <div style="width: 350px" class="d-flex flex-column gap-2">
-            @if (HaveAnyItem is false)
+            
+            @if (_isLoadingData)
             {
-                
-                @if (_isLoadingData)
-                {
-                    <MudProgressLinear Color="Color.Secondary" Indeterminate Class="my-7"/>
-                }
-                else
-                {
-                    <DvFileUpload OnFilesChanged="OnFilesChangedAsync"/>
-                    <MudSwitch @bind-Value="@_skipFirstRow" Label="Erste Zeile überspringen" LabelPosition="LabelPosition.Start" Color="Color.Warning" />
-                }
+                <MudText Color="Color.Secondary" Typo="Typo.body1">Lesen der Datei ...</MudText>
+                <MudProgressLinear Color="Color.Secondary" Indeterminate Class="my-7"/>
+                <MudText Color="Color.Secondary" Typo="Typo.body1">@DataLinesCount</MudText>
+            }
+            else if (ImportState.Value.IsImporting)
+            {
+                <MudText Color="Color.Secondary" Typo="Typo.body1">Schreiben der Artikel ...</MudText>
+                <MudProgressLinear Color="Color.Secondary" Class="my-7" Value="@ImportedCount" Max="@DataLinesCount" />
+                <MudText Color="Color.Secondary" Typo="Typo.body1">@($"{ImportedCount} / {DataLinesCount}")</MudText>
+            }
+            else if (HaveAnyItem is false)
+            {
+                <DvFileUpload OnFilesChanged="OnFilesChangedAsync"/>
+                <MudSwitch @bind-Value="@_skipFirstRow" Label="Erste Zeile überspringen" LabelPosition="LabelPosition.Start" Color="Color.Warning"/>
             }
             else if (EverythingImported is false)
             {
@@ -35,7 +40,7 @@
                                      IconColor="@GetListColor(item)"
                                      Icon="@Icons.Material.TwoTone.PlayArrow"
                                      Text="@GetListText(item)"
-                                     SecondaryText="@GetListSecondaryText(item)"/>
+                                     SecondaryText="@GetListSecondaryText(item)" />
                     }
                 </MudList>
             }
@@ -43,6 +48,7 @@
             {
                 <MudText> Alle Artikel wurden erfolgreich importiert !</MudText>
             }
+
         </div>
     </DialogContent>
     <DialogActions>
@@ -64,6 +70,10 @@
 
     private bool HaveAnyItem => ImportState.Value.Items.Any();
 
+    private int ImportedCount => ImportState.Value.Items.Count(p => p.Imported is true);
+
+    private int DataLinesCount => ImportState.Value.Items.Count();
+
     private IEnumerable<ImportInfo> ImportInfoItems => ImportState.Value.Items.Where(p => p.Imported is false or null);
 
     private bool _isLoadingData;
@@ -74,11 +84,13 @@
     {
         _importTried = true;
 
-        var linesToImport = ImportState.Value.Items.ToArray()
-            .Select(p => new ImportActions.ImportDataLine(p.LineIndex, p.Article!))
+        var linesToImport = ImportState.Value.Items
+            .Select(p => (p.LineIndex, p.Article!))
             .ToArray();
-
+            
         ImportFacade.ImportDataLines(linesToImport);
+
+        StateHasChanged();
     }
 
     private void OnClose()

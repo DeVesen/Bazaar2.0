@@ -3,9 +3,9 @@
 namespace DeVesen.Bazaar.Client.State.Import;
 
 [FeatureState]
-public record ImportState(IEnumerable<ImportInfo> Items)
+public record ImportState(IEnumerable<ImportInfo> Items, bool IsImporting)
 {
-    private ImportState() : this(Enumerable.Empty<ImportInfo>()) { }
+    private ImportState() : this(Enumerable.Empty<ImportInfo>(), false) { }
 }
 
 public record ImportInfo

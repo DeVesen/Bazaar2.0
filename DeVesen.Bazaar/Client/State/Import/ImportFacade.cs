@@ -1,23 +1,19 @@
 ﻿using Fluxor;
+using Microsoft.AspNetCore.Components;
 
 namespace DeVesen.Bazaar.Client.State.Import
 {
-    public class ImportFacade
+    public class ImportFacade(IDispatcher dispatcher)
     {
-        private readonly IDispatcher _dispatcher;
-
-        public ImportFacade(IDispatcher dispatcher)
-        {
-            _dispatcher = dispatcher;
-        }
+        public IDispatcher Dispatcher { get; } = dispatcher;
 
         public void ClearBuffer()
-            => _dispatcher.Dispatch(new ImportActions.ClearBuffer());
+            => Dispatcher.Dispatch(new ImportActions.ClearBuffer());
 
         public void AnalyzeDataLine(string vendorId, int lineIndex, string lineData)
-            => _dispatcher.Dispatch(new ImportActions.AnalyzeDataLine(vendorId, lineIndex, lineData));
+            => Dispatcher.Dispatch(new ImportActions.AnalyzeDataLine(vendorId, lineIndex, lineData));
 
-        public void ImportDataLines(IEnumerable<ImportActions.ImportDataLine> lines)
-            => _dispatcher.Dispatch(new ImportActions.ImportDataLines(lines));
+        public void ImportDataLines(IEnumerable<(int LineIndex, Models.Article Article)> lines)
+            => Dispatcher.Dispatch(new ImportActions.ImportDataLines(lines));
     }
 }

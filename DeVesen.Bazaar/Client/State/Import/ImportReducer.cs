@@ -6,7 +6,15 @@ public static class ImportReducer
 {
     [ReducerMethod(typeof(ImportActions.ClearBuffer))]
     public static ImportState ClearBuffer(ImportState state)
-        => state with { Items = Enumerable.Empty<ImportInfo>() };
+        => state with { Items = Enumerable.Empty<ImportInfo>(), IsImporting = false };
+
+    [ReducerMethod(typeof(ImportActions.ImportDataLines))]
+    public static ImportState ImportDataLines(ImportState state)
+        => state with { IsImporting = true };
+
+    [ReducerMethod(typeof(ImportActions.AllIDataLinesImported))]
+    public static ImportState AllIDataLinesImported(ImportState state)
+        => state with { IsImporting = false };
 
     [ReducerMethod]
     public static ImportState AddAnalyzedDataLine(ImportState state, ImportActions.DataLineAnalyzed action)
