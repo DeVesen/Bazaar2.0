@@ -47,8 +47,10 @@
                                 DisableNewItem="@DisableNewItem"
                                 OuterClass="flex-grow-1" />
 
-                <MudIconButton Icon="@Icons.Material.TwoTone.QrCodeScanner"
-                               OnClick="OnBcScanner"/>
+                <MudTooltip Text="Barcode scannen">
+                    <MudIconButton Icon="@Icons.Material.TwoTone.QrCodeScanner"
+                                   OnClick="OnBcScanner"/>
+                </MudTooltip>
             }
             else
             {

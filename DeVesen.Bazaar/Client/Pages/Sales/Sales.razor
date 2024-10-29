@@ -70,13 +70,15 @@
                                       OnKeyUp="@OnArticleSearchKeyUpAsync"
                                       OnAdornmentClick="OnAdornmentClick" />
 
-                        <MudIconButton Icon="@BazaarIcons.Enter"/>
+                        <MudTooltip Text="Eingabe bestätigen" Disabled="@(_articleNumber.HasValue is false)">
+                            <MudIconButton Icon="@BazaarIcons.Enter" Disabled="@(_articleNumber.HasValue is false)" />
+                        </MudTooltip>
 
                         <MudButtonGroup OverrideStyles="false" Class="ptsm">
                             <SalesPriceBtn Value="@_article?.Price01"
                                            Color="Color.Primary"
                                            Disabled="@(ArticleValidForSale is false)"
-                                           OnClick="() => OnArticlePriceClickAsync(_article!, _article!.Price01)" />
+                                           OnClick="() => OnArticlePriceClickAsync(_article!, _article!.Price01)"/>
                             <SalesPriceBtn Value="@_article?.Price02"
                                            Color="Color.Secondary"
                                            Disabled="@(ArticleValidForSale is false)"
@@ -118,20 +120,24 @@
                         </MudItem>
                         <MudSpacer/>
                         <MudItem xs="4" Class="d-flex justify-end gap-2">
-                            <MudIconButton Disabled="@(HasItemsInCart is false)"
-                                           Icon="@Icons.Material.TwoTone.Delete"
-                                           Variant="Variant.Filled"
-                                           Color="Color.Primary"
-                                           Size="Size.Large"
-                                           OnClick="@OnClearCartClicked"
-                                           Class="p-3"/>
-                            <MudIconButton Disabled="@(HasItemsInCart is false)"
-                                           Icon="@Icons.Material.TwoTone.Euro"
-                                           Variant="Variant.Filled"
-                                           Color="Color.Primary"
-                                           Size="Size.Large"
-                                           OnClick="@OnCompleteSaleClicked"
-                                           Class="p-3"/>
+                            <MudTooltip Text="Warenkorb leeren" Disabled="@(HasItemsInCart is false)">
+                                <MudIconButton Disabled="@(HasItemsInCart is false)"
+                                               Icon="@Icons.Material.TwoTone.Delete"
+                                               Variant="Variant.Filled"
+                                               Color="Color.Primary"
+                                               Size="Size.Large"
+                                               OnClick="@OnClearCartClicked"
+                                               Class="p-3"/>
+                            </MudTooltip>
+                            <MudTooltip Text="Verkauf abschließen" Disabled="@(HasItemsInCart is false)">
+                                <MudIconButton Disabled="@(HasItemsInCart is false)"
+                                               Icon="@Icons.Material.TwoTone.Euro"
+                                               Variant="Variant.Filled"
+                                               Color="Color.Primary"
+                                               Size="Size.Large"
+                                               OnClick="@OnCompleteSaleClicked"
+                                               Class="p-3"/>
+                            </MudTooltip>
                         </MudItem>
                     </MudGrid>
                 </MudItem>

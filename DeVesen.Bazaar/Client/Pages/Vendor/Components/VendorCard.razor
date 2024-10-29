@@ -24,7 +24,9 @@
             <MudText Typo="Typo.body2">@VendorItem.Vendor.Id</MudText>
         </CardHeaderContent>
         <CardHeaderActions>
-            <DvIconButtonEdit OnClick="DoEdit"/>
+            <MudTooltip Text="Händler editieren">
+                <DvIconButtonEdit OnClick="DoEdit"/>
+            </MudTooltip>
         </CardHeaderActions>
     </MudCardHeader>
     <MudCardContent>
@@ -32,10 +34,10 @@
         <ListingElementText Icon="@Icons.Material.TwoTone.Info" Value="@VendorItem.Vendor.Note" />
     </MudCardContent>
     <MudCardActions Class="d-flex justify-space-between">
-        <DvIconButtonArticles OnClick="GoToArticles"/>
-        <DvIconButtonImport OnClick="OnArticleImport" />
-        <DvIconButtonDownload OnClick="OnArticleDownload" />
-        <DvIconButtonApprove OnClick="OnArticleApprove" />
+        <DvIconButtonArticles OnClick="GoToArticles" ToolTipText="Artikelliste"/>
+        <DvIconButtonImport OnClick="OnArticleImport" ToolTipText="Artikelliste importieren"/>
+        <DvIconButtonDownload OnClick="OnArticleDownload" ToolTipText="Artikelliste download"/>
+        <DvIconButtonApprove OnClick="OnArticleApprove" ToolTipText="Artikel freigeben"/>
     </MudCardActions>
 </MudCard>
 

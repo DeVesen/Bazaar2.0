@@ -39,21 +39,27 @@
         <MudButtonGroup Color="Color.Surface"
                         Variant="Variant.Filled"
                         Size="Size.Large">
-            <MudIconButton Icon="@Icons.Material.TwoTone.Print"
-                           Disabled="@(HasVendorSelected is false)"
-                           Size="Size.Large"
-                           Class="action-short-button"
-                           OnClick="OnPrintOverviewAsync" />
-            <MudIconButton Icon="@GiveBackIconPath"
-                           Disabled="@(HasVendorSelected is false)"
-                           Size="Size.Large"
-                           Class="action-short-button"
-                           OnClick="OnGiveBackAsync" />
-            <MudIconButton Icon="@PayOutIconPath"
-                           Disabled="@(HasArticlesToGiveBack || HasArticlesToSettle is false)"
-                           Size="Size.Large"
-                           Class="action-short-button"
-                           OnClick="OnPayOutAsync" />
+            <MudTooltip Text="Liste drucken" Disabled="@(HasVendorSelected is false)">
+                <MudIconButton Icon="@Icons.Material.TwoTone.Print"
+                               Disabled="@(HasVendorSelected is false)"
+                               Size="Size.Large"
+                               Class="action-short-button h-100"
+                               OnClick="OnPrintOverviewAsync"/>
+            </MudTooltip>
+            <MudTooltip Text="Artikel zurück geben" Disabled="@(HasVendorSelected is false)">
+                <MudIconButton Icon="@GiveBackIconPath"
+                               Disabled="@(HasVendorSelected is false)"
+                               Size="Size.Large"
+                               Class="action-short-button h-100"
+                               OnClick="OnGiveBackAsync"/>
+            </MudTooltip>
+            <MudTooltip Text="Händler auszahlen" Disabled="@(HasArticlesToGiveBack || HasArticlesToSettle is false)">
+                <MudIconButton Icon="@PayOutIconPath"
+                               Disabled="@(HasArticlesToGiveBack || HasArticlesToSettle is false)"
+                               Size="Size.Large"
+                               Class="action-short-button h-100"
+                               OnClick="OnPayOutAsync"/>
+            </MudTooltip>
         </MudButtonGroup>
     </ArticleOverviewToolbar>
     @if (SettlementState.Value.IsEmpty)

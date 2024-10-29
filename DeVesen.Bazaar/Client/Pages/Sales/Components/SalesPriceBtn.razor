@@ -1,14 +1,16 @@
-﻿<MudButton Disabled="@DisableCtrl"
-           Style="width: 128px;"
-           Size="Size.Large"
-           Variant="Variant.Filled"
-           Color="@(Value.HasValue ? Color : Color.Default)"
-           OnClick="@OnClick">
-    <MudText Typo="Typo.body1"
-             Style="font-size: 28px">
-        @(Value.HasValue ? $"{Value} €" : "-")
-    </MudText>
-</MudButton>
+﻿<MudTooltip Text="@($"Zum Preis von {@Value} € in den Warenkorb legen.")" Disabled="@DisableCtrl">
+    <MudButton Disabled="@DisableCtrl"
+               Style="width: 128px;"
+               Size="Size.Large"
+               Variant="Variant.Filled"
+               Color="@(Value.HasValue ? Color : Color.Default)"
+               OnClick="@OnClick">
+        <MudText Typo="Typo.body1"
+                 Style="font-size: 28px">
+            @(Value.HasValue ? $"{Value} €" : "-")
+        </MudText>
+    </MudButton>
+</MudTooltip>
 
 @code {
     private bool DisableCtrl => Disabled || Value.HasValue is false;

@@ -1,15 +1,20 @@
 ﻿
-<DvIconButton FullWidth="@FullWidth"
-              Icon="@BazaarIcons.Approve"
-              Size="@Size"
-              Variant="@Variant"
-              Color="@Color"
-              Disabled="@Disabled"
-              OnClick="OnClick" />
+<MudTooltip Text="@ToolTipText">
+    <DvIconButton FullWidth="@FullWidth"
+                  Icon="@BazaarIcons.Approve"
+                  Size="@Size"
+                  Variant="@Variant"
+                  Color="@Color"
+                  Disabled="@Disabled"
+                  OnClick="OnClick" />
+</MudTooltip>
 
 @code {
     [Parameter]
     public bool Disabled { get; set; }
+
+    [Parameter]
+    public string ToolTipText { get; set; } = string.Empty;
 
     [Parameter]
     public bool FullWidth { get; set; } = true;

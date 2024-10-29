@@ -1,0 +1,54 @@
+﻿
+<div class="border-solid border-1 mud-border-dark px-2 py-1" style="@_mainDivStyle">
+    <div class="d-flex flex-row gap-1">
+        <div style="width: 25%; max-width: 25%;">
+            <QrCode ElementId="@($"id-{Number}")"
+                Width="79"
+                height="79"
+                Text="@Number">
+            </QrCode>
+            <MudText Align="Align.Center" Typo="Typo.body2">@Number</MudText>
+        </div>
+        <div class="d-flex flex-column" style="width: 75%; max-width: 75%;">
+            <MudText Class="py-1" Align="Align.End" Typo="Typo.h2">@Price</MudText>
+            @if (string.IsNullOrWhiteSpace(Description) is false)
+            {
+                <MudText Class="py-1" Align="Align.End" Typo="Typo.body1">@Description</MudText>
+            }
+        </div>
+    </div>
+    <div class="d-flex flex-row justify-space-between gap-1">
+        <div class="pa-2 rounded-circle" style="@_vendorCircleStyle"></div>
+        <MudText Align="Align.Center" Typo="Typo.body2">www.schneesport-hochstadt.de</MudText>
+        <div class="pa-2 rounded-circle" style="@_vendorCircleStyle"></div>
+    </div>
+</div>
+
+@code {
+    private string _mainDivStyle = string.Empty;
+    private string _vendorCircleStyle = string.Empty;
+
+    [Parameter]
+    public string Width { get; set; } = "325px";
+
+    [Parameter]
+    public string Number { get; set; }
+
+    [Parameter]
+    public string Description { get; set; }
+
+    [Parameter]
+    public string Price { get; set; }
+
+    [Parameter]
+    public string VendorColor { get; set; } = "#00FF00";
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        _mainDivStyle = $"width: {Width}; max-width: {Width};";
+        _vendorCircleStyle = $"background-color: {VendorColor};";
+    }
+
+}

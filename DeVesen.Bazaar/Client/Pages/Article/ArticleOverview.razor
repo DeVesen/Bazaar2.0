@@ -51,17 +51,21 @@
         <MudButtonGroup Color="Color.Surface"
                         Variant="Variant.Filled"
                         Size="Size.Large">
-            <MudIconButton Icon="@Icons.Material.TwoTone.Add"
-                           Disabled="@(_vendor == null)"
-                           Color="Color.Tertiary"
-                           Size="Size.Large"
-                           Class="action-short-button"
-                           OnClick="CreateArticleAsync"/>
-            <MudIconButton Icon="@Icons.Material.TwoTone.Print"
-                           Disabled="@(_vendor == null)"
-                           Size="Size.Large"
-                           Class="action-short-button"
-                           OnClick="PrintOverviewAsync" />
+            <MudTooltip Text="Artikel erstellen" Disabled="@(_vendor == null)">
+                <MudIconButton Icon="@Icons.Material.TwoTone.Add"
+                               Disabled="@(_vendor == null)"
+                               Color="Color.Tertiary"
+                               Size="Size.Large"
+                               Class="action-short-button h-100"
+                               OnClick="CreateArticleAsync"/>
+            </MudTooltip>
+            <MudTooltip Text="Liste drucken" Disabled="@(_vendor == null)">
+                <MudIconButton Icon="@Icons.Material.TwoTone.Print"
+                               Disabled="@(_vendor == null)"
+                               Size="Size.Large"
+                               Class="action-short-button h-100"
+                               OnClick="PrintOverviewAsync"/>
+            </MudTooltip>
             <MudMenu Icon="@Icons.Material.Filled.ArrowDropDown"
                      Disabled="@(_vendor == null)"
                      Size="Size.Large"
@@ -72,7 +76,7 @@
                              OnClick="ImportArticlesAsync">Import</MudMenuItem>
                 <MudMenuItem Icon="@BazaarIcons.Download"
                              OnClick="ExportArticlesAsync">Export</MudMenuItem>
-                <MudDivider />
+                <MudDivider/>
                 <MudMenuItem Icon="@BazaarIcons.Approve"
                              OnClick="ApproveArticleAsync">Freigeben</MudMenuItem>
             </MudMenu>
