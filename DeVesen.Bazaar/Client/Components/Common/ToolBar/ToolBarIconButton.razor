@@ -1,14 +1,19 @@
 ﻿
+<MudTooltip Text="@ToolTipText">
 <MudButton StartIcon="@Icon"
            Color="@Color"
            Size="@Size"
            Disabled="@Disabled"
            Variant="@Variant"
            OnClick="@OnClick" />
+</MudTooltip>
 
 @code {
     [Parameter]
     public string? Title { get; set; }
+
+    [Parameter]
+    public string? ToolTipText { get; set; }
 
     [Parameter]
     public required string Icon { get; set; }
