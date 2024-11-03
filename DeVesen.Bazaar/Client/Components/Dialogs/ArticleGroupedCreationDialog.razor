@@ -1,0 +1,79 @@
+﻿@using DeVesen.Bazaar.Client.Components.Common
+@using DeVesen.Bazaar.Client.Components.Common.Buttons
+@using DeVesen.Bazaar.Client.Models
+
+@inject Services.DialogService DialogService;
+@inject Services.VendorService VendorService;
+@inject Services.NavigationService NavigationService
+
+<MudDialog>
+    <DialogContent>
+        <MudGrid Style="min-width: 450px;">
+            <MudItem xs="12">
+                <MudIconButton Class="w-100"
+                               Icon="@BazaarIcons.Add"
+                               Variant="Variant.Text"
+                               OnClick="OnAddNewArticle"/>
+            </MudItem>
+
+            <MudItem xs="6">
+                <MudField Label="Anzahl neue Artikel"
+                          FullWidth="true">
+                    <div class="d-flex justify-end">
+                        <MudText>@($"{_newArticleCount} St")</MudText>
+                    </div>
+                </MudField>
+            </MudItem>
+            <MudItem xs="6">
+                <MudField Label="Aufwandsentschädigung"
+                          FullWidth="true">
+                    <div class="d-flex justify-end">
+                        <MudText>@($"{_offerUnitPrice:##0.00} €")</MudText>
+                    </div>
+                </MudField>
+            </MudItem>
+        </MudGrid>
+    </DialogContent>
+    <DialogActions>
+        <DvButtonClose OnClick="OnCloseAsync" />
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
+
+    [Parameter] public required string VendorId { get; set; }
+
+    private int _newArticleCount;
+    private double _offerUnitPrice;
+    private Vendor? _vendor;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await  base.OnInitializedAsync();
+
+        var vendorResponse = await VendorService.GetByIdAsync(VendorId);
+        _vendor = vendorResponse.IsValid
+            ? vendorResponse.Value.Vendor
+            : null;
+    }
+
+    private void OnCloseAsync()
+    {
+        if (_newArticleCount > 0)
+        {
+            NavigationService.ToVendorPrint(VendorId);
+        }
+
+        MudDialog.Close();
+    }
+
+    private async Task OnAddNewArticle(MouseEventArgs arg)
+    {
+        if (await DialogService.CreateArticleAsync(VendorId))
+        {
+            _newArticleCount++;
+            _offerUnitPrice = _newArticleCount * _vendor!.OfferUnitPrice;
+        }
+    }
+}

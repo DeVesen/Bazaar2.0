@@ -58,26 +58,32 @@ public class DialogService(IDialogService dialogService)
     }
 
 
-    public async Task CreateArticleAsync(string vendorId, bool disableAutoApprove = false)
+    public async Task<bool> CreateArticleAsync(string vendorId, bool disableAutoApprove = false)
     {
         var options = GetDefaultOptions();
-        var forceNext = false;
 
-        do
+        var parameters = new DialogParameters<ArticleCreateDialog>
         {
-            var parameters = new DialogParameters<ArticleCreateDialog>
-            {
-                { x => x.ForceNext, forceNext },
-                { x => x.VendorId, vendorId },
-                { x => x.DisableAutoApprove, disableAutoApprove }
-            };
+            { x => x.VendorId, vendorId },
+            { x => x.DisableAutoApprove, disableAutoApprove }
+        };
 
-            var dlg = await dialogService.ShowAsync<ArticleCreateDialog>("Artikel anlegen", parameters, options);
-            var result = await dlg.Result;
+        var dlg = await dialogService.ShowAsync<ArticleCreateDialog>("Artikel anlegen", parameters, options);
+        var result = await dlg.Result;
 
-            forceNext = result!.Canceled is false && (bool)result.Data!;
+        return result!.Canceled is false;
+    }
 
-        } while (forceNext);
+    public async Task ArticleGroupedCreationDialog(string vendorId, bool disableAutoApprove = false)
+    {
+        var options = GetDefaultOptions();
+        var parameters = new DialogParameters<ArticleGroupedCreationDialog>
+        {
+            { x => x.VendorId, vendorId }
+        };
+
+        await dialogService.ShowAsync<ArticleGroupedCreationDialog>("Artikel anlegen", parameters, options)
+                           .WaitForResult();
     }
 
     public async Task ModifyArticleAsync(Article article, bool disableStateChange = false)

@@ -147,7 +147,7 @@
 
     private async Task CreateArticleAsync()
     {
-        await DialogService.CreateArticleAsync(_vendor!.Id);
+        await DialogService.ArticleGroupedCreationDialog(_vendor!.Id);
 
         FetchArticleList();
     }
