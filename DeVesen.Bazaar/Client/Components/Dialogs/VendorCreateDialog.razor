@@ -9,7 +9,8 @@
 
 <MudDialog>
     <DialogContent>
-        <VendorForm IsValid="@_isValid"
+        <VendorForm @ref="_vendorForm"
+                    IsValid="@_isValid"
                     IsTouched="@_isTouched"
                     IsValidChanged="@(x => _isValid = x)"
                     IsTouchedChanged="@(x => _isTouched = x)"
@@ -34,7 +35,9 @@
 
     private bool DisableSave => (_isValid && _isTouched) is false;
 
+    private VendorForm? _vendorForm;
     private Vendor _item = Vendor.New;
+    private bool _preFilled = false;
     private bool _isValid;
     private bool _isTouched;
 
@@ -56,6 +59,21 @@
 
         _item.FirstName = StartText.Trim()[..lastSpacePos].Trim();
         _item.LastName = StartText.Trim()[lastSpacePos..].Trim();
+
+        _preFilled = true;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            if (_preFilled && _vendorForm != null)
+            {
+                await _vendorForm.ValidateForm();
+            }
+        }
     }
 
     private async Task SubmitAsync()

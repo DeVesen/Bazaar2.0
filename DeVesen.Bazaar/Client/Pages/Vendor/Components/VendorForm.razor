@@ -1,7 +1,8 @@
 ﻿@using DeVesen.Bazaar.Client.Components.Common.TextField
 @using DeVesen.Bazaar.Client.Models
 
-<MudForm IsValid="@IsValid"
+<MudForm @ref="_mudForm"
+         IsValid="@IsValid"
          IsTouched="@IsTouched"
          IsValidChanged="@IsValidChanged"
          IsTouchedChanged="@IsTouchedChanged"
@@ -13,6 +14,7 @@
     <MudGrid Spacing="2">
         <MudItem xs="12" sm="6">
             <DvTextField T="string"
+                         @ref="_firstNameTxt"
                          Required
                          Label="Vorname"
                          @bind-Value="Item.FirstName"
@@ -21,6 +23,7 @@
         <MudItem xs="12" sm="6">
             <DvTextField T="string"
                          Required
+                         @ref="_lastNameTxt"
                          Label="Nachname"
                          @bind-Value="Item.LastName"
                          For="@(() => Item.LastName)"/>
@@ -109,9 +112,23 @@
     [Category(CategoryTypes.FormComponent.Validation)]
     public object? Validation { get; set; } = null;
 
+    private MudForm? _mudForm;
+    private DvTextField<string>? _firstNameTxt;
+    private DvTextField<string>? _lastNameTxt;
+
     private async Task OnFormFieldChangedAsync()
     {
         await ItemChanged.InvokeAsync(Item);
     }
 
+    public async Task ValidateForm()
+    {
+        if (_mudForm != null && _firstNameTxt != null && _lastNameTxt != null)
+        {
+            await _firstNameTxt.BlurAsync();
+            await _lastNameTxt.BlurAsync();
+
+            await _mudForm.Validate();
+        }
+    }
 }
