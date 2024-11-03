@@ -7,6 +7,7 @@
 
 @inject ArticleValidator ArticleValidator
 @inject ArticleService ArticleService
+@inject Services.DialogService DialogService
 
 <MudForm @ref="_form"
          Class="hear-comes-the-form"
@@ -18,8 +19,8 @@
          Style="margin-bottom: 20px;">
     <MudGrid Spacing="2">
         <MudItem xs="12" sm="12">
-            <MudGrid Spacing="0">
-                <MudItem xs="12" sm="6">
+            <MudGrid Spacing="2">
+                <MudItem xs="10" sm="6">
                     @if (DisableNumber)
                     {
                         <MudField Label="Nummer">
@@ -33,12 +34,26 @@
                                      Required
                                      Label="Nummer"
                                      @bind-Value="ArticleItem.Number"
-                                     For="@(() => ArticleItem.Number)"
-                                     Adornment="Adornment.End"
-                                     AdornmentIcon="@Icons.Material.TwoTone.Refresh"
-                                     OnAdornmentClick="OnAdornmentClickAsync" />
+                                     For="@(() => ArticleItem.Number)" />
                     }
                 </MudItem>
+                @if (DisableNumber is false)
+                {
+                    <MudItem xs="2" sm="6">
+                        <MudButtonGroup Variant="Variant.Filled" >
+                            <MudTooltip Text="Generieren einer zufälligen freien Nummer.">
+                                <MudIconButton Style="height: 56px; max-height: 56px;"
+                                               Icon="@Icons.Material.TwoTone.Refresh"
+                                               OnClick="OnGenerateNumberBtnClickAsync" />
+                            </MudTooltip>
+                            <MudTooltip Text="Aktiviere Barcode-Scanner">
+                                <MudIconButton Style="height: 56px; max-height: 56px;"
+                                               Icon="@Icons.Material.TwoTone.QrCodeScanner"
+                                               OnClick="OnScanNumberBtnClickAsync" />
+                            </MudTooltip>
+                        </MudButtonGroup>
+                    </MudItem>
+                }
             </MudGrid>
         </MudItem>
 
@@ -124,7 +139,7 @@
         await _form.Validate();
     }
 
-    private async Task OnAdornmentClickAsync()
+    private async Task OnGenerateNumberBtnClickAsync()
     {
         var numberResponse = await ArticleService.GetNextNumber();
 
@@ -133,6 +148,28 @@
         if (_numberInput != null)
         {
             await _numberInput.Validate();
+            await _numberInput.BlurAsync();
+        }
+    }
+
+    private async Task OnScanNumberBtnClickAsync()
+    {
+        var scanData = await DialogService.ScanBarcodeAsync();
+
+        if (scanData.Canceled is false &&
+            int.TryParse(scanData.Data, out var numberRef))
+        {
+            ArticleItem.Number = numberRef;
+        }
+        else
+        {
+            ArticleItem.Number = 0;
+        }
+
+        if (_numberInput != null)
+        {
+            await _numberInput.Validate();
+            await _numberInput.BlurAsync();
         }
     }
 
