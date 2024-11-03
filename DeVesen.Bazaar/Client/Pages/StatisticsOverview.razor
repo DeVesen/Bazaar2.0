@@ -44,18 +44,21 @@
                               Value="@_turnover"
                               TopValue="@_valueOfFoods"
                               Surfix="€"
+                              ShowComma
                               ProgressLinearColor="Color.Tertiary" />
 
             <ListingElement01 Title="Händleranteil"
                               Value="@_vendorShare"
                               TopValue="@_turnover"
                               Surfix="€"
+                              ShowComma
                               ProgressLinearColor="Color.Secondary" />
 
             <ListingElement01 Title="Clubanteil"
                               Value="@_clubShare"
                               TopValue="@_turnover"
                               Surfix="€"
+                              ShowComma
                               ProgressLinearColor="Color.Primary" />
         </MudPaper>
     </MudItem>
@@ -66,12 +69,14 @@
                               Value="@_clubShare"
                               TopValue="@_totalClubIncome"
                               Surfix="€"
+                              ShowComma
                               ProgressLinearColor="Color.Primary" />
 
             <ListingElement01 Title="Aufwandsentschädigung"
                               Value="@_administrativeCharge"
                               TopValue="@_totalClubIncome"
                               Surfix="€"
+                              ShowComma
                               ProgressLinearColor="Color.Secondary" />
         </MudPaper>
     </MudItem>

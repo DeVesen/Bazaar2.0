@@ -48,6 +48,7 @@
                     </div>
                 </MudField>
             </MudItem>
+
             <MudItem xs="3">
                 <MudField Label="im Verkauf"
                           Margin="Margin.Dense"
@@ -57,6 +58,7 @@
                     </div>
                 </MudField>
             </MudItem>
+
             <MudItem xs="3">
                 <MudField Label="Verkauft"
                           Margin="Margin.Dense"
@@ -66,12 +68,23 @@
                     </div>
                 </MudField>
             </MudItem>
+
             <MudItem xs="3">
                 <MudField Label="zurück gegeben"
                           Margin="Margin.Dense"
                           Variant="Variant.Filled">
                     <div class="d-flex justify-end">
                         <MudText>@($"{ArticlesReturnedCount} St")</MudText>
+                    </div>
+                </MudField>
+            </MudItem>
+
+            <MudItem xs="3">
+                <MudField Label="Bearbeitungsgebühr"
+                          Margin="Margin.Dense"
+                          Variant="Variant.Filled">
+                    <div class="d-flex justify-end">
+                        <MudText>@($"{AllowanceForExpenses:##0.00} €")</MudText>
                     </div>
                 </MudField>
             </MudItem>
@@ -94,16 +107,6 @@
                               Variant="Variant.Filled">
                         <div class="d-flex justify-end">
                             <MudText>@($"{SalesCommission:##0.00} €")</MudText>
-                        </div>
-                    </MudField>
-                </MudItem>
-
-                <MudItem xs="3">
-                    <MudField Label="Bearbeitungsgebühr"
-                              Margin="Margin.Dense"
-                              Variant="Variant.Filled">
-                        <div class="d-flex justify-end">
-                            <MudText>@($"{AllowanceForExpenses:##0.00} €")</MudText>
                         </div>
                     </MudField>
                 </MudItem>
@@ -191,7 +194,7 @@ else
     private double SalesProceeds => SettlementState.Value.ArticleValue!.TotalSalesValue;
     private double SalesCommission => SettlementState.Value.ArticleValue!.TotalSalesCommission;
     private double AllowanceForExpenses => SettlementState.Value.ArticleValue!.TotalHandlingFee;
-    private double DealerShare => SalesProceeds - SalesCommission - AllowanceForExpenses;
+    private double DealerShare => SalesProceeds - SalesCommission;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
