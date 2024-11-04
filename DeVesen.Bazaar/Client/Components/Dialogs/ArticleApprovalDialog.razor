@@ -21,6 +21,10 @@
             {
                 <DeVesScanner OnBarcodeReceived="OnBarcodeReceivedAsync" />
             }
+            else @if (_autoRestartCountdown > 0)
+            {
+                <MudProgressLinear Color="Color.Tertiary" Size="Size.Large" Value="_autoRestartCountdown" Max="@_autoRestartTotalSec" />
+            }
             
             @if (string.IsNullOrWhiteSpace(_releaseSeverityText) is false)
             {
@@ -45,6 +49,9 @@
     private Variant _releaseVariant = Variant.Text;
     private bool _scanIsActive;
     private string _releaseSeverityText = "Bitte Artickelnummer eingeben ...";
+
+    private const int _autoRestartTotalSec = 3;
+    private int _autoRestartCountdown = 0;
 
     private void OnCloseAsync() => MudDialog.Close();
 
@@ -104,14 +111,51 @@
     {
         _scanIsActive = !_scanIsActive;
 
-        if (_scanIsActive)
+        if (_scanIsActive is false)
         {
-            _articleNumber = null;
-
-            _releaseSeverityStatus = Severity.Success;
-            _releaseVariant = Variant.Filled;
-            _releaseSeverityText = string.Empty;
+            return;
         }
+
+        ResetInput();
+
+        _releaseSeverityStatus = Severity.Success;
+        _releaseVariant = Variant.Filled;
+        _releaseSeverityText = string.Empty;
+    }
+
+    private void RestartScanner()
+    {
+        const int tickPerSec = 2;
+        const int intervalMs = 1000 / tickPerSec;
+        const int counter = _autoRestartTotalSec * tickPerSec;
+        
+        Task.Run(async () =>
+        {
+            _autoRestartCountdown = _autoRestartTotalSec;
+            StateHasChanged();
+
+            for (var index = 0; index < counter; index++)
+            {
+                await Task.Delay(intervalMs);
+
+                _autoRestartCountdown = (counter - index) / tickPerSec;
+
+                StateHasChanged();
+            }
+
+            ResetInput();
+
+            _scanIsActive = true;
+            _autoRestartCountdown = 0;
+
+            StateHasChanged();
+            
+        });
+    }
+
+    private void ResetInput()
+    {
+        _articleNumber = null;
     }
 
     private async Task OnBarcodeReceivedAsync(string obj)
@@ -127,6 +171,8 @@
         {
             SetReleaseError($"'{obj}' ist kein erlaubter Wert!");
         }
+        
+        RestartScanner();
     }
 
 }
