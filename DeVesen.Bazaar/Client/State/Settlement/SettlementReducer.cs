@@ -15,7 +15,7 @@ public static class SettlementReducer
             Vendor = action.Vendor,
             ArticleStock = action.ArticleStock,
             ArticleValue = action.ArticleValue,
-            Articles = action.Articles,
+            Articles = action.Articles.Where(p => p.IsApprovedForSale()).ToArray(),
             State = SettlementState.LoadingState.Loaded
         };
 
