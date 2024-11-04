@@ -1,0 +1,43 @@
+﻿
+.demo-area {
+    background-color: gray;
+    padding: 8px 8px 75px 8px;
+    display: flex;
+    justify-content: center;
+}
+
+.demo-page-background {
+    background-color: white;
+}
+
+.demo-page-din-a4-horizontal {
+    width: 793.70px;
+    max-width: 793.70px;
+    height: 1122.52px;
+    min-height: 1122.52px;
+}
+
+@media print {
+    .no-print, .no-print * {
+        display: none !important;
+    }
+
+    .demo-area {
+        background-color: transparent;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+    }
+
+    .demo-page-background {
+        background-color: transparent;
+    }
+
+    .demo-page-din-a4-horizontal {
+        width: auto;
+        max-width: auto;
+        height: auto;
+        min-height: auto;
+    }
+}

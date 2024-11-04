@@ -1,0 +1,53 @@
+﻿@using System.Text
+@using System.Text.Json
+@using DeVesen.Bazaar.Client.Pages.Article.Components
+
+@layout PrintLayout
+
+@page "/article-lables/{printData}"
+
+<div class="d-flex flex-wrap">
+    @foreach (var element in Elements)
+    {
+        <ArticleLabel Icon="@element.Icon"
+                      Number="@element.Number"
+                      Price="@element.Price"
+                      Description="@element.Description" />
+    }
+</div>
+
+@code {
+
+    [Parameter]
+    public string PrintData { get; set; } = string.Empty;
+
+    private IEnumerable<LabelElement> Elements
+    {
+        get
+        {
+            if (string.IsNullOrWhiteSpace(PrintData))
+            {
+                yield break;
+            }
+
+            var jsonBytes = Convert.FromBase64String(PrintData);
+            var decodedJsonString = Encoding.UTF8.GetString(jsonBytes);
+            var infos = JsonSerializer.Deserialize<LabelRangeInfo>(decodedJsonString);
+
+            if (infos == null)
+            {
+                yield break;
+            }
+
+            for (var counter = infos.Min; counter <= infos.Max; counter++)
+            {
+                yield return new LabelElement(infos.Icon, counter.ToString(), string.Empty, infos.Description);
+            }
+        }
+    }
+
+    public record LabelElement(string Icon, string Number, string Price, string Description);
+
+    public record LabelRangeInfo(int Min, int Max, string Description, string Icon);
+
+}

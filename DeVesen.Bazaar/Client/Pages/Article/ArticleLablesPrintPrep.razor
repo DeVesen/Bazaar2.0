@@ -1,0 +1,175 @@
+﻿@page "/article-lables"
+@using System.Text
+@using System.Text.Json
+@using DeVesen.Bazaar.Client.Services
+
+@inject NavigationService NavigationService
+
+<MudGrid>
+    <MudItem xs="12" md="6">
+        <MudGrid>
+            <MudItem xs="12" md="6">
+                <MudNumericField T="int"
+                                 @ref="_endNumberInputRef"
+                                 @bind-value="_endNumber"
+                                 FullWidth
+                                 ShrinkLabel
+                                 Label="Nummer MAX"
+                                 Validation="EndNumberValidation"
+                                 OnBlur="ValidateInputAsync" />
+            </MudItem>
+            <MudItem xs="12" md="6">
+                <MudNumericField T="int"
+                                 @ref="_startNumberInputRef"
+                                 @bind-value="_startNumber"
+                                 FullWidth
+                                 ShrinkLabel
+                                 Label="Nummer MIN"
+                                 Validation="StartNumberValidation"
+                                 OnBlur="ValidateInputAsync" />
+            </MudItem>
+            <MudItem xs="12" md="6">
+                <MudTextField T="string"
+                              @bind-value="_description"
+                              FullWidth
+                              ShrinkLabel
+                              Clearable
+                              Label="Zusatztext"
+                              OnBlur="ValidateInputAsync" />
+            </MudItem>
+            <MudItem xs="12" md="6">
+                <MudSelect @bind-Value="_labelImg"
+                           FullWidth
+                           ShrinkLabel
+                           Clearable
+                           Label="Bild">
+                    <MudSelectItem Value="@(string.Empty)"></MudSelectItem>
+                    @foreach (var icon in IconsList)
+                    {
+                        <MudSelectItem Value="@icon.Value">
+                            <div class="d-flex gap-2">
+                                <MudIcon Icon="@icon.Value" />
+                                <MudText>@icon.Name</MudText>
+                            </div>
+                        </MudSelectItem>
+                    }
+                </MudSelect>
+            </MudItem>
+            <MudItem xs="12">
+                <MudButton FullWidth
+                           Color="Color.Primary"
+                           Variant="Variant.Filled"
+                           OnClick="OnShowPrintPrefAsync">
+                    <MudText>Drucken</MudText>
+                </MudButton>
+            </MudItem>
+        </MudGrid>
+    </MudItem>
+</MudGrid>
+
+@code {
+    private MudNumericField<int> _startNumberInputRef = null!;
+    private MudNumericField<int> _endNumberInputRef = null!;
+
+    private int _startNumber = 1;
+    private int _endNumber = 50;
+    private string _description = string.Empty;
+    private string _labelImg = string.Empty;
+
+    private IEnumerable<IconInfo> IconsList => GetIcons().OrderBy(p => p.Name);
+
+    private async Task<bool> ValidateInputAsync()
+    {
+        await _startNumberInputRef.Validate();
+        await _endNumberInputRef.Validate();
+
+        return _startNumberInputRef.Error is false &&
+               _endNumberInputRef.Error is false;
+    }
+
+    private string StartNumberValidation(int value)
+    {
+        if (value <= 0)
+        {
+            return "Wert darf nicht kleiner gleich 0 sein!";
+        }
+        if (value > _endNumber)
+        {
+            return "Wert muss kleiner / gleich MAX sein!";
+        }
+
+        return string.Empty;
+    }
+
+    private string EndNumberValidation(int value)
+    {
+        if (value <= 0)
+        {
+            return "Wert darf nicht kleiner gleich 0 sein!";
+        }
+        if (value > _endNumber)
+        {
+            return "Wert muss größer / gleich MIN sein!";
+        }
+
+        return string.Empty;
+    }
+
+    private async Task OnShowPrintPrefAsync(MouseEventArgs obj)
+    {
+        if (await ValidateInputAsync() is false)
+        {
+            return;
+        }
+
+        var dataStream = GetElementsStream();
+
+        await NavigationService.ToArticleLabelPrint(dataStream);
+    }
+
+    private ArticleLablesPrint.LabelRangeInfo GetLabelRangeInfo()
+    {
+        return new ArticleLablesPrint.LabelRangeInfo(_startNumber, _endNumber, _description, _labelImg);
+    }
+
+    private string GetElementsStream()
+    {
+        var jsonString = JsonSerializer.Serialize(GetLabelRangeInfo());
+        return Convert.ToBase64String(Encoding.UTF8.GetBytes(jsonString));
+    }
+
+    private static IEnumerable<IconInfo> GetIcons()
+    {
+        yield return new IconInfo("AcUnit", @Icons.Material.Filled.AcUnit);
+        yield return new IconInfo("AccessAlarm", @Icons.Material.Filled.AccessAlarm);
+        yield return new IconInfo("Accessibility", @Icons.Material.Filled.Accessibility);
+        yield return new IconInfo("AccountBalance", @Icons.Material.Filled.AccountBalance);
+        yield return new IconInfo("AccountBox", @Icons.Material.Filled.AccountBox);
+        yield return new IconInfo("AdUnits", @Icons.Material.Filled.AdUnits);
+        yield return new IconInfo("Adb", @Icons.Material.Filled.Adb);
+        yield return new IconInfo("AddCircle", @Icons.Material.Filled.AddCircle);
+        yield return new IconInfo("Air", @Icons.Material.Filled.Air);
+        yield return new IconInfo("AirlineSeatReclineExtra", @Icons.Material.Filled.AirlineSeatReclineExtra);
+        yield return new IconInfo("AirlineSeatFlat", @Icons.Material.Filled.AirlineSeatFlat);
+        yield return new IconInfo("AirportShuttle", @Icons.Material.Filled.AirportShuttle);
+        yield return new IconInfo("Album", @Icons.Material.Filled.Album);
+        yield return new IconInfo("AllInbox", @Icons.Material.Filled.AllInbox);
+        yield return new IconInfo("AllInclusive", @Icons.Material.Filled.AllInclusive);
+        yield return new IconInfo("AllOut", @Icons.Material.Filled.AllOut);
+        yield return new IconInfo("Anchor", @Icons.Material.Filled.Anchor);
+        yield return new IconInfo("Android", @Icons.Material.Filled.Android);
+        yield return new IconInfo("Aod", @Icons.Material.Filled.Aod);
+        yield return new IconInfo("Apartment", @Icons.Material.Filled.Apartment);
+        yield return new IconInfo("Approval", @Icons.Material.Filled.Approval);
+        yield return new IconInfo("Apps", @Icons.Material.Filled.Apps);
+        yield return new IconInfo("Architecture", @Icons.Material.Filled.Architecture);
+        yield return new IconInfo("Article", @Icons.Material.Filled.Article);
+
+        yield return new IconInfo("Class", @Icons.Material.Filled.Class);
+        yield return new IconInfo("HotelClass", @Icons.Material.Filled.HotelClass);
+
+    }
+
+    private record IconInfo(string Name, string Value);
+
+}

@@ -1,0 +1,9 @@
+﻿.page-margin {
+    padding: 0.4in;
+}
+
+@media print {
+    .page-margin {
+        padding: 0;
+    }
+}

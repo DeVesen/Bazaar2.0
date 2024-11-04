@@ -1,0 +1,12 @@
+﻿.article-label-area {
+    border: 1px solid LightGray !important;
+    width: 396.85px;
+    height: 132.28px;
+}
+
+@media print {
+    .article-label-area {
+        width: 396.85px;
+        height: 132.28px;
+    }
+}

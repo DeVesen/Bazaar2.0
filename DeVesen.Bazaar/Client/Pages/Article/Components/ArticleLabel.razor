@@ -1,54 +1,50 @@
 ﻿
-<div class="border-solid border-1 mud-border-dark px-2 py-1" style="@_mainDivStyle">
-    <div class="d-flex flex-row gap-1">
-        <div style="width: 25%; max-width: 25%;">
-            <QrCode ElementId="@($"id-{Number}")"
-                Width="79"
-                height="79"
-                Text="@Number">
-            </QrCode>
-            <MudText Align="Align.Center" Typo="Typo.body2">@Number</MudText>
+<div class="article-label-area px-1 py-2">
+    <div class="d-flex flex-row">
+        <div>
+            <MudIcon Icon="@Icon"
+                     Size="Size.Medium"></MudIcon>
         </div>
-        <div class="d-flex flex-column" style="width: 75%; max-width: 75%;">
-            <MudText Class="py-1" Align="Align.End" Typo="Typo.h2">@Price</MudText>
-            @if (string.IsNullOrWhiteSpace(Description) is false)
-            {
-                <MudText Class="py-1" Align="Align.End" Typo="Typo.body1">@Description</MudText>
-            }
+        <div class="px-2">
+            <QrCode ElementId="@($"id-{Number}")"
+                    Width="100"
+                    height="100"
+                    Text="@Number">
+            </QrCode>
+            <MudText Align="Align.Center"
+                     Typo="Typo.body2"
+                     Class="w-100">@Number</MudText>
+        </div>
+        <div class="w-100 d-flex flex-column">
+            <div class="d-flex justify-end">
+                <MudIcon Icon="@Icon"
+                         Size="Size.Medium"></MudIcon>
+            </div>
+            <MudText Class="w-100"
+                     Align="Align.Right"
+                     Typo="Typo.h2">@($"{Price} €")</MudText>
+            <MudText Class="w-100"
+                     Align="Align.Center"
+                     Typo="Typo.body2">@Description</MudText>
         </div>
     </div>
-    <div class="d-flex flex-row justify-space-between gap-1">
+    @* <div class="d-flex flex-row justify-space-between gap-1">
         <div class="pa-2 rounded-circle" style="@_vendorCircleStyle"></div>
         <MudText Align="Align.Center" Typo="Typo.body2">www.schneesport-hochstadt.de</MudText>
         <div class="pa-2 rounded-circle" style="@_vendorCircleStyle"></div>
-    </div>
+    </div> *@
 </div>
 
 @code {
-    private string _mainDivStyle = string.Empty;
-    private string _vendorCircleStyle = string.Empty;
+    [Parameter]
+    public required string Number { get; set; }
 
     [Parameter]
-    public string Width { get; set; } = "325px";
+    public string Description { get; set; } = string.Empty;
 
     [Parameter]
-    public string Number { get; set; }
+    public string Price { get; set; } = string.Empty;
 
     [Parameter]
-    public string Description { get; set; }
-
-    [Parameter]
-    public string Price { get; set; }
-
-    [Parameter]
-    public string VendorColor { get; set; } = "#00FF00";
-
-    protected override void OnParametersSet()
-    {
-        base.OnParametersSet();
-
-        _mainDivStyle = $"width: {Width}; max-width: {Width};";
-        _vendorCircleStyle = $"background-color: {VendorColor};";
-    }
-
+    public string Icon { get; set; } = string.Empty;
 }

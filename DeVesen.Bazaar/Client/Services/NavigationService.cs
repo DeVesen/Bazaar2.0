@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using DeVesen.Bazaar.Client.Models;
+using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
 namespace DeVesen.Bazaar.Client.Services;
@@ -30,6 +31,20 @@ public class NavigationService(NavigationManager navigationManager, IJSRuntime j
         try
         {
             await jsRuntime.InvokeAsync<object>("open", $"{BaseUri}vendors/{vendorId}/print/settlement", "_blank");
+        }
+        catch
+        {
+            // ignored
+        }
+    }
+
+    public async Task ToArticleLabelPrint(string data)
+    {
+        try
+        {
+            var targetUrl = $"{BaseUri}article-lables/{data}";
+
+            await jsRuntime.InvokeAsync<object>("open", targetUrl, "_blank");
         }
         catch
         {

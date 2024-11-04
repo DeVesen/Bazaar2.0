@@ -1,11 +1,13 @@
-﻿        
+﻿
 <div class="w-100 mud-elevation-1 my-3 p-2">
     <MudText Typo="Typo.subtitle2">@_title</MudText>
     @foreach (var condition in _conditions)
     {
         <div class="d-flex w-100">
-            <MudIcon Size="Size.Small" Icon="@Icons.Material.TwoTone.ArrowRight"/>
-            <MudText Typo="Typo.body2">@condition</MudText>
+            <MudIcon Icon="@Icons.Material.TwoTone.ArrowRight"
+                     Style="max-width: 15px; max-height: 15px;" />
+            <MudText Typo="Typo.body2"
+                     Style="font-size: 10px;">@condition</MudText>
         </div>
     }
 </div>
