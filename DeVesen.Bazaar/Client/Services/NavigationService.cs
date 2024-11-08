@@ -16,26 +16,28 @@ public class NavigationService(NavigationManager navigationManager, IJSRuntime j
 
     public async Task ToVendorPrint(string vendorId)
     {
-        try
-        {
-            await jsRuntime.InvokeAsync<object>("open", $"{BaseUri}vendors/{vendorId}/print", "_blank");
-        }
-        catch
-        {
-            // ignored
-        }
+        navigationManager.NavigateTo($"{BaseUri}vendors/{vendorId}/print");
+        //try
+        //{
+        //    await jsRuntime.InvokeAsync<object>("open", $"{BaseUri}vendors/{vendorId}/print");
+        //}
+        //catch
+        //{
+        //    // ignored
+        //}
     }
 
     public async Task ToVendorPrintSettlement(string vendorId)
     {
-        try
-        {
-            await jsRuntime.InvokeAsync<object>("open", $"{BaseUri}vendors/{vendorId}/print/settlement", "_blank");
-        }
-        catch
-        {
-            // ignored
-        }
+        navigationManager.NavigateTo($"{BaseUri}vendors/{vendorId}/print/settlement");
+        //try
+        //{
+        //    await jsRuntime.InvokeAsync<object>("open", $"{BaseUri}vendors/{vendorId}/print/settlement");
+        //}
+        //catch
+        //{
+        //    // ignored
+        //}
     }
 
     public async Task ToArticleLabelPrint(string data)
