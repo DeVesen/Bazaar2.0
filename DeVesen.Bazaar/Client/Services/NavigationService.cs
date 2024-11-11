@@ -42,16 +42,17 @@ public class NavigationService(NavigationManager navigationManager, IJSRuntime j
 
     public async Task ToArticleLabelPrint(string data)
     {
-        try
-        {
-            var targetUrl = $"{BaseUri}article-lables/{data}";
+        navigationManager.NavigateTo($"{BaseUri}article-lables/{data}");
+        //try
+        //{
+        //    var targetUrl = $"{BaseUri}article-lables/{data}";
 
-            await jsRuntime.InvokeAsync<object>("open", targetUrl, "_blank");
-        }
-        catch
-        {
-            // ignored
-        }
+        //    await jsRuntime.InvokeAsync<object>("open", targetUrl, "_blank");
+        //}
+        //catch
+        //{
+        //    // ignored
+        //}
     }
 
     public void ToModifyOverview(string vendorId)

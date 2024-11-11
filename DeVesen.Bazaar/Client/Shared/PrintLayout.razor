@@ -41,7 +41,7 @@
 
     private async Task OnCancelPrintAsync()
     {
-        await JsRuntime.InvokeVoidAsync("closeBlazorWindow");
+        await JsRuntime.InvokeVoidAsync("history.back");
     }
 
 }
