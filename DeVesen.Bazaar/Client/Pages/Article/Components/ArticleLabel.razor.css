@@ -1,12 +1,17 @@
 ﻿.article-label-area {
-    border: 1px solid LightGray !important;
-    width: 396.85px;
-    height: 132.28px;
+    border: 1px solid black;
+    overflow: hidden;
+    width: calc(50% - 2px);
+    height: calc(132.28px - 2px);
+    padding: 9px 5px 0 5px;
 }
 
 @media print {
     .article-label-area {
-        width: 396.85px;
+        border: 0px;
+        overflow: hidden;
+        width: 50%;
         height: 132.28px;
+        padding: 5px;
     }
 }
