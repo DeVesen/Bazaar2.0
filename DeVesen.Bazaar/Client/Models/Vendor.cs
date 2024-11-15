@@ -13,7 +13,7 @@ public record Vendor
     public string? Note { get; set; }
 
     public double OfferUnitPrice { get; set; } = 0.50d;
-    public double SalesShare { get; set; } = 0.10d;
+    public double SalesShare { get; set; } = 0.15d;
 
     public static Vendor New => new();
 
