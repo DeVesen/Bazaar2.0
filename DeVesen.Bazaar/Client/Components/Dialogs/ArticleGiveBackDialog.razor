@@ -23,7 +23,7 @@
             }
             else @if (_autoRestartCountdown > 0)
             {
-                <MudProgressLinear Color="Color.Tertiary" Size="Size.Large" Value="_autoRestartCountdown" Max="@_autoRestartTotalSec" />
+                <MudProgressLinear Color="Color.Tertiary" Size="Size.Large" Value="_autoRestartCountdown" Max="@_autoRestartCountdownTop" />
             }
             
             @if (string.IsNullOrWhiteSpace(_releaseSeverityText) is false)
@@ -50,7 +50,8 @@
     private bool _scanIsActive;
     private string _releaseSeverityText = "Bitte Artickelnummer eingeben ...";
 
-    private const int _autoRestartTotalSec = 3;
+    private int _autoRestartTotalSec = 2;
+    private int _autoRestartCountdownTop = 0;
     private int _autoRestartCountdown = 0;
 
     private void OnCloseAsync() => MudDialog.Close();
@@ -125,20 +126,20 @@
 
     private void RestartScanner()
     {
-        const int tickPerSec = 2;
+        const int tickPerSec = 10;
         const int intervalMs = 1000 / tickPerSec;
-        const int counter = _autoRestartTotalSec * tickPerSec;
+        _autoRestartCountdownTop = _autoRestartTotalSec * tickPerSec;
 
         Task.Run(async () =>
         {
-            _autoRestartCountdown = _autoRestartTotalSec;
+            _autoRestartCountdown = 0;
             StateHasChanged();
 
-            for (var index = 0; index < counter; index++)
+            for (var index = 0; index < _autoRestartCountdownTop; index++)
             {
                 await Task.Delay(intervalMs);
 
-                _autoRestartCountdown = (counter - index) / tickPerSec;
+                _autoRestartCountdown = index;
 
                 StateHasChanged();
             }
