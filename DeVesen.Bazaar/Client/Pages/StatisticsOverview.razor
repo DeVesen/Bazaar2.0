@@ -1,5 +1,4 @@
-﻿@using DeVesen.Bazaar.Client.Models
-@using DeVesen.Bazaar.Client.Services
+﻿@using DeVesen.Bazaar.Client.Services
 @using DeVesen.Bazaar.Client.Components.Statistics
 
 @page "/statistics"
@@ -9,6 +8,40 @@
 @inject StatisticService StatisticService
 
 <MudGrid Class="p-2">
+    
+
+    <MudItem xs="12" sm="2" lg="2">
+        <MudField Label="Händler">
+            <MudText Align="Align.Center">@($"{_vendorTotalCount} St.")</MudText>
+        </MudField>
+    </MudItem>
+    <MudItem xs="12" sm="2" lg="2">
+        <MudField Label="Artikel Anzahl (gemeldet)">
+            <MudText Align="Align.Center">@($"{_articleTotalCount} St.")</MudText>
+        </MudField>
+    </MudItem>
+    <MudItem xs="12" sm="2" lg="2">
+        <MudField Label="Artikel Anzahl (gelistet)">
+            <MudText Align="Align.Center">@($"{_articleCount} St.")</MudText>
+        </MudField>
+    </MudItem>
+    <MudItem xs="12" sm="2" lg="2">
+        <MudField Label="Artikel Wert (gelistet)">
+            <MudText Align="Align.Center">@($"{_valueOfFoods} €")</MudText>
+        </MudField>
+    </MudItem>
+    <MudItem xs="12" sm="2" lg="2">
+        <MudField Label="Umsatz">
+            <MudText Align="Align.Center">@($"{_turnover} €")</MudText>
+        </MudField>
+    </MudItem>
+    <MudItem xs="12" sm="2" lg="2">
+        <MudField Label="Clubanteil">
+            <MudText Align="Align.Center">@($"{_clubShare} €")</MudText>
+        </MudField>
+    </MudItem>
+
+
 
     <MudItem xs="12" sm="6" lg="4">
         <MudPaper Class="p-3 d-flex flex-column gap-4">
@@ -16,25 +49,25 @@
                               Value="@_articleOnSaleCount"
                               TopValue="@_articleCount"
                               Surfix="St."
-                              ProgressLinearColor="Color.Tertiary" />
+                              ProgressLinearColor="Color.Tertiary"/>
 
             <ListingElement01 Title="Artikel verkauft"
                               Value="@_articlesSoldCount"
                               TopValue="@_articleOnSaleCount"
                               Surfix="St."
-                              ProgressLinearColor="Color.Success" />
+                              ProgressLinearColor="Color.Success"/>
 
             <ListingElement01 Title="Artikel rückgegeben"
                               Value="@_articlesReturnedCount"
                               TopValue="@_articleOnSaleCount"
                               Surfix="St."
-                              ProgressLinearColor="Color.Secondary" />
+                              ProgressLinearColor="Color.Secondary"/>
 
             <ListingElement01 Title="Artikel abgerechnet"
                               Value="@_articlesSettlementCount"
                               TopValue="@_articleOnSaleCount"
                               Surfix="St."
-                              ProgressLinearColor="Color.Primary" />
+                              ProgressLinearColor="Color.Primary"/>
         </MudPaper>
     </MudItem>
 
@@ -45,21 +78,21 @@
                               TopValue="@_valueOfFoods"
                               Surfix="€"
                               ShowComma
-                              ProgressLinearColor="Color.Tertiary" />
+                              ProgressLinearColor="Color.Tertiary"/>
 
             <ListingElement01 Title="Händleranteil"
                               Value="@_vendorShare"
                               TopValue="@_turnover"
                               Surfix="€"
                               ShowComma
-                              ProgressLinearColor="Color.Secondary" />
+                              ProgressLinearColor="Color.Secondary"/>
 
             <ListingElement01 Title="Clubanteil"
                               Value="@_clubShare"
                               TopValue="@_turnover"
                               Surfix="€"
                               ShowComma
-                              ProgressLinearColor="Color.Primary" />
+                              ProgressLinearColor="Color.Primary"/>
         </MudPaper>
     </MudItem>
 
@@ -70,14 +103,14 @@
                               TopValue="@_totalClubIncome"
                               Surfix="€"
                               ShowComma
-                              ProgressLinearColor="Color.Primary" />
+                              ProgressLinearColor="Color.Primary"/>
 
             <ListingElement01 Title="Aufwandsentschädigung"
                               Value="@_administrativeCharge"
                               TopValue="@_totalClubIncome"
                               Surfix="€"
                               ShowComma
-                              ProgressLinearColor="Color.Secondary" />
+                              ProgressLinearColor="Color.Secondary"/>
         </MudPaper>
     </MudItem>
 
@@ -85,6 +118,9 @@
 
 
 @code {
+    private double _vendorTotalCount;
+    private double _articleTotalCount;
+
     private double _articleCount;
     private double _articleOnSaleCount;
     private double _articlesSoldCount;
@@ -97,9 +133,6 @@
     private double _clubShare;
     private double _administrativeCharge;
     private double _totalClubIncome;
-
-    private IEnumerable<StatisticSummeryView.GraphDataModel> _offersGraphData = [];
-    private IEnumerable<StatisticSummeryView.GraphDataModel> _salesGraphData = [];
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -116,6 +149,9 @@
         var response = await StatisticService.Get();
         var statisticInfo = response.Value;
 
+        _vendorTotalCount = statisticInfo.Vendors.TotalCount;
+        _articleTotalCount = statisticInfo.Articles.TotalCount;
+
         _articleCount = statisticInfo.Articles.ApprovedCount;
         _articleOnSaleCount = statisticInfo.ActualStock.IsOnSaleCount;
         _articlesSoldCount = statisticInfo.ActualStock.IsSoldCount;
@@ -128,9 +164,6 @@
         _clubShare = statisticInfo.Income.TurnoverClubShare;
         _administrativeCharge = statisticInfo.Income.WorkingFee;
         _totalClubIncome = statisticInfo.Income.TurnoverClubShare + statisticInfo.Income.WorkingFee;
-
-        _offersGraphData = statisticInfo.OffersGraphData;
-        _salesGraphData = statisticInfo.SalesGraphData;
 
         StateHasChanged();
     }
