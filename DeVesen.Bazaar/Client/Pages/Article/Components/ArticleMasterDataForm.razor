@@ -1,4 +1,5 @@
-﻿@using DeVesen.Bazaar.Client.Models
+﻿@using System.Reflection.Metadata
+@using DeVesen.Bazaar.Client.Models
 @using DeVesen.Bazaar.Client.Validator
 @using DeVesen.Bazaar.Client.Components.Common.TextField
 @using DeVesen.Bazaar.Client.Components.Manufacturer
@@ -58,18 +59,18 @@
         </MudItem>
 
         <MudItem xs="12" sm="6">
-            <ArticleCategorySelector Required
+            <ArticleCategorySelector Required="@IsRequiredData"
                                      For="@(() => ArticleItem.ArticleCategory)"
                                      @bind-Value="ArticleItem.ArticleCategory" />
         </MudItem>
         <MudItem xs="12" sm="6">
-            <ManufacturerSelector Required
+            <ManufacturerSelector Required="@IsRequiredData"
                                   For="@(() => ArticleItem.Manufacturer)"
                                   @bind-Value="ArticleItem.Manufacturer" />
         </MudItem>
         <MudItem xs="12" sm="12">
             <DvTextField T="string"
-                         Required
+                         Required="@IsRequiredData"
                          Label="Beschreibung"
                          @bind-Value="ArticleItem.Description"
                          For="@(() => ArticleItem.Description)" />
@@ -77,7 +78,7 @@
 
         <MudItem xs="12" sm="6">
             <DvTextField T="double"
-                         Required
+                         Required="@IsRequiredData"
                          Label="Preis"
                          @bind-Value="ArticleItem.Price01"
                          For="@(() => ArticleItem.Price01)" />
@@ -95,6 +96,8 @@
 @code {
     private MudForm _form = null!;
     private DvTextField<long>? _numberInput;
+
+    private bool IsRequiredData => ArticleItem.Manufacturer.Equals("00 Mitgebracht", StringComparison.OrdinalIgnoreCase) is false;
 
     [Parameter]
     public required bool DisableNumber { get; set; }
@@ -135,8 +138,6 @@
     private async Task OnFormFieldChangedAsync()
     {
         await ArticleItemChanged.InvokeAsync(ArticleItem);
-
-        await _form.Validate();
     }
 
     private async Task OnGenerateNumberBtnClickAsync()

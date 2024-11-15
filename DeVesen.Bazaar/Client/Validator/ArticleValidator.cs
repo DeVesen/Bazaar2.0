@@ -19,19 +19,28 @@ public class ArticleValidator : BaseValidator<Article>
             .Must(x => x > 0).WithMessage("Muss größer 0 sein!");
 
         RuleFor(x => x.Description)
-            .NotEmpty().WithMessage("Darf nicht leer sein!")
-            .MaximumLength(80).WithMessage("Darf nicht lönger 80 Zeichen sein!");
+            .NotEmpty()
+                .When(p => p.Manufacturer.Equals("00 Mitgebracht", StringComparison.OrdinalIgnoreCase) is false)
+                    .WithMessage("Darf nicht leer sein!")
+            .MaximumLength(200)
+                .WithMessage("Darf nicht lönger 200 Zeichen sein!");
 
         RuleFor(x => x.ArticleCategory)
             .NotEmpty().WithMessage("Darf nicht leer sein!")
-            .MustAsync(BeExistAsArticleCategoryAsync).WithMessage("Ist nicht bekannt!").WithErrorCode("NotKnown");
+            .MustAsync(BeExistAsArticleCategoryAsync)
+                .When(p => p.Manufacturer.Equals("00 Mitgebracht", StringComparison.OrdinalIgnoreCase) is false)
+                    .WithMessage("Ist nicht bekannt!").WithErrorCode("NotKnown");
 
         RuleFor(x => x.Manufacturer)
             .NotEmpty().WithMessage("Darf nicht leer sein!")
-            .MustAsync(BeExistAsManufacturerAsync).WithMessage("Ist nicht bekannt!").WithErrorCode("NotKnown");
+            .MustAsync(BeExistAsManufacturerAsync)
+                .When(p => p.Manufacturer.Equals("00 Mitgebracht", StringComparison.OrdinalIgnoreCase) is false)
+                    .WithMessage("Ist nicht bekannt!").WithErrorCode("NotKnown");
 
         RuleFor(x => x.Price01)
-            .Must(x => x > 0).WithMessage("Muss größer 0 sein!");
+            .Must(x => x > 0)
+                .When(p => p.Manufacturer.Equals("00 Mitgebracht", StringComparison.OrdinalIgnoreCase) is false)
+                    .WithMessage("Muss größer 0 sein!");
     }
 
     private async Task<bool> BeExistAsArticleCategoryAsync(Article dto, string value, CancellationToken _)

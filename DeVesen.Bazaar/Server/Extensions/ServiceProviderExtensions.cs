@@ -30,6 +30,7 @@ namespace DeVesen.Bazaar.Server.Extensions
         {
             var initialManufacturer = new[]
             {
+                "00 Mitgebracht",
                 "Rossignol",
                 "Salomon",
                 "Atomic",

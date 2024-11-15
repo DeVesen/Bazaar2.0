@@ -7,7 +7,7 @@
 </div>
 
 @code {
-    public double ValueProcedural => Value * 100 / TopValue;
+    public double ValueProcedural => TopValue > 0 ? Value * 100 / TopValue : 0;
 
     public string SurfixTxt => string.IsNullOrWhiteSpace(Surfix) ? string.Empty : $" {Surfix}";
     private string ValueTxt => ShowComma ? $"{Value:##0.00}{SurfixTxt}" : $"{Value:###}{SurfixTxt}";
