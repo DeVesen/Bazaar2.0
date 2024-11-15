@@ -99,6 +99,21 @@
                                   Variant="@_articleAlertVariant"
                                   Severity="@_articleAlertSeverity"
                                   ContentAlignment="HorizontalAlignment.Center">@_articleAlertText</MudAlert>
+
+
+                        @if (_article != null)
+                        {
+                            <div class="d-flex flex-column gap-2">
+                                <div class="d-flex gap-2">
+                                    <MudField Label="Kategorie"
+                                              Margin="Margin.Dense">@_article.ArticleCategory</MudField>
+                                    <MudField Label="Hersteller"
+                                              Margin="Margin.Dense">@_article.Manufacturer</MudField>
+                                </div>
+                                <MudField Label="Beschreibung"
+                                          Margin="Margin.Dense">@_article.Description</MudField>
+                            </div>
+                        }
                     }
                 </MudPaper>
             </MudItem>
@@ -226,7 +241,7 @@
                     ShowErrorArticleSelectionMessage($"Artikel {_articleNumber} nicht für den Verkauf frei gegeben!");
                     break;
                 case Article.StatusType.Approved:
-                    ShowSuccessArticleSelectionMessage($"Artikel {_articleNumber} bereit, bitte Preis wählen...", Variant.Text);
+                    ShowSuccessArticleSelectionMessage($"Artikel {_articleNumber} bereit, bitte Preis wählen...", Variant.Filled);
                     break;
                 case Article.StatusType.Sold:
                     ShowErrorArticleSelectionMessage($"Artikel {_articleNumber} ist bereits verkauft!");
