@@ -55,6 +55,8 @@ builder.Services.AddTransient<ArticleCategoryStorage>()
                 .AddTransient<VendorStorage>()
                 .AddTransient<ArticleStorage>();
 
+builder.Services.AddTransient<StatisticsService>();
+
 builder.Services.AddTransient<ArticleCategoryValidator>()
                 .AddTransient<ManufacturerValidator>()
                 .AddTransient<VendorValidator>()

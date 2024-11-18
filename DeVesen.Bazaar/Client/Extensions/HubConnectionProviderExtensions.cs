@@ -62,17 +62,17 @@ namespace DeVesen.Bazaar.Client.Extensions
             await _connection.DisposeAsync();
         }
 
-        public IDisposable RegisterOnAdded(Action handler)
+        public IDisposable RegisterOnAdded(Action<VendorAddedArgs> handler)
         {
             return _connection.On("Added", handler);
         }
 
-        public IDisposable RegisterOnUpdated(Action<string> handler)
+        public IDisposable RegisterOnUpdated(Action<VendorUpdatedArgs> handler)
         {
             return _connection.On("Updated", handler);
         }
 
-        public IDisposable RegisterOnRemoved(Action<string> handler)
+        public IDisposable RegisterOnRemoved(Action<VendorRemovedArgs> handler)
         {
             return _connection.On("Removed", handler);
         }

@@ -1,14 +1,21 @@
 ﻿
-<div class="d-flex gap-4">
+<div class="@GetClass()" style="@Style">
     <MudIcon Icon="@Icon" />
     @ChildContent
 </div>
 
 @code {
-
     [Parameter]
     public required string Icon { get; set; }
 
     [Parameter]
     public required RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public string? Style { get; set; }
+
+    private string GetClass() => $"d-flex gap-4 {Class}";
 }

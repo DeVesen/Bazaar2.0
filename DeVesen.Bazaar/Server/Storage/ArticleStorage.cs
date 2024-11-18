@@ -2,8 +2,10 @@
 using DeVesen.Bazaar.Server.Domain;
 using DeVesen.Bazaar.Server.Extensions;
 using DeVesen.Bazaar.Server.Hubs;
+using DeVesen.Bazaar.Shared.Events;
 using DeVesen.Bazaar.Shared.Services;
 using FluentResults;
+using static MudBlazor.CategoryTypes;
 
 namespace DeVesen.Bazaar.Server.Storage;
 
@@ -11,15 +13,17 @@ public class ArticleStorage
 {
     private readonly IVendorRepository _vendorRepository;
     private readonly IArticleRepository _articleRepository;
+    private readonly VendorHubContext _vendorHubContext;
     private readonly ArticleHubContext _articleHubContext;
     private readonly SystemClock _systemClock;
 
-    public ArticleStorage(IVendorRepository vendorRepository, IArticleRepository articleRepository, ArticleHubContext articleHubContext, SystemClock systemClock)
+    public ArticleStorage(IVendorRepository vendorRepository, IArticleRepository articleRepository, VendorHubContext vendorHubContext, ArticleHubContext articleHubContext, SystemClock systemClock)
     {
         _vendorRepository = vendorRepository;
         _articleRepository = articleRepository;
         _systemClock = systemClock;
         _articleHubContext = articleHubContext;
+        _vendorHubContext = vendorHubContext;
     }
 
     public async Task<bool> ExistByIdAsync(string id)
@@ -89,6 +93,8 @@ public class ArticleStorage
         await _articleRepository.CreateAsync(element.ToEntity());
 
         await _articleHubContext.SendAdded(element.VendorId, element.Id, element.Number);
+
+        _vendorHubContext.SendUpdated(element.VendorId, VendorUpdatedArgs.Reasons.ArticleData);
     }
 
     public async Task UpdateAsync(Article element)
@@ -116,6 +122,8 @@ public class ArticleStorage
         await _articleRepository.UpdateAsync(element.ToEntity());
 
         await _articleHubContext.SendUpdated(element.VendorId, element.Id, element.Number);
+
+        _vendorHubContext.SendUpdated(element.VendorId, VendorUpdatedArgs.Reasons.ArticleData);
     }
 
     public async Task DeleteByIdAsync(string id)
@@ -130,6 +138,8 @@ public class ArticleStorage
         await _articleRepository.DeleteAsync(id);
 
         await _articleHubContext.SendRemoved(response.Entity!.VendorId, response.Entity!.Id, response.Entity!.Number);
+
+        _vendorHubContext.SendUpdated(response.Entity!.VendorId, VendorUpdatedArgs.Reasons.ArticleData);
     }
 
     public async Task BookOrderAsync(IEnumerable<SalesOrder.Position> positions)

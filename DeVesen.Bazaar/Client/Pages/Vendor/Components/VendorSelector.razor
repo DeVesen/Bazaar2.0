@@ -67,7 +67,7 @@
 
     private async Task<IEnumerable<VendorSelectBase>> VendorSearchAsync(string value, CancellationToken token)
     {
-        var vendorResponse = await VendorService.GetAllAsync(searchText: value);
+        var vendorResponse = await VendorService.GetOverviewAsync(searchText: value);
         var elements = vendorResponse.Value;
 
         if (string.IsNullOrWhiteSpace(value) is false)

@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using DeVesen.Bazaar.Shared.Statistics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace DeVesen.Bazaar.Shared;
 
@@ -27,7 +28,8 @@ public record VendorDto
 public record VendorOverviewItemDto
 {
     public required VendorDto Vendor { get; init; }
-    public required VendorArticleStockDto ArticleStock { get; init; }
+    public required CountsStatistics Counts { get; set; }
+    public required ValuesStatistics Values { get; set; }
 }
 
 [ExcludeFromCodeCoverage]

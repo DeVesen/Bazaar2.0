@@ -1,21 +1,23 @@
 ﻿using DeVesen.Bazaar.Server.Basics;
 using DeVesen.Bazaar.Server.Domain;
 using DeVesen.Bazaar.Server.Extensions;
+using DeVesen.Bazaar.Server.Services;
 using DeVesen.Bazaar.Server.Storage;
 using DeVesen.Bazaar.Shared;
+using DeVesen.Bazaar.Shared.Statistics;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DeVesen.Bazaar.Server.Controllers;
 
 [ApiController]
 [Route("api/v1/[controller]")]
-public class VendorController(VendorStorage vendorStorage, ArticleStorage articleStorage) : ControllerBase
+public class VendorController(VendorStorage vendorStorage, ArticleStorage articleStorage, StatisticsService statisticsLogic) : ControllerBase
 {
     [HttpGet("{id}")]
     public async Task<IActionResult> GetByIdAsync(string id)
     {
         var filter = new VendorFilter { Id = id };
-        var items = await GetAllAsync(filter);
+        var items = await GetOverviewAsync(filter);
         var item = items.FirstOrDefault();
 
         if (item == null)
@@ -24,36 +26,6 @@ public class VendorController(VendorStorage vendorStorage, ArticleStorage articl
         }
 
         return Ok(item);
-    }
-
-    [HttpGet]
-    public async Task<IList<VendorOverviewItemDto>> GetAllAsync([FromQuery] VendorFilter? parameters)
-    {
-        var vendors = (await vendorStorage.GetAllAsync(parameters ?? new VendorFilter())).ToArray();
-        var articles = (await articleStorage.GetAllAsync()).ToArray();
-
-        var vendorView =
-            from vendor in vendors
-            let vendorArticles = articles.Where(p => p.VendorId == vendor.Id).ToArray()
-            select new { Vendor = vendor, Articles = vendorArticles };
-
-        return vendorView.Select(vendor =>
-        {
-            var articleStock = new VendorArticleStockDto
-            {
-                Recorded = vendor.Articles.Length,
-                OnSale = vendor.Articles.Count(p => p.IsOnSale()),
-                Sold = vendor.Articles.Count(p => p.IsSold()),
-                Returned = vendor.Articles.Count(p => p.IsReturned()),
-                Settled = vendor.Articles.Count(p => p.IsSettled())
-            };
-
-            return new VendorOverviewItemDto
-            {
-                Vendor = vendor.Vendor.ToDto(),
-                ArticleStock = articleStock
-            };
-        }).ToList();
     }
 
     [HttpPost]
@@ -92,5 +64,47 @@ public class VendorController(VendorStorage vendorStorage, ArticleStorage articl
         await vendorStorage.DeleteAsync(id);
 
         return Ok();
+    }
+
+
+
+    [HttpGet("overview")]
+    public async Task<IList<VendorOverviewItemDto>> GetOverviewAsync([FromQuery] VendorFilter? parameters)
+    {
+        var vendors = (await vendorStorage.GetAllAsync(parameters ?? new VendorFilter())).ToArray();
+        var articles = (await articleStorage.GetAllAsync()).ToArray();
+
+        var vendorView =
+            from vendor in vendors
+            let vendorArticles = articles.Where(p => p.VendorId == vendor.Id).ToArray()
+            select new { Vendor = vendor, Articles = vendorArticles };
+
+        return vendorView.Select(vendor => new VendorOverviewItemDto
+        {
+            Vendor = vendor.Vendor.ToDto(),
+            Counts = statisticsLogic.CalculateCounts(vendor.Articles),
+            Values = statisticsLogic.CalculateValues(vendor.Vendor.OfferUnitPrice, vendor.Vendor.SalesShare, vendor.Articles)
+        }).ToList();
+    }
+
+    [HttpGet("{vendorId}/statistics")]
+    public async Task<IActionResult> GetStatisticsByVendor(string vendorId)
+    {
+        if (await vendorStorage.ExistByIdAsync(vendorId) is false)
+        {
+            return NotFound();
+        }
+
+        var vendor = await vendorStorage.GetAsync(vendorId);
+        var articles = (await articleStorage.GetAllAsync(new ArticleFilter { VendorId = vendorId })).ToArray();
+
+        var result = new VendorStatisticsDto
+        {
+            VendorId = vendorId,
+            Counts = statisticsLogic.CalculateCounts(articles),
+            Values = statisticsLogic.CalculateValues(vendor.OfferUnitPrice, vendor.SalesShare, articles)
+        };
+
+        return Ok(result);
     }
 }

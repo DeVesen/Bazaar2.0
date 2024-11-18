@@ -3,6 +3,7 @@ using DeVesen.Bazaar.Client.Domain;
 using DeVesen.Bazaar.Client.Extensions;
 using DeVesen.Bazaar.Client.Models;
 using DeVesen.Bazaar.Shared;
+using DeVesen.Bazaar.Shared.Statistics;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
 namespace DeVesen.Bazaar.Client.Services;
@@ -46,26 +47,6 @@ public class VendorService
         catch (Exception ex)
         {
             return Response<VendorOverviewItem>.Invalid(ex.Message);
-        }
-    }
-
-    public async Task<Response<IEnumerable<VendorOverviewItem>>> GetAllAsync(string? id = null, string? searchText = null)
-    {
-        try
-        {
-            var requestUri = new UriBuilder(_httpClient.BaseAddress)
-                .SetQueryItem("Id", id)
-                .SetQueryItem("SearchText", searchText)
-                .Build();
-
-            var elements =
-                await _httpClient.GetFromJsonAsync<IEnumerable<VendorOverviewItem>>(requestUri) ?? [];
-
-            return Response<IEnumerable<VendorOverviewItem>>.Valid(elements.ToArray());
-        }
-        catch (Exception ex)
-        {
-            return Response<IEnumerable<VendorOverviewItem>>.Invalid(ex.Message);
         }
     }
 
@@ -124,5 +105,55 @@ public class VendorService
 
         _snackBarService.AddError($"Ausnahmefehler {response.StatusCode}");
         return Response.Invalid();
+    }
+
+
+
+    public async Task<Response<IEnumerable<VendorOverviewItem>>> GetOverviewAsync(string? id = null, string? searchText = null)
+    {
+        try
+        {
+            var requestUri = new UriBuilder(_httpClient.BaseAddress)
+                .AddUriPart("overview")
+                .SetQueryItem("Id", id)
+                .SetQueryItem("SearchText", searchText)
+                .Build();
+
+            var elements =
+                await _httpClient.GetFromJsonAsync<IEnumerable<VendorOverviewItem>>(requestUri) ?? [];
+
+            return Response<IEnumerable<VendorOverviewItem>>.Valid(elements.ToArray());
+        }
+        catch (Exception ex)
+        {
+            return Response<IEnumerable<VendorOverviewItem>>.Invalid(ex.Message);
+        }
+    }
+
+    public async Task<Response<(CountsStatistics Counts, ValuesStatistics Values)>> GetStatisticsByVendor(string vendorId)
+    {
+        try
+        {
+            var requestUri = new UriBuilder(_httpClient.BaseAddress)
+                .AddUriPart(vendorId)
+                .AddUriPart("statistics")
+                .Build();
+
+            var response =
+                await _httpClient.GetAsync(requestUri);
+
+            if (response.IsSuccessStatusCode is false)
+            {
+                return Response<(CountsStatistics Counts, ValuesStatistics Values)>.Invalid($"Verkäufer Statistik für '{vendorId}' konnte nicht geladen werden: {response.StatusCode}");
+            }
+
+            var statistics = await response.Content.ReadFromJsonAsync<VendorStatisticsDto>();
+
+            return Response<(CountsStatistics Counts, ValuesStatistics Values)>.Valid((statistics!.Counts, statistics.Values));
+        }
+        catch (Exception ex)
+        {
+            return Response<(CountsStatistics Counts, ValuesStatistics Values)>.Invalid(ex.Message);
+        }
     }
 }

@@ -1,21 +1,31 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using DeVesen.Bazaar.Shared.Events;
+using Microsoft.AspNetCore.SignalR;
 
 namespace DeVesen.Bazaar.Server.Hubs;
 
 public class VendorHubContext(IHubContext<VendorHub> hubContext)
 {
-    public async Task SendAdded()
+    public void SendAdded(string vendorId)
     {
-        await hubContext.Clients.All.SendAsync("Added");
+        Task.Run(async () =>
+        {
+            await hubContext.Clients.All.SendAsync("Added", new VendorAddedArgs(vendorId));
+        });
     }
 
-    public async Task SendUpdated(string vendorId)
+    public void SendUpdated(string vendorId, VendorUpdatedArgs.Reasons reason)
     {
-        await hubContext.Clients.All.SendAsync("Updated", vendorId);
+        Task.Run(async () =>
+        {
+            await hubContext.Clients.All.SendAsync("Updated", new VendorUpdatedArgs(vendorId, reason));
+        });
     }
 
-    public async Task SendRemoved(string vendorId)
+    public void SendRemoved(string vendorId)
     {
-        await hubContext.Clients.All.SendAsync("Removed", vendorId);
+        Task.Run(async () =>
+        {
+            await hubContext.Clients.All.SendAsync("Removed", new VendorRemovedArgs(vendorId));
+        });
     }
 }

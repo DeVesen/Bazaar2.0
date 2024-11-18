@@ -1,8 +1,8 @@
 ﻿using DeVesen.Bazaar.Server.Contracts;
 using DeVesen.Bazaar.Server.Domain;
-using DeVesen.Bazaar.Server.Extensions;
 using DeVesen.Bazaar.Server.Hubs;
 using DeVesen.Bazaar.Server.Infrastructure;
+using DeVesen.Bazaar.Shared.Events;
 using DeVesen.Bazaar.Shared.Extensions;
 
 namespace DeVesen.Bazaar.Server.Storage;
@@ -60,7 +60,7 @@ public class VendorStorage
 
         await _vendorRepository.CreateAsync(element);
 
-        await _vendorHubContext.SendAdded();
+        _vendorHubContext.SendAdded(element.Id);
     }
 
     public async Task UpdateAsync(VendorEntity element)
@@ -72,7 +72,7 @@ public class VendorStorage
 
         await _vendorRepository.UpdateAsync(element);
 
-        await _vendorHubContext.SendUpdated(element.Id);
+        _vendorHubContext.SendUpdated(element.Id, VendorUpdatedArgs.Reasons.MasterData);
     }
 
     public async Task DeleteAsync(string id)
@@ -86,7 +86,7 @@ public class VendorStorage
 
         await _vendorRepository.DeleteAsync(id);
 
-        await _vendorHubContext.SendRemoved(id);
+        _vendorHubContext.SendRemoved(id);
     }
 
     private async Task DeleteRelatedArticles(string vendorId)

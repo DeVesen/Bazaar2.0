@@ -21,6 +21,9 @@ public record Article
     public DateTime? Settled { get; set; } = null;
 
 
+    public bool IsApproved()
+        => ApprovedForSale.HasValue;
+
     public bool IsOnSale()
         => ApprovedForSale.HasValue &&
            Sold.HasValue is false &&
@@ -33,8 +36,7 @@ public record Article
            Settled.HasValue is false;
 
     public bool IsReturned()
-        => Returned.HasValue &&
-           Settled.HasValue is false;
+        => Returned.HasValue;
 
     public bool IsSettled()
         => Settled.HasValue;

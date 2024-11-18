@@ -1,4 +1,4 @@
-﻿<ListingElement Icon="@Icon">
+﻿<ListingElement Class="@Class" Style="@Style" Icon="@Icon">
     <MudText>@Value</MudText>
 </ListingElement>
 
@@ -9,4 +9,10 @@
 
     [Parameter]
     public required string Value { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public string? Style { get; set; }
 }

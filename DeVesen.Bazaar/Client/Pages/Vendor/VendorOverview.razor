@@ -4,7 +4,6 @@
 @using DeVesen.Bazaar.Client.Pages.Vendor.Components
 @using DeVesen.Bazaar.Client.State.Title
 @using DeVesen.Bazaar.Client.State.VendorView
-@using DeVesen.Bazaar.Client.Components.HubHandler
 
 @page "/vendors"
 @attribute [Authorize]
@@ -14,11 +13,8 @@
 @inject Services.DialogService DialogService
 
 @inject TitleFacade TitleFacade
-@inject VendorViewFacade VendorFacade
+@inject VendorViewFacade VendorViewFacade
 @inject IState<VendorViewState> VendorState
-
-<VendorHubActionHandler Added="FetchVendorList" Updated="FetchVendorList" Removed="FetchVendorList" />
-<ArticleHubActionHandler Added="FetchVendorList" Updated="FetchVendorList" Removed="FetchVendorList" />
 
 <div class="d-flex flex-column gap-4 px-1">
     <MudToolBar WrapContent Dense Gutters="false">
@@ -27,21 +23,31 @@
                            ToolTipText="Händler erstellen"
                            OnClick="CreateElementAsync" />
         <DvTextField T="string"
+                     Label="Freitextsuche:"
                      OuterStyle="max-width: 200px"
                      OuterClass="pl-2"
-                     Value="@_searchText"
-                     ValueChanged="@OnSearchChanged" />
+                     @bind-Value="@_searchText"
+                     Adornment="Adornment.End"
+                     AdornmentIcon="@Icons.Material.TwoTone.Search"
+                     OnAdornmentClick="@OnSearchChanged" />
     </MudToolBar>
 
     <MudGrid Spacing="3">
         @if (VendorState.Value.IsLoaded)
         {
-            @foreach (var element in @VendorState.Value.Vendors)
+            if (@VendorState.Value.Vendors.Any())
             {
-                <MudItem xs="12" md="4" lg="3">
-                    <VendorCard VendorItem="@element"
-                                OnEdit="x => ModifyVendorAsync(x.Vendor)" />
-                </MudItem>
+                @foreach (var element in @VendorState.Value.Vendors)
+                {
+                    <MudItem xs="12" md="4" lg="3">
+                        <VendorCard VendorItem="@element"
+                                    OnEdit="x => ModifyVendorAsync(x.Vendor)" />
+                    </MudItem>
+                }
+            }
+            else
+            {
+                <MudText>Es wurde kein Verkäufereintrag gefunden.</MudText>
             }
         }
     </MudGrid>
@@ -56,32 +62,33 @@
     {
         await base.OnInitializedAsync();
 
-        FetchVendorList();
-
         TitleFacade.SetCaption("Verkäufer");
+
+        await VendorViewFacade.StartCallbacks();
+        VendorViewFacade.Fetch();
+    }
+
+    protected override async ValueTask DisposeAsyncCore(bool disposing)
+    {
+        await base.DisposeAsyncCore(disposing);
+
+        await VendorViewFacade.StopCallbacks();
+
+        VendorViewFacade.CleanUp();
     }
 
     private async Task CreateElementAsync()
     {
         await DialogService.CreateVendorAsync();
-
-        FetchVendorList();
     }
 
     private async Task ModifyVendorAsync(Vendor vendor)
     {
         await DialogService.ModifyVendorAsync(vendor);
-
-        FetchVendorList();
     }
 
-    private void OnSearchChanged(string newValue)
+    private void OnSearchChanged()
     {
-        _searchText = newValue;
-    }
-
-    private void FetchVendorList()
-    {
-        VendorFacade.Fetch(searchText: _searchText);
+        VendorViewFacade.Fetch(searchText: _searchText);
     }
 }

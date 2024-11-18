@@ -1,9 +1,6 @@
-﻿using DeVesen.Bazaar.Client.Pages.Sales;
-using DeVesen.Bazaar.Server.Domain;
+﻿using DeVesen.Bazaar.Server.Domain;
 using DeVesen.Bazaar.Server.Storage;
-using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
-using static MudBlazor.Colors;
 
 namespace DeVesen.Bazaar.Server.Controllers;
 
@@ -11,7 +8,6 @@ namespace DeVesen.Bazaar.Server.Controllers;
 [Route("api/v1/[controller]")]
 public class StatisticController(VendorStorage vendorStorage, ArticleStorage articleStorage) : ControllerBase
 {
-
     [HttpGet]
     public async Task<IActionResult> Get()
     {

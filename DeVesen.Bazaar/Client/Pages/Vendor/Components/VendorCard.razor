@@ -30,8 +30,26 @@
         </CardHeaderActions>
     </MudCardHeader>
     <MudCardContent>
-        <ListingElementText Icon="@Icons.Material.TwoTone.AreaChart" Value="@VendorItem.ArticleStock.ToString()" />
-        <ListingElementText Icon="@Icons.Material.TwoTone.Info" Value="@VendorItem.Vendor.Note" />
+        <div class="d-flex flex-column gap-3">
+            <div class="d-flex flex-wrap gap-1">
+                <ListingElementText Style="width: 45%;" Icon="@Icons.Material.TwoTone.Article" Value="@($"{VendorItem.Counts.Count} St.")" />
+                <ListingElementText Style="width: 45%;" Icon="@Icons.Material.TwoTone.Search" Value="@($"{VendorItem.Counts.Approved} St.")" />
+                <ListingElementText Style="width: 45%;" Icon="@Icons.Material.TwoTone.Sell" Value="@($"{VendorItem.Counts.OnSale} St.")" />
+                <ListingElementText Style="width: 45%;" Icon="@Icons.Material.TwoTone.ShoppingCart" Value="@($"{VendorItem.Counts.Sold} St.")" />
+                <ListingElementText Style="width: 45%;" Icon="@Icons.Material.TwoTone.Backspace" Value="@($"{VendorItem.Counts.Returned} St.")" />
+                <ListingElementText Style="width: 100%;" Icon="@Icons.Material.TwoTone.Handshake" Value="@($"{VendorItem.Counts.Settled} St.")" />
+            </div>
+            <div class="d-flex flex-wrap gap-1">
+                <ListingElementText Style="width: 45%;" Icon="@Icons.Material.TwoTone.Article" Value="@($"{VendorItem.Values.ApprovedValue} €")" />
+                <ListingElementText Style="width: 45%;" Icon="@Icons.Material.TwoTone.ShoppingCart" Value="@($"{VendorItem.Values.SoldValue} €")" />
+            </div>
+            <div class="d-flex flex-wrap gap-1">
+                <ListingElementText Style="width: 45%;" Icon="@Icons.Material.TwoTone.Article" Value="@($"{VendorItem.Values.OfferValue} €")" />
+                <ListingElementText Style="width: 45%;" Icon="@Icons.Material.TwoTone.Euro" Value="@($"{VendorItem.Values.ShareValue} €")" />
+            </div>
+            <ListingElementText Style="width: 100%;" Icon="@Icons.Material.TwoTone.LocationOn" Value="@VendorItem.Vendor.Address" />
+            <ListingElementText Style="width: 100%;" Icon="@Icons.Material.TwoTone.Info" Value="@VendorItem.Vendor.Note" />
+        </div>
     </MudCardContent>
     <MudCardActions Class="d-flex justify-space-between">
         <DvIconButtonArticles OnClick="GoToArticles" ToolTipText="Artikelliste"/>

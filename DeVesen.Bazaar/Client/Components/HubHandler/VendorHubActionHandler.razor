@@ -1,8 +1,11 @@
 ﻿@using DeVesen.Bazaar.Client.Extensions
+@using DeVesen.Bazaar.Client.State.VendorView
+@using DeVesen.Bazaar.Shared.Events
 
 @implements IAsyncDisposable;
 
 @inject VendorHubConnectionService VendorHub;
+@inject VendorViewFacade VendorViewFacade;
 
 @code {
 
@@ -11,46 +14,42 @@
     private IDisposable _removedActionHandle = null!;
 
     [Parameter]
-    public EventCallback Added { get; set; }
+    public EventCallback<VendorAddedArgs> Added { get; set; }
 
     [Parameter]
-    public EventCallback<string> Updated { get; set; }
+    public EventCallback<VendorUpdatedArgs> Updated { get; set; }
 
     [Parameter]
-    public EventCallback<string> Removed { get; set; }
-    
+    public EventCallback<VendorRemovedArgs> Removed { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
 
         await VendorHub.StartAsync();
-        
+
         _addedActionHandle = VendorHub.RegisterOnAdded(OnAdded);
         _updatedActionHandle = VendorHub.RegisterOnUpdated(OnUpdated);
         _removedActionHandle = VendorHub.RegisterOnRemoved(OnRemoved);
     }
 
-    private void OnAdded()
+    private void OnAdded(VendorAddedArgs args)
     {
-        Added.InvokeAsync();
+        Added.InvokeAsync(args);
     }
 
-    private void OnUpdated(string id)
+    private void OnUpdated(VendorUpdatedArgs args)
     {
-        Updated.InvokeAsync(id);
+        Updated.InvokeAsync(args);
     }
 
-    private void OnRemoved(string id)
+    private void OnRemoved(VendorRemovedArgs args)
     {
-        Removed.InvokeAsync(id);
+        Removed.InvokeAsync(args);
     }
 
     public async ValueTask DisposeAsync()
     {
-        // _addedActionHandle.Dispose();
-        // _updatedActionHandle.Dispose();
-        // _removedActionHandle.Dispose();
-
         await VendorHub.StopAsync();
     }
 
