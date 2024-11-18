@@ -382,7 +382,10 @@
 
     private void OnArticleUpdated(ArticleUpdatedInfo args)
     {
-        SalesCartFacade.AddCriticalWarning(args.ArticleNumber, "Artikel wurde verändert!");
+        if (SalesCartState.Value.PurchaseItems.Any(p => p.ArticleNumber == args.ArticleNumber))
+        {
+            SalesCartFacade.AddCriticalWarning(args.ArticleNumber, "Artikel wurde verändert!");
+        }
     }
 
     private void OnArticleRemoved(ArticleRemovedInfo args)
