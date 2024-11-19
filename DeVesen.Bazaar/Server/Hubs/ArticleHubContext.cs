@@ -7,17 +7,17 @@ public class ArticleHubContext(IHubContext<ArticleHub> hubContext)
 {
     public async Task SendAdded(string vendorId, string articleId, long articleNumber)
     {
-        await hubContext.Clients.All.SendAsync("Added", new ArticleAddedInfo(vendorId, articleId, articleNumber));
+        await hubContext.Clients.All.SendAsync("Added", new ArticleAddedArgs(vendorId, articleId, articleNumber));
     }
 
     public async Task SendUpdated(string vendorId, string articleId, long articleNumber)
     {
-        await hubContext.Clients.All.SendAsync("Updated", new ArticleUpdatedInfo(vendorId, articleId, articleNumber));
+        await hubContext.Clients.All.SendAsync("Updated", new ArticleUpdatedArgs(vendorId, articleId, articleNumber));
     }
 
     public async Task SendRemoved(string vendorId, string articleId, long articleNumber)
     {
-        await hubContext.Clients.All.SendAsync("Removed", new ArticleRemovedInfo(vendorId, articleId, articleNumber));
+        await hubContext.Clients.All.SendAsync("Removed", new ArticleRemovedArgs(vendorId, articleId, articleNumber));
     }
 
 

@@ -3,7 +3,7 @@
 @using DeVesen.Bazaar.Client.Models
 @using DeVesen.Bazaar.Client.Pages.Article.Components
 @using DeVesen.Bazaar.Client.Services
-@using DeVesen.Bazaar.Client.State.Article
+@using DeVesen.Bazaar.Client.State.ArticleView
 @using DeVesen.Bazaar.Client.State.Title
 
 @layout AcquisitionLayout
@@ -13,9 +13,9 @@
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 
 @inject TitleFacade TitleFacade
-@inject ArticleFacade ArticleFacade
+@inject ArticleViewFacade ArticleFacade
 @inject VendorService VendorService
-@inject IState<ArticleState> ArticleState
+@inject IState<ArticleViewState> ArticleState
 @inject ImportExportService ImportExportService
 
 @inject Services.DialogService DialogService;

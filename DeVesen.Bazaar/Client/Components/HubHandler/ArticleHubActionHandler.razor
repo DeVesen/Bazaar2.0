@@ -13,13 +13,13 @@
     private IDisposable _statusChangedActionHandle = null!;
 
     [Parameter]
-    public EventCallback<ArticleAddedInfo> Added { get; set; }
+    public EventCallback<ArticleAddedArgs> Added { get; set; }
 
     [Parameter]
-    public EventCallback<ArticleUpdatedInfo> Updated { get; set; }
+    public EventCallback<ArticleUpdatedArgs> Updated { get; set; }
 
     [Parameter]
-    public EventCallback<ArticleRemovedInfo> Removed { get; set; }
+    public EventCallback<ArticleRemovedArgs> Removed { get; set; }
 
     [Parameter]
     public EventCallback<ArticleStatusChangedInfo> StatusChanged { get; set; }
@@ -36,17 +36,17 @@
         _statusChangedActionHandle = ArticleHub.RegisterOnStatusChanged(OnStatusChanged);
     }
 
-    private void OnAdded(ArticleAddedInfo args)
+    private void OnAdded(ArticleAddedArgs args)
     {
         Added.InvokeAsync(args);
     }
 
-    private void OnUpdated(ArticleUpdatedInfo args)
+    private void OnUpdated(ArticleUpdatedArgs args)
     {
         Updated.InvokeAsync(args);
     }
 
-    private void OnRemoved(ArticleRemovedInfo args)
+    private void OnRemoved(ArticleRemovedArgs args)
     {
         Removed.InvokeAsync(args);
     }

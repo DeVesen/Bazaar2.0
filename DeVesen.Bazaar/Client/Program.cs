@@ -1,8 +1,8 @@
 using DeVesen.Bazaar.Client;
 using DeVesen.Bazaar.Client.Extensions;
 using DeVesen.Bazaar.Client.Services;
-using DeVesen.Bazaar.Client.State.Article;
 using DeVesen.Bazaar.Client.State.ArticleCategory;
+using DeVesen.Bazaar.Client.State.ArticleView;
 using DeVesen.Bazaar.Client.State.Import;
 using DeVesen.Bazaar.Client.State.Manufacturer;
 using DeVesen.Bazaar.Client.State.SalesCart;
@@ -31,7 +31,7 @@ builder.Services.AddScoped<AuthenticationStateProvider>(provider => provider.Get
 builder.Services.AddTransient<ManufacturerFacade>();
 builder.Services.AddTransient<ArticleCategoryFacade>();
 builder.Services.AddTransient<VendorViewFacade>();
-builder.Services.AddTransient<ArticleFacade>();
+builder.Services.AddTransient<ArticleViewFacade>();
 builder.Services.AddTransient<SettlementFacade>();
 
 builder.Services.AddTransient<ImportFacade>();

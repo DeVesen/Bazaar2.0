@@ -380,7 +380,7 @@
     }
 
 
-    private void OnArticleUpdated(ArticleUpdatedInfo args)
+    private void OnArticleUpdated(ArticleUpdatedArgs args)
     {
         if (SalesCartState.Value.PurchaseItems.Any(p => p.ArticleNumber == args.ArticleNumber))
         {
@@ -388,7 +388,7 @@
         }
     }
 
-    private void OnArticleRemoved(ArticleRemovedInfo args)
+    private void OnArticleRemoved(ArticleRemovedArgs args)
     {
         if (SalesCartState.Value.PurchaseItems.Any(p => p.ArticleNumber == args.ArticleNumber))
         {

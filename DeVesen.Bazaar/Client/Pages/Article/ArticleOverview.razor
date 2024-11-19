@@ -2,11 +2,9 @@
 @using DeVesen.Bazaar.Client.Models
 @using DeVesen.Bazaar.Client.Pages.Article.Components
 @using DeVesen.Bazaar.Client.Services
-@using DeVesen.Bazaar.Client.State.Article
 @using DeVesen.Bazaar.Client.State.Title
-@using DeVesen.Bazaar.Client.Components.HubHandler
-@using DeVesen.Bazaar.Shared.Events
 @using DeVesen.Bazaar.Client.Components.Common
+@using DeVesen.Bazaar.Client.State.ArticleView
 
 @page "/articles"
 @page "/vendors/{vendorId}/articles"
@@ -15,11 +13,11 @@
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 
 @inject TitleFacade TitleFacade
-@inject ArticleFacade ArticleFacade
+@inject ArticleViewFacade ArticleFacade
 @inject ImportExportService ImportExportService
 @inject VendorService VendorService
 @inject NavigationService NavigationService
-@inject IState<ArticleState> ArticleState
+@inject IState<ArticleViewState> ArticleState
 
 @inject Services.DialogService DialogService;
 
@@ -36,8 +34,6 @@
 </style>
 
 <FileDownloadActions @ref="_downloadActions" />
-<VendorHubActionHandler Removed="OnVendorRemoved" />
-<ArticleHubActionHandler Added="OnArticleAdded" Updated="OnArticleUpdated" Removed="OnArticleRemoved" />
 
 <div class="d-flex flex-column gap-4 px-1">
 
@@ -83,7 +79,7 @@
         </MudButtonGroup>
     </ArticleOverviewToolbar>
     
-    @if (_vendorRemoved)
+    @if (ArticleState.Value.BadVendor)
     {
         <MudAlert Variant="Variant.Filled"
                   Severity="Severity.Error"
@@ -126,7 +122,6 @@
     private Vendor? _vendor;
     private string? _number;
     private string? _searchText;
-    private bool _vendorRemoved;
 
     protected override async Task OnInitializedAsync()
     {
@@ -135,35 +130,38 @@
         var vendorResult = await VendorService.GetByIdAsync(VendorId);
         _vendor = vendorResult.IsValid ? vendorResult.Value.Vendor : null;
 
-        FetchArticleList();
+        await ArticleFacade.StartCallbacks();
 
         SetPageCaption();
+
+        ArticleFacade.Fetch(_vendor?.Id, _number, _searchText);
+    }
+
+    protected override async ValueTask DisposeAsyncCore(bool disposing)
+    {
+        await base.DisposeAsyncCore(disposing);
+        await ArticleFacade.StopCallbacks();
+        ArticleFacade.Clear();
     }
 
     private void OnArticleFilterChange()
     {
-        FetchArticleList();
+        ArticleFacade.Fetch(_vendor?.Id, _number, _searchText);
     }
 
     private async Task CreateArticleAsync()
     {
         await DialogService.ArticleGroupedCreationDialog(_vendor!.Id);
-
-        FetchArticleList();
     }
 
     private async Task ModifyArticleAsync(Article article)
     {
         await DialogService.ModifyArticleAsync(article);
-
-        FetchArticleList();
     }
 
     private async Task ImportArticlesAsync()
     {
         await DialogService.ImportArticleAsync(_vendor!.Id);
-
-        FetchArticleList();
     }
 
     private async Task ExportArticlesAsync()
@@ -183,18 +181,11 @@
     private async Task ApproveArticleAsync()
     {
         await DialogService.ApproveArticleAsync(_vendor!.Id);
-
-        FetchArticleList();
     }
 
     private async Task PrintOverviewAsync()
     {
         await NavigationService.ToVendorPrint(_vendor!.Id);
-    }
-
-    private void FetchArticleList()
-    {
-        ArticleFacade.Fetch(_vendor?.Id, _number, _searchText);
     }
 
     private void SetPageCaption()
@@ -207,51 +198,5 @@
         }
 
         TitleFacade.SetCaption(caption);
-    }
-
-
-
-    private void OnArticleAdded(ArticleAddedInfo args)
-    {
-        // if (_vendor == null)
-        // {
-        //     FetchArticleList();
-        // }
-    }
-
-    private void OnArticleUpdated(ArticleUpdatedInfo args)
-    {
-        if (_vendor == null)
-        {
-            FetchArticleList();
-        }
-        if (_vendor?.Id == args.VendorId)
-        {
-            FetchArticleList();
-        }
-    }
-
-    private void OnArticleRemoved(ArticleRemovedInfo args)
-    {
-        if (_vendor == null)
-        {
-            FetchArticleList();
-        }
-        if (_vendor?.Id == args.VendorId)
-        {
-            FetchArticleList();
-        }
-    }
-
-    private void OnVendorRemoved(string vendorId)
-    {
-        if (_vendor == null)
-        {
-            FetchArticleList();
-        }
-        if (_vendor?.Id == vendorId)
-        {
-            _vendorRemoved = true;
-        }
     }
 }
