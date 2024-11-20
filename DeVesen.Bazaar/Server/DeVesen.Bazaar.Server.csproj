@@ -10,6 +10,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Business\**" />
+    <Content Remove="Business\**" />
+    <EmbeddedResource Remove="Business\**" />
+    <None Remove="Business\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="certificate.crt" />
     <None Remove="Cert\certificate.crt" />
     <None Remove="Cert\private.key" />
@@ -38,10 +45,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Client\DeVesen.Bazaar.Client.csproj" />
     <ProjectReference Include="..\Shared\DeVesen.Bazaar.Shared.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Business\" />
   </ItemGroup>
 
 
