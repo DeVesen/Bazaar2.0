@@ -382,34 +382,25 @@
 
     private void OnArticleUpdated(ArticleUpdatedArgs args)
     {
-        if (SalesCartState.Value.PurchaseItems.Any(p => p.ArticleNumber == args.ArticleNumber))
+        if (SalesCartState.Value.PurchaseItems.Any(p => p.ArticleNumber == args.Article.Number))
         {
-            SalesCartFacade.AddCriticalWarning(args.ArticleNumber, "Artikel wurde verändert!");
+            SalesCartFacade.AddCriticalWarning(args.Article.Number, "Artikel wurde verändert!");
         }
     }
 
     private void OnArticleRemoved(ArticleRemovedArgs args)
     {
-        if (SalesCartState.Value.PurchaseItems.Any(p => p.ArticleNumber == args.ArticleNumber))
+        if (SalesCartState.Value.PurchaseItems.Any(p => p.ArticleNumber == args.Article.Number))
         {
-            SalesCartFacade.AddCriticalWarning(args.ArticleNumber, "Artikel wurde gelöscht!");
+            SalesCartFacade.AddCriticalWarning(args.Article.Number, "Artikel wurde gelöscht!");
         }
     }
 
-    private void OnStatusChanged(ArticleStatusChangedInfo args)
+    private void OnStatusChanged(ArticleStatusChangedArgs args)
     {
-        if (SalesCartState.Value.PurchaseItems.Any(p => p.ArticleNumber == args.ArticleNumber))
+        if (SalesCartState.Value.PurchaseItems.Any(p => p.ArticleNumber == args.Article.Number))
         {
-            var procedure = args.Field switch
-            {
-                ArticleStatusChangedInfo.ChangedField.Approved => "Freigegeben",
-                ArticleStatusChangedInfo.ChangedField.Sold => "Verkauft",
-                ArticleStatusChangedInfo.ChangedField.Returned => "Zurückgegeben",
-                ArticleStatusChangedInfo.ChangedField.Settled => "Abgerechnet",
-                _ => string.Empty
-            };
-
-            SalesCartFacade.AddCriticalWarning(args.ArticleNumber, $"Artikel wurde verändert: {procedure}");
+            SalesCartFacade.AddCriticalWarning(args.Article.Number, "Artikel wurde verändert!");
         }
     }
 

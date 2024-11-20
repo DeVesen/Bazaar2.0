@@ -13,16 +13,16 @@
     private IDisposable _statusChangedActionHandle = null!;
 
     [Parameter]
-    public EventCallback<IEnumerable<ArticleAddedArgs>> Added { get; set; }
+    public EventCallback<ArticleAddedArgs> Added { get; set; }
 
     [Parameter]
-    public EventCallback<IEnumerable<ArticleUpdatedArgs>> Updated { get; set; }
+    public EventCallback<ArticleUpdatedArgs> Updated { get; set; }
 
     [Parameter]
-    public EventCallback<IEnumerable<ArticleRemovedArgs>> Removed { get; set; }
+    public EventCallback<ArticleRemovedArgs> Removed { get; set; }
 
     [Parameter]
-    public EventCallback<IEnumerable<ArticleStatusChangedArgs>> StatusChanged { get; set; }
+    public EventCallback<ArticleStatusChangedArgs> StatusChanged { get; set; }
     
     protected override async Task OnInitializedAsync()
     {
@@ -38,31 +38,38 @@
 
     private void OnAdded(IEnumerable<ArticleAddedArgs> args)
     {
-        Added.InvokeAsync(args);
+        foreach (var arg in args)
+        {
+            Added.InvokeAsync(arg);
+        }
     }
 
     private void OnUpdated(IEnumerable<ArticleUpdatedArgs> args)
     {
-        Updated.InvokeAsync(args);
+        foreach (var arg in args)
+        {
+            Updated.InvokeAsync(arg);
+        }
     }
 
     private void OnRemoved(IEnumerable<ArticleRemovedArgs> args)
     {
-        Removed.InvokeAsync(args);
+        foreach (var arg in args)
+        {
+            Removed.InvokeAsync(arg);
+        }
     }
 
     private void OnStatusChanged(IEnumerable<ArticleStatusChangedArgs> args)
     {
-        StatusChanged.InvokeAsync(args);
+        foreach (var arg in args)
+        {
+            StatusChanged.InvokeAsync(arg);
+        }
     }
 
     public async ValueTask DisposeAsync()
     {
-        // _addedActionHandle.Dispose();
-        // _updatedActionHandle.Dispose();
-        // _removedActionHandle.Dispose();
-        // _statusChangedActionHandle.Dispose();
-
         await ArticleHub.StopAsync();
     }
 
