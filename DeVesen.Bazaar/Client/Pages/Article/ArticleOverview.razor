@@ -10,14 +10,11 @@
 @page "/vendors/{vendorId}/articles"
 @attribute [Authorize]
 
-@inherits Fluxor.Blazor.Web.Components.FluxorComponent
-
 @inject TitleFacade TitleFacade
 @inject ArticleViewFacade ArticleFacade
 @inject ImportExportService ImportExportService
 @inject VendorService VendorService
 @inject NavigationService NavigationService
-@inject IState<ArticleViewState> ArticleState
 
 @inject Services.DialogService DialogService;
 
@@ -37,7 +34,8 @@
 
 <div class="d-flex flex-column gap-4 px-1">
 
-    <ArticleOverviewToolbar @bind-Vendor="@_vendor"
+    <ArticleOverviewToolbar @key="Field1" 
+                            @bind-Vendor="@_vendor"
                             @bind-Number="@_number"
                             @bind-SearchText="@_searchText"
                             @bind-Vendor:after="@OnArticleFilterChange"
@@ -79,44 +77,15 @@
         </MudButtonGroup>
     </ArticleOverviewToolbar>
     
-    @if (ArticleState.Value.BadVendor)
-    {
-        <MudAlert Variant="Variant.Filled"
-                  Severity="Severity.Error"
-                  ContentAlignment="HorizontalAlignment.Center">Händler wurde gelöscht, bitte Seite aktuallisieren.</MudAlert>
-    }
-    else
-    {
-        <MudTable T="Article"
-                  FixedHeader
-                  Hover
-                  Loading="@(ArticleState.Value.IsLoaded is false)"
-                  Items="@ArticleState.Value.Items"
-                  SortLabel="Sort By"
-                  OnRowClick="x => ModifyArticleAsync(x.Item!)">
-            <HeaderContent>
-                <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Number)">Nummer</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.ArticleCategory)">Kategorie</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Manufacturer)">Hersteller</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Description)">Beschreibung</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Price01)">Preis</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Status)">Status</MudTableSortLabel></MudTh>
-            </HeaderContent>
-            <RowTemplate>
-                <MudTd DataLabel="Nummer">@context.Number</MudTd>
-                <MudTd DataLabel="Kategorie">@context.ArticleCategory</MudTd>
-                <MudTd DataLabel="Hersteller">@context.Manufacturer</MudTd>
-                <MudTd DataLabel="Beschreibung">@context.Description</MudTd>
-                <MudTd DataLabel="Preis">@context.Price01</MudTd>
-                <MudTd DataLabel="Status">@context.StatusText</MudTd>
-            </RowTemplate>
-        </MudTable>
-    }
+    <ArticleOverviewTable RowClicked="ModifyArticleAsync" />
 </div>
 
 @code {
     [Parameter]
     public string VendorId { get; set; } = string.Empty;
+
+    public object? Field1 { get; set; } = new object();
+    public object? Field2 { get; set; } = new object();
 
     private FileDownloadActions _downloadActions = null!;
     private Vendor? _vendor;
@@ -135,13 +104,6 @@
         SetPageCaption();
 
         ArticleFacade.Fetch(_vendor?.Id, _number, _searchText);
-    }
-
-    protected override async ValueTask DisposeAsyncCore(bool disposing)
-    {
-        await base.DisposeAsyncCore(disposing);
-        await ArticleFacade.StopCallbacks();
-        ArticleFacade.Clear();
     }
 
     private void OnArticleFilterChange()
@@ -166,16 +128,16 @@
 
     private async Task ExportArticlesAsync()
     {
-        var exportBuilder = new StringBuilder();
+        // var exportBuilder = new StringBuilder();
 
-        exportBuilder.AppendLine(ImportExportService.ArticleToDataLineTitle());
+        // exportBuilder.AppendLine(ImportExportService.ArticleToDataLineTitle());
 
-        foreach (var article in ArticleState.Value.Items)
-        {
-            exportBuilder.AppendLine(ImportExportService.ArticleToDataLine(article));
-        }
+        // foreach (var article in ArticleState.Value.Items)
+        // {
+        //     exportBuilder.AppendLine(ImportExportService.ArticleToDataLine(article));
+        // }
 
-        await _downloadActions.TriggerDownload(exportBuilder.ToString(), $"Articles_{_vendor?.GetTotalName()}.csv");
+        // await _downloadActions.TriggerDownload(exportBuilder.ToString(), $"Articles_{_vendor?.GetTotalName()}.csv");
     }
 
     private async Task ApproveArticleAsync()

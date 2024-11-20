@@ -13,16 +13,16 @@
     private IDisposable _statusChangedActionHandle = null!;
 
     [Parameter]
-    public EventCallback<ArticleAddedArgs> Added { get; set; }
+    public EventCallback<IEnumerable<ArticleAddedArgs>> Added { get; set; }
 
     [Parameter]
-    public EventCallback<ArticleUpdatedArgs> Updated { get; set; }
+    public EventCallback<IEnumerable<ArticleUpdatedArgs>> Updated { get; set; }
 
     [Parameter]
-    public EventCallback<ArticleRemovedArgs> Removed { get; set; }
+    public EventCallback<IEnumerable<ArticleRemovedArgs>> Removed { get; set; }
 
     [Parameter]
-    public EventCallback<ArticleStatusChangedInfo> StatusChanged { get; set; }
+    public EventCallback<IEnumerable<ArticleStatusChangedArgs>> StatusChanged { get; set; }
     
     protected override async Task OnInitializedAsync()
     {
@@ -36,22 +36,22 @@
         _statusChangedActionHandle = ArticleHub.RegisterOnStatusChanged(OnStatusChanged);
     }
 
-    private void OnAdded(ArticleAddedArgs args)
+    private void OnAdded(IEnumerable<ArticleAddedArgs> args)
     {
         Added.InvokeAsync(args);
     }
 
-    private void OnUpdated(ArticleUpdatedArgs args)
+    private void OnUpdated(IEnumerable<ArticleUpdatedArgs> args)
     {
         Updated.InvokeAsync(args);
     }
 
-    private void OnRemoved(ArticleRemovedArgs args)
+    private void OnRemoved(IEnumerable<ArticleRemovedArgs> args)
     {
         Removed.InvokeAsync(args);
     }
 
-    private void OnStatusChanged(ArticleStatusChangedInfo args)
+    private void OnStatusChanged(IEnumerable<ArticleStatusChangedArgs> args)
     {
         StatusChanged.InvokeAsync(args);
     }

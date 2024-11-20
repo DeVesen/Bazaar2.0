@@ -4,60 +4,83 @@ using Fluxor;
 
 namespace DeVesen.Bazaar.Client.State.ArticleView;
 
-public class ArticleViewFacade(IDispatcher dispatcher,
-                               VendorHubConnectionService vendorHub,
-                               ArticleHubConnectionService articleHub)
+public class ArticleViewFacade
 {
+    private readonly IDispatcher _dispatcher;
+    private readonly VendorHubConnectionService _vendorHub;
+    private readonly ArticleHubConnectionService _articleHub;
+
+    public ArticleViewFacade(IDispatcher dispatcher,
+                             VendorHubConnectionService vendorHub,
+                             ArticleHubConnectionService articleHub)
+    {
+        _dispatcher = dispatcher;
+        _vendorHub = vendorHub;
+        _articleHub = articleHub;
+    }
+
     public void Fetch(string? vendorId = null, string? number = null, string? searchText = null)
-        => dispatcher.Dispatch(new ArticleViewActions.Fetch(vendorId, number, searchText));
+        => _dispatcher.Dispatch(new ArticleViewActions.Fetch(vendorId, number, searchText));
 
     public void Clear()
-        => dispatcher.Dispatch(new ArticleViewActions.Clear());
+        => _dispatcher.Dispatch(new ArticleViewActions.Clear());
 
 
     public async Task StartCallbacks()
     {
-        await vendorHub.StartAsync();
-        await articleHub.StartAsync();
+        await _vendorHub.StartAsync();
+        await _articleHub.StartAsync();
 
-        vendorHub.RegisterOnRemoved(OnVendorRemoved);
+        _vendorHub.RegisterOnRemoved(OnVendorRemoved);
 
-        articleHub.RegisterOnAdded(OnArticleAdded);
-        articleHub.RegisterOnUpdated(OnArticleUpdated);
-        articleHub.RegisterOnStatusChanged(OnArticleStatusChanged);
-        articleHub.RegisterOnRemoved(OnArticleRemoved);
+        _articleHub.RegisterOnAdded(OnArticleAdded);
+        _articleHub.RegisterOnUpdated(OnArticleUpdated);
+        _articleHub.RegisterOnStatusChanged(OnArticleStatusChanged);
+        _articleHub.RegisterOnRemoved(OnArticleRemoved);
     }
 
     public async Task StopCallbacks()
     {
-        await vendorHub.StopAsync();
-        await articleHub.StopAsync();
+        await _vendorHub.StopAsync();
+        await _articleHub.StopAsync();
     }
 
 
     private void OnVendorRemoved(VendorRemovedArgs args)
     {
-        dispatcher.Dispatch(new ArticleViewActions.SetBadVendor(args.Id));
+        _dispatcher.Dispatch(new ArticleViewActions.SetBadVendor(args.Id));
     }
 
 
-    private void OnArticleAdded(ArticleAddedArgs args)
+    private void OnArticleAdded(IEnumerable<ArticleAddedArgs> args)
     {
-        dispatcher.Dispatch(new ArticleViewActions.LoadItem(args.VendorId, args.ArticleId, args.ArticleNumber));
+        foreach (var arg in args)
+        {
+            _dispatcher.Dispatch(new ArticleViewActions.SetItem(arg.Article.ToModel()));
+        }
     }
 
-    private void OnArticleUpdated(ArticleUpdatedArgs args)
+    private void OnArticleUpdated(IEnumerable<ArticleUpdatedArgs> args)
     {
-        dispatcher.Dispatch(new ArticleViewActions.LoadItem(args.VendorId, args.ArticleId, args.ArticleNumber));
+        foreach (var arg in args)
+        {
+            _dispatcher.Dispatch(new ArticleViewActions.SetItem(arg.Article.ToModel()));
+        }
     }
 
-    private void OnArticleStatusChanged(ArticleStatusChangedInfo args)
+    private void OnArticleStatusChanged(IEnumerable<ArticleStatusChangedArgs> args)
     {
-        dispatcher.Dispatch(new ArticleViewActions.LoadItem(args.VendorId, args.ArticleId, args.ArticleNumber));
+        foreach (var arg in args)
+        {
+            _dispatcher.Dispatch(new ArticleViewActions.SetItem(arg.Article.ToModel()));
+        }
     }
 
-    private void OnArticleRemoved(ArticleRemovedArgs args)
+    private void OnArticleRemoved(IEnumerable<ArticleRemovedArgs> args)
     {
-        dispatcher.Dispatch(new ArticleViewActions.RemoveItem(args.VendorId, args.ArticleId, args.ArticleNumber));
+        foreach (var arg in args)
+        {
+            _dispatcher.Dispatch(new ArticleViewActions.SetItem(arg.Article.ToModel()));
+        }
     }
 }

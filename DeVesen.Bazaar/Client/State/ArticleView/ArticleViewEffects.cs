@@ -3,7 +3,7 @@ using Fluxor;
 
 namespace DeVesen.Bazaar.Client.State.ArticleView;
 
-public class ArticleViewEffects(IState<ArticleViewState> articleViewState, ArticleService articleService)
+public class ArticleViewEffects(ArticleService articleService)
 {
     [EffectMethod]
     public async Task Fetch(ArticleViewActions.Fetch action, IDispatcher dispatcher)
@@ -20,29 +20,5 @@ public class ArticleViewEffects(IState<ArticleViewState> articleViewState, Artic
             .ThenBy(p => p.Description);
 
         dispatcher.Dispatch(new ArticleViewActions.SetList(domainElements));
-    }
-
-    [EffectMethod]
-    public async Task LoadItem(ArticleViewActions.LoadItem action, IDispatcher dispatcher)
-    {
-        if (articleViewState.Value.IsLoaded is false)
-        {
-            return;
-        }
-
-        if (string.IsNullOrWhiteSpace(articleViewState.Value.ActualVendorId) is false &&
-            articleViewState.Value.ActualVendorId != action.VendorId)
-        {
-            return;
-        }
-
-        var response = await articleService.GetByNumber(action.ArticleNumber);
-
-        if (response.IsValid is false)
-        {
-            return;
-        }
-
-        dispatcher.Dispatch(new ArticleViewActions.SetItem(response.Value!));
     }
 }

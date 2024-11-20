@@ -91,22 +91,22 @@ namespace DeVesen.Bazaar.Client.Extensions
         public async ValueTask StopAsync()
             => await _connection.DisposeAsync();
 
-        public IDisposable RegisterOnAdded(Action<ArticleAddedArgs> handler)
+        public IDisposable RegisterOnAdded(Action<IEnumerable<ArticleAddedArgs>> handler)
         {
             return _connection.On("Added", handler);
         }
 
-        public IDisposable RegisterOnUpdated(Action<ArticleUpdatedArgs> handler)
+        public IDisposable RegisterOnUpdated(Action<IEnumerable<ArticleUpdatedArgs>> handler)
         {
             return _connection.On("Updated", handler);
         }
 
-        public IDisposable RegisterOnRemoved(Action<ArticleRemovedArgs> handler)
+        public IDisposable RegisterOnRemoved(Action<IEnumerable<ArticleRemovedArgs>> handler)
         {
             return _connection.On("Removed", handler);
         }
 
-        public IDisposable RegisterOnStatusChanged(Action<ArticleStatusChangedInfo> handler)
+        public IDisposable RegisterOnStatusChanged(Action<IEnumerable<ArticleStatusChangedArgs>> handler)
         {
             return _connection.On("StatusChanged", handler);
         }

@@ -92,7 +92,7 @@ public class ArticleStorage
 
         await _articleRepository.CreateAsync(element.ToEntity());
 
-        await _articleHubContext.SendAdded(element.VendorId, element.Id, element.Number);
+        await _articleHubContext.SendAdded(element);
 
         _vendorHubContext.SendUpdated(element.VendorId, VendorUpdatedArgs.Reasons.ArticleData);
     }
@@ -121,7 +121,7 @@ public class ArticleStorage
 
         await _articleRepository.UpdateAsync(element.ToEntity());
 
-        await _articleHubContext.SendUpdated(element.VendorId, element.Id, element.Number);
+        await _articleHubContext.SendUpdated(element);
 
         _vendorHubContext.SendUpdated(element.VendorId, VendorUpdatedArgs.Reasons.ArticleData);
     }
@@ -137,7 +137,7 @@ public class ArticleStorage
 
         await _articleRepository.DeleteAsync(id);
 
-        await _articleHubContext.SendRemoved(response.Entity!.VendorId, response.Entity!.Id, response.Entity!.Number);
+        await _articleHubContext.SendRemoved(response.Entity!.ToDomain());
 
         _vendorHubContext.SendUpdated(response.Entity!.VendorId, VendorUpdatedArgs.Reasons.ArticleData);
     }
@@ -155,7 +155,7 @@ public class ArticleStorage
 
             await UpdateAsync(element);
 
-            await _articleHubContext.SendSold(element.VendorId, element.Id, element.Number);
+            await _articleHubContext.SendSold(element);
         }
     }
 
@@ -197,7 +197,7 @@ public class ArticleStorage
 
         await UpdateAsync(element);
 
-        await _articleHubContext.SendApproved(element.VendorId, element.Id, element.Number);
+        await _articleHubContext.SendApproved(element);
 
         return Result.Ok();
     }
@@ -245,7 +245,7 @@ public class ArticleStorage
 
         await UpdateAsync(element);
 
-        await _articleHubContext.SendReturned(element.VendorId, element.Id, element.Number);
+        await _articleHubContext.SendReturned(element);
 
         return Result.Ok();
     }
@@ -260,7 +260,7 @@ public class ArticleStorage
 
             await UpdateAsync(element);
 
-            await _articleHubContext.SendReturned(element.VendorId, element.Id, element.Number);
+            await _articleHubContext.SendReturned(element);
         }
 
         return Result.Ok();

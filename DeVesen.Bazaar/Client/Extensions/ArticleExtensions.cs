@@ -44,4 +44,28 @@ public static class ArticleExtensions
             Returned = data.Returned
         };
     }
+
+    public static Article ToModel(this ArticleDto data)
+    {
+        return new Article
+        {
+            Id = data.Id,
+            VendorId = data.VendorId,
+            Number = data.Number,
+
+            ArticleCategory = data.ArticleCategory,
+            Manufacturer = data.Manufacturer,
+            Description = data.Description,
+
+            Price01 = data.Price01,
+            Price02 = data.Price02,
+            Created = data.Created,
+
+            ApprovedForSale = data.ApprovedForSale,
+            Sold = data.Sold,
+            SoldAt = data.SoldAt,
+            Returned = data.Returned,
+            Settled = data.Settled
+        };
+    }
 }

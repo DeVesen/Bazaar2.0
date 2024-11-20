@@ -40,10 +40,10 @@ builder.Services.AddSingleton<ILiteDbEngine, LiteDbEngine>(_ => new LiteDbEngine
 
 builder.Services.AddTransient<SystemClock>();
 
-builder.Services.AddTransient<VendorHubContext>();
-builder.Services.AddTransient<ArticleHubContext>();
-builder.Services.AddTransient<ArticleCategoryHubContext>();
-builder.Services.AddTransient<ManufacturerHubContext>();
+builder.Services.AddSingleton<VendorHubContext>();
+builder.Services.AddSingleton<ArticleHubContext>();
+builder.Services.AddSingleton<ArticleCategoryHubContext>();
+builder.Services.AddSingleton<ManufacturerHubContext>();
 
 builder.Services.AddTransient<IArticleCategoryRepository, ArticleCategoryLiteDbRepository>()
                 .AddTransient<IManufacturerRepository, ManufacturerLiteDbRepository>()

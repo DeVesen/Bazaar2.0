@@ -14,7 +14,7 @@ namespace DeVesen.Bazaar.Server.Controllers;
 public class ArticleController(ArticleStorage articleStorage, ArticleValidator articleValidator, ArticleNumberService articleNumberService) : ControllerBase
 {
     [HttpGet("next-number")]
-    public async Task<NextArticleNumberDto> GetAllAsync()
+    public async Task<NextArticleNumberDto> GetNextNumber()
     {
         var nextNumber = await articleNumberService.GetNextNumber();
 

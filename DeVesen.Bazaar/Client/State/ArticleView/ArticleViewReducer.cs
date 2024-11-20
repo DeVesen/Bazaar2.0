@@ -49,7 +49,7 @@ public static class ArticleViewReducer
     [ReducerMethod]
     public static ArticleViewState RemoveItem(ArticleViewState state, ArticleViewActions.RemoveItem action)
     {
-        var newList = state.Items.Where(p => p.Id != action.ArticleId)
+        var newList = state.Items.Where(p => p.Id != action.Article.Id)
                                  .ToArray();
 
         return state with { Items = newList };

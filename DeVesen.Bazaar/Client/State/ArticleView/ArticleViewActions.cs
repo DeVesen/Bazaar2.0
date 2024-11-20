@@ -13,12 +13,9 @@ public class ArticleViewActions
     public record Clear;
 
 
-    public record LoadItem(string VendorId, string ArticleId, long ArticleNumber);
-
     public record SetItem(Article Article);
 
-
-    public record RemoveItem(string VendorId, string ArticleId, long ArticleNumber);
+    public record RemoveItem(Article Article);
 
 
     public record SetBadVendor(string VendorId);

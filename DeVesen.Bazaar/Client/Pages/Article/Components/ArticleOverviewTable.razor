@@ -1,0 +1,58 @@
+﻿@using DeVesen.Bazaar.Client.Models
+@using DeVesen.Bazaar.Client.State.ArticleView
+
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+
+@inject IState<ArticleViewState> ArticleState
+@inject ArticleViewFacade ArticleFacade
+
+@if (ArticleState.Value.BadVendor)
+{
+    <MudAlert Variant="Variant.Filled"
+              Severity="Severity.Error"
+              ContentAlignment="HorizontalAlignment.Center">Händler wurde gelöscht, bitte Seite aktuallisieren.</MudAlert>
+}
+else
+{
+    <MudTable T="Article"
+              FixedHeader
+              Hover
+              Loading="@(ArticleState.Value.IsLoaded is false)"
+              Items="@ArticleState.Value.Items"
+              SortLabel="Sort By"
+              OnRowClick="x => ModifyArticleAsync(x.Item!)">
+        <HeaderContent>
+            <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Number)">Nummer</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.ArticleCategory)">Kategorie</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Manufacturer)">Hersteller</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Description)">Beschreibung</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Price01)">Preis</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<Article, object>(x => x.Status)">Status</MudTableSortLabel></MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Nummer">@context.Number</MudTd>
+            <MudTd DataLabel="Kategorie">@context.ArticleCategory</MudTd>
+            <MudTd DataLabel="Hersteller">@context.Manufacturer</MudTd>
+            <MudTd DataLabel="Beschreibung">@context.Description</MudTd>
+            <MudTd DataLabel="Preis">@context.Price01</MudTd>
+            <MudTd DataLabel="Status">@context.StatusText</MudTd>
+        </RowTemplate>
+    </MudTable>
+}
+
+@code {
+    [Parameter]
+    public EventCallback<Article> RowClicked { get; set; }
+
+    protected override async ValueTask DisposeAsyncCore(bool disposing)
+    {
+        await base.DisposeAsyncCore(disposing);
+        await ArticleFacade.StopCallbacks();
+        ArticleFacade.Clear();
+    }
+
+    private async Task ModifyArticleAsync(Article article)
+    {
+        await RowClicked.InvokeAsync(article);
+    }
+}

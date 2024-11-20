@@ -17,9 +17,9 @@ public record Article
     public string Id { get; init; } = string.Empty;
     public required string VendorId { get; init; }
     public long Number { get; set; }
+
     public string ArticleCategory { get; set; } = string.Empty;
     public string Manufacturer { get; set; } = string.Empty;
-
     public string Description { get; set; } = string.Empty;
 
     public double Price01 { get; set; }
