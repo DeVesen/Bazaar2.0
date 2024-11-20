@@ -15,6 +15,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeVesen.Bazaar.Shared", "De
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeVesen.Bazaar.Server.Tests", "DeVesen.Bazaar.Server.Tests\DeVesen.Bazaar.Server.Tests.csproj", "{A5A02190-7028-43EB-85E5-B5FB34BE4361}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Simulators", "Simulators", "{52A20E1D-B4C2-44FE-8C02-98651B85817A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeVesen.Bazaar.ClientSimulator", "DeVesen.Bazaar.ClientSimulator\DeVesen.Bazaar.ClientSimulator.csproj", "{1E74D4DC-3D2D-4019-8593-B51ABE4EAC88}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,6 +41,10 @@ Global
 		{A5A02190-7028-43EB-85E5-B5FB34BE4361}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A5A02190-7028-43EB-85E5-B5FB34BE4361}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A5A02190-7028-43EB-85E5-B5FB34BE4361}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1E74D4DC-3D2D-4019-8593-B51ABE4EAC88}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E74D4DC-3D2D-4019-8593-B51ABE4EAC88}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E74D4DC-3D2D-4019-8593-B51ABE4EAC88}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E74D4DC-3D2D-4019-8593-B51ABE4EAC88}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -46,6 +54,7 @@ Global
 		{D10BA03D-B87E-4A2D-96C9-1E3133CFF980} = {2F4D7058-D5A3-4B5E-8AB6-C6F148BE7319}
 		{87D53E22-8284-4E97-9B95-D511F0ED2C4A} = {2F4D7058-D5A3-4B5E-8AB6-C6F148BE7319}
 		{A5A02190-7028-43EB-85E5-B5FB34BE4361} = {1CBD02FD-DBBB-40D0-AC9C-6A96BC855EEE}
+		{1E74D4DC-3D2D-4019-8593-B51ABE4EAC88} = {52A20E1D-B4C2-44FE-8C02-98651B85817A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5E9CE496-656F-4BDB-B539-939D202005B8}
