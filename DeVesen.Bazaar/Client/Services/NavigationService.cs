@@ -1,5 +1,4 @@
-﻿using DeVesen.Bazaar.Client.Models;
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
 namespace DeVesen.Bazaar.Client.Services;

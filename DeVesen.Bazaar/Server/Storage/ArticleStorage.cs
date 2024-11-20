@@ -5,7 +5,6 @@ using DeVesen.Bazaar.Server.Hubs;
 using DeVesen.Bazaar.Shared.Events;
 using DeVesen.Bazaar.Shared.Services;
 using FluentResults;
-using static MudBlazor.CategoryTypes;
 
 namespace DeVesen.Bazaar.Server.Storage;
 

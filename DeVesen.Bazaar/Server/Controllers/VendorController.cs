@@ -4,7 +4,6 @@ using DeVesen.Bazaar.Server.Extensions;
 using DeVesen.Bazaar.Server.Services;
 using DeVesen.Bazaar.Server.Storage;
 using DeVesen.Bazaar.Shared;
-using DeVesen.Bazaar.Shared.Statistics;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DeVesen.Bazaar.Server.Controllers;
