@@ -59,14 +59,16 @@ public class UriBuilder
         return this;
     }
 
-    public UriBuilder AddUriPart(string part)
+    public UriBuilder AddUriPart(object part)
     {
-        if (string.IsNullOrWhiteSpace(part))
+        var partStr = part.ToString()!;
+
+        if (string.IsNullOrWhiteSpace(partStr))
         {
             part = string.Empty;
         }
 
-        _uriParts.Add(part.Trim('/'));
+        _uriParts.Add(partStr.Trim('/'));
 
         return this;
     }

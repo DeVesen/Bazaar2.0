@@ -1,5 +1,4 @@
-﻿using System.Net.Http.Json;
-using DeVesen.Bazaar.Client.Domain;
+﻿using DeVesen.Bazaar.Client.Domain;
 using DeVesen.Bazaar.Client.Extensions;
 using DeVesen.Bazaar.Client.Models;
 using DeVesen.Bazaar.Shared;
@@ -7,195 +6,156 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
 namespace DeVesen.Bazaar.Client.Services;
 
-public class ArticleService
+public class ArticleService(IWebAssemblyHostEnvironment hostEnvironment,
+                            HttpClient httpClient,
+                            SnackBarService snackBarService) : BaseService(hostEnvironment, httpClient, "api/v1/Article")
 {
-    private readonly HttpClient _httpClient;
-    private readonly SnackBarService _snackBarService;
-
-    public ArticleService(IWebAssemblyHostEnvironment hostEnvironment,
-        HttpClient httpClient, SnackBarService snackBarService)
+    public async Task<Response<Article>> GetByNumber(long number)
     {
-        _httpClient = httpClient;
-        _snackBarService = snackBarService;
-        _httpClient.BaseAddress = hostEnvironment.GetApiEndpointUrl("api/v1/Article");
-    }
+        var requestUri = new UriBuilder(BaseAddress)
+            .AddUriPart("by-number")
+            .AddUriPart(number)
+            .Build();
 
-    public async Task<Response<long>> GetNextNumber()
-    {
-        try
-        {
-            var requestUri = new UriBuilder(_httpClient.BaseAddress)
-                .AddUriPart("next-number")
-                .Build();
+        var response = await GetFromJsonAsync<Article>(requestUri);
 
-            var dtoElement =
-                await _httpClient.GetFromJsonAsync<NextArticleNumberDto>(requestUri);
-
-            return dtoElement != null
-                ? Response<long>.Valid(dtoElement.Number)
-                : Response<long>.Invalid("Invalid response!");
-        }
-        catch (Exception ex)
-        {
-            return Response<long>.Invalid(ex.Message);
-        }
-    }
-
-    public async Task<Response<Article?>> GetByNumber(long number)
-    {
-        var result = await GetAllAsync(number: number.ToString());
-
-        return result.IsValid 
-            ? Response<Article?>.Valid(result.Value.FirstOrDefault(p => p.Number == number))
-            : Response<Article?>.Invalid(result.ErrorMessages);
+        return response.IsSuccess
+            ? Response<Article>.Valid(response.ResponsedData)
+            : Response<Article>.Invalid(response.ErrorMsg);
     }
 
     public async Task<Response<IEnumerable<Article>>> GetAllAsync(string? vendorId = null, string? number = null, string? searchText = null)
     {
-        try
-        {
-            var requestUri = new UriBuilder(_httpClient.BaseAddress)
-                .SetQueryItem("VendorId", vendorId)
-                .SetQueryItem("Number", number)
-                .SetQueryItem("SearchText", searchText)
-                .Build();
+        var requestUri = new UriBuilder(BaseAddress)
+            .AddUriPart("list")
+            .SetQueryItem("VendorId", vendorId)
+            .SetQueryItem("Number", number)
+            .SetQueryItem("SearchText", searchText)
+            .Build();
 
-            var dtoElements =
-                await _httpClient.GetFromJsonAsync<IEnumerable<ArticleDto>>(requestUri) ?? [];
+        var response = await GetFromJsonAsync<IEnumerable<Article>>(requestUri);
 
-            var domainElements = MapToDomain(dtoElements);
-
-            return Response<IEnumerable<Article>>.Valid(domainElements.ToArray());
-        }
-        catch (Exception ex)
-        {
-            return Response<IEnumerable<Article>>.Invalid(ex.Message);
-        }
+        return response.IsSuccess
+            ? Response<IEnumerable<Article>>.Valid(response.ResponsedData)
+            : Response<IEnumerable<Article>>.Invalid(response.ErrorMsg);
     }
+
 
     public async Task<Response> CreateAsync(Article element, bool showResultSnackBar = true)
     {
-        var requestUri = _httpClient.BaseAddress;
+        var requestUri = new UriBuilder(BaseAddress)
+            .Build();
+
         var createDto = element.ToCreateDto();
+        var response = await PostAsJsonAsync(requestUri, createDto);
 
-        var response = await _httpClient.PostAsJsonAsync(requestUri, createDto);
-
-        if (response.IsSuccessStatusCode)
+        if (response.IsSuccess)
         {
             if (showResultSnackBar)
             {
-                _snackBarService.AddInfo($"Artikel '{element.Number}' - '{element.Description}' erfolgreich angelegt ...");
+                snackBarService.AddInfo($"Artikel '{element.Number}' - '{element.Description}' erfolgreich angelegt ...");
             }
 
             return Response.Valid();
         }
 
-        var message = await response.Content.ReadFromJsonAsync<FailedRequestMessage>();
-
         if (showResultSnackBar)
         {
-            _snackBarService.AddError($"Ausnahmefehler {response.StatusCode}{Environment.NewLine}{message!.Message}");
+            snackBarService.AddError($"Ausnahmefehler {response.StatusCode}{Environment.NewLine}{response.ErrorMsg}");
         }
 
-        return Response.Invalid(message!.Message);
+        return Response.Invalid(response.ErrorMsg);
     }
 
     public async Task<Response> UpdateAsync(Article element)
     {
-        var requestUri = _httpClient.BaseAddress + $"/{element.Id}";
+        var requestUri = new UriBuilder(BaseAddress)
+            .AddUriPart(element.Id)
+            .Build();
+
         var updateDto = element.ToUpdateDto();
+        var response = await PutAsJsonAsync(requestUri, updateDto);
 
-        var response = await _httpClient.PutAsJsonAsync(requestUri, updateDto);
-
-        if (response.IsSuccessStatusCode)
+        if (response.IsSuccess)
         {
-            _snackBarService.AddInfo($"Artikel '{element.Number}' - '{element.Description}' erfolgreich geändert ...");
+            snackBarService.AddInfo($"Artikel '{element.Number}' - '{element.Description}' erfolgreich geändert ...");
             return Response.Valid();
         }
 
-        var message = await response.Content.ReadFromJsonAsync<FailedRequestMessage>();
+        snackBarService.AddError($"Ausnahmefehler {response.StatusCode}{Environment.NewLine}{response.ErrorMsg}");
 
-        _snackBarService.AddError($"Ausnahmefehler {response.StatusCode}{Environment.NewLine}{message!.Message}");
-        return Response.Invalid();
+        return Response.Invalid(response.ErrorMsg);
     }
 
     public async Task<Response> DeleteAsync(Article element)
     {
-        var requestUri = _httpClient.BaseAddress + $"/{element.Id}";
+        var requestUri = new UriBuilder(BaseAddress)
+            .AddUriPart(element.Id)
+            .Build();
 
-        var response = await _httpClient.DeleteAsync(requestUri);
+        var response = await base.DeleteAsync(requestUri);
 
-        if (response.IsSuccessStatusCode)
+        if (response.IsSuccess)
         {
-            _snackBarService.AddInfo($"Artikel '{element.Number}' - '{element.Description}' erfolgreich gelöscht ...");
+            snackBarService.AddInfo($"Artikel '{element.Number}' - '{element.Description}' erfolgreich gelöscht ...");
             return Response.Valid();
         }
 
-        var message = await response.Content.ReadFromJsonAsync<FailedRequestMessage>();
+        snackBarService.AddError($"Ausnahmefehler {response.StatusCode}{Environment.NewLine}{response.ErrorMsg}");
 
-        _snackBarService.AddError($"Ausnahmefehler {response.StatusCode}{Environment.NewLine}{message!.Message}");
-        return Response.Invalid();
+        return Response.Invalid(response.ErrorMsg);
     }
 
 
+    public async Task<Response<long>> GetNextNumber()
+    {
+        var requestUri = new UriBuilder(BaseAddress)
+            .AddUriPart("next-number")
+            .Build();
+
+        var response = await GetFromJsonAsync<NextArticleNumberDto>(requestUri);
+
+        return response.IsSuccess
+            ? Response<long>.Valid(response.ResponsedData.Number)
+            : Response<long>.Invalid(response.ErrorMsg);
+    }
+
     public async Task<Response> BookOrderAsync(IEnumerable<SalesOrderDto.Position> soldItems)
     {
+        var requestUri = new UriBuilder(BaseAddress)
+            .AddUriPart("book-sale")
+            .Build();
+
         var soldItemArray = soldItems.ToArray();
-        var requestUri = _httpClient.BaseAddress + "/book-sale";
-        var response = await _httpClient.PostAsJsonAsync(requestUri, new SalesOrderDto(soldItemArray));
+        var postData = new SalesOrderDto(soldItemArray);
+        var response = await PostAsJsonAsync(requestUri, postData);
 
-        if (response.IsSuccessStatusCode)
+        if (response.IsSuccess is false)
         {
-            var itemsCount = soldItemArray.Length;
-            var itemsTotal = soldItemArray.Sum(p => p.Price);
-
-            _snackBarService.AddInfo($"{itemsCount} Artikel für {itemsTotal} € erfolgreich verkauft.");
-            return Response.Valid();
+            return Response.Invalid(response.ErrorMsg);
         }
 
-        var message = await response.Content.ReadFromJsonAsync<FailedRequestMessage>();
+        var itemsCount = soldItemArray.Length;
+        var itemsTotal = soldItemArray.Sum(p => p.Price);
 
-        return Response.Invalid(message!.Message);
+        snackBarService.AddInfo($"{itemsCount} Artikel für {itemsTotal} € erfolgreich verkauft.");
+
+        return Response.Valid();
+
     }
 
     public async Task<Response> ApproveAsync(long articleNumber, string vendorId)
     {
-        var requestUri = _httpClient.BaseAddress + $"/{articleNumber}/approve-for/{vendorId}";
-        var response = await _httpClient.PostAsync(requestUri, null);
+        var requestUri = new UriBuilder(BaseAddress)
+            .AddUriPart(articleNumber)
+            .AddUriPart("approve-for")
+            .AddUriPart(vendorId)
+            .Build();
 
-        if (response.IsSuccessStatusCode)
-        {
-            return Response.Valid();
-        }
+        var response = await PostAsync(requestUri);
 
-        var message = await response.Content.ReadFromJsonAsync<FailedRequestMessage>();
-
-        return Response.Invalid(message!.Message);
+        return response.IsSuccess
+            ? Response.Valid()
+            : Response.Invalid(response.ErrorMsg);
     }
-
-
-    internal static IEnumerable<Article> MapToDomain(IEnumerable<ArticleDto> elements)
-        => elements.Select(MapToDomain);
-
-    internal static Article MapToDomain(ArticleDto dtoElement)
-        => new()
-        {
-            Id = dtoElement.Id,
-            VendorId = dtoElement.VendorId,
-            Number = dtoElement.Number,
-
-            ArticleCategory = dtoElement.ArticleCategory,
-            Manufacturer = dtoElement.Manufacturer,
-            Description = dtoElement.Description,
-
-            Price01 = dtoElement.Price01,
-            Price02 = dtoElement.Price02,
-            Created = dtoElement.Created,
-
-            ApprovedForSale = dtoElement.ApprovedForSale,
-            Sold = dtoElement.Sold,
-            SoldAt = dtoElement.SoldAt,
-            Returned = dtoElement.Returned,
-            Settled = dtoElement.Settled
-        };
 }

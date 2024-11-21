@@ -10,11 +10,14 @@ public interface IArticleRepository
 
     public Task<bool> ExistByNumberAsync(long number, string? allowedId);
 
+
     public Task<(bool Exist, ArticleEntity? Entity)> TryGetByIdAsync(string id);
 
     public Task<(bool Exist, ArticleEntity? Entity)> TryGetByNumberAsync(long number);
 
+
     public Task<IEnumerable<ArticleEntity>> GetAllAsync();
+
 
     public Task CreateAsync(ArticleEntity entity);
 

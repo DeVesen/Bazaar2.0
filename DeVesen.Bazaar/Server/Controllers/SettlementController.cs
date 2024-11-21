@@ -50,16 +50,14 @@ public class SettlementController(VendorStorage vendorStorage, ArticleStorage ar
 
         return result.IsSuccess
             ? Ok()
-            : BadRequest(new FailedRequestMessage(result.Errors.First().Message));
+            : BadRequest(new FailedRequestMessage(result.Error));
     }
 
     [HttpPut("{vendorId}/settle")]
     public async Task<ActionResult> SettleAsync(string vendorId)
     {
-        var result = await articleStorage.SettleArticlesAsync(vendorId);
+        await articleStorage.SettleArticlesAsync(vendorId);
 
-        return result.IsSuccess
-            ? Ok()
-            : BadRequest(new FailedRequestMessage(result.Errors.First().Message));
+        return Ok();
     }
 }

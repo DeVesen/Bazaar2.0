@@ -4,7 +4,6 @@ using DeVesen.Bazaar.Server.Extensions;
 using DeVesen.Bazaar.Server.Hubs;
 using DeVesen.Bazaar.Shared.Events;
 using DeVesen.Bazaar.Shared.Services;
-using FluentResults;
 
 namespace DeVesen.Bazaar.Server.Storage;
 
@@ -16,6 +15,7 @@ public class ArticleStorage
     private readonly ArticleHubContext _articleHubContext;
     private readonly SystemClock _systemClock;
 
+
     public ArticleStorage(IVendorRepository vendorRepository, IArticleRepository articleRepository, VendorHubContext vendorHubContext, ArticleHubContext articleHubContext, SystemClock systemClock)
     {
         _vendorRepository = vendorRepository;
@@ -24,6 +24,7 @@ public class ArticleStorage
         _articleHubContext = articleHubContext;
         _vendorHubContext = vendorHubContext;
     }
+
 
     public async Task<bool> ExistByIdAsync(string id)
     {
@@ -35,17 +36,23 @@ public class ArticleStorage
         return await _articleRepository.ExistByNumberAsync(number);
     }
 
-    public async Task<Article> GetByNumberAsync(long number)
+
+    public async Task<(bool Found, Article Article)> TryGetByIdAsync(string id)
+    {
+        var element = await _articleRepository.TryGetByIdAsync(id);
+        return element.Exist
+            ? (true, element.Entity!.ToDomain())
+            : (false, null!);
+    }
+
+    public async Task<(bool Found, Article Article)> TryGetByNumberAsync(long number)
     {
         var element = await _articleRepository.TryGetByNumberAsync(number);
-
-        if (element.Exist is false)
-        {
-            throw new InvalidDataException($"Number '{number}' not found!");
-        }
-
-        return element.Entity!.ToDomain();
+        return element.Exist
+            ? (true, element.Entity!.ToDomain())
+            : (false, null!);
     }
+
 
     public async Task<IEnumerable<Article>> GetAllAsync()
     {
@@ -72,21 +79,13 @@ public class ArticleStorage
         return elements.Select(p => p.ToDomain());
     }
 
-    public async Task CreateAsync(Article element)
-    {
-        if (await ExistByIdAsync(element.Id))
-        {
-            throw new InvalidDataException($"Id '{element.Id}' already exist!");
-        }
 
-        if (await ExistByNumberAsync(element.Number))
+    public async Task<(bool IsSuccess, string Error)> CreateAsync(Article element)
+    {
+        var validationResult = await ValidateCreate(element);
+        if (validationResult.IsSuccess is false)
         {
-            throw new InvalidDataException($"SearchText '{element.Number}' already exist!");
-        }
-            
-        if (await _vendorRepository.ExistByIdAsync(element.VendorId) is false)
-        {
-            throw new InvalidDataException($"Vendor not known by '{element.Id}'!");
+            return (false, validationResult.Error);
         }
 
         await _articleRepository.CreateAsync(element.ToEntity());
@@ -94,28 +93,16 @@ public class ArticleStorage
         await _articleHubContext.SendAdded(element);
 
         _vendorHubContext.SendUpdated(element.VendorId, VendorUpdatedArgs.Reasons.ArticleData);
+
+        return (true, string.Empty);
     }
 
-    public async Task UpdateAsync(Article element)
+    public async Task<(bool IsSuccess, string Error)> UpdateAsync(Article element)
     {
-        if (await ExistByIdAsync(element.Id) is false)
+        var validationResult = await ValidateUpdate(element);
+        if (validationResult.IsSuccess is false)
         {
-            throw new InvalidDataException($"Id '{element.Id}' not found!");
-        }
-
-        if (await ExistByNumberAsync(element.Number))
-        {
-            var entity = await GetByNumberAsync(element.Number);
-
-            if (entity != null && entity.Id != element.Id)
-            {
-                throw new InvalidDataException($"SearchText '{element.Number}' already exist!");
-            }
-        }
-
-        if (await _vendorRepository.ExistByIdAsync(element.VendorId) is false)
-        {
-            throw new InvalidDataException($"Vendor not known by '{element.Id}'!");
+            return (false, validationResult.Error);
         }
 
         await _articleRepository.UpdateAsync(element.ToEntity());
@@ -123,133 +110,145 @@ public class ArticleStorage
         await _articleHubContext.SendUpdated(element);
 
         _vendorHubContext.SendUpdated(element.VendorId, VendorUpdatedArgs.Reasons.ArticleData);
+
+        return (true, string.Empty);
     }
 
-    public async Task DeleteByIdAsync(string id)
+    public async Task<(bool IsSuccess, string Error)> DeleteByIdAsync(string id)
     {
-        var response = await _articleRepository.TryGetByIdAsync(id);
+        var result = await TryGetByIdAsync(id);
 
-        if (response.Exist is false)
+        if (result.Found is false)
         {
-            throw new InvalidDataException($"Id '{id}' not found!");
+            return (false, $"Artikel '{id}' nicht bekannt!");
         }
 
         await _articleRepository.DeleteAsync(id);
 
-        await _articleHubContext.SendRemoved(response.Entity!.ToDomain());
+        await _articleHubContext.SendRemoved(result.Article);
 
-        _vendorHubContext.SendUpdated(response.Entity!.VendorId, VendorUpdatedArgs.Reasons.ArticleData);
+        _vendorHubContext.SendUpdated(result.Article.VendorId, VendorUpdatedArgs.Reasons.ArticleData);
+
+        return (true, string.Empty);
     }
 
-    public async Task BookOrderAsync(IEnumerable<SalesOrder.Position> positions)
+
+    public async Task<(bool IsSuccess, string Error)> BookOrderAsync(IEnumerable<SalesOrder.Position> positions)
     {
         var soldTime = _systemClock.GetNow();
 
         foreach (var item in positions)
         {
-            var element = await GetByNumberAsync(item.Number);
+            var result = await TryGetByNumberAsync(item.Number);
 
-            element.Sold = soldTime;
-            element.SoldAt = item.Price;
+            if (result.Found is false)
+            {
+                return (false, $"Artikel '{item.Number}' nicht bekannt!");
+            }
 
-            await UpdateAsync(element);
+            result.Article.Sold = soldTime;
+            result.Article.SoldAt = item.Price;
 
-            await _articleHubContext.SendSold(element);
+            await UpdateAsync(result.Article);
+
+            await _articleHubContext.SendSold(result.Article);
         }
+
+        return (true, string.Empty);
     }
 
-    public async Task<Result> ApproveArticleAsync(long number, string vendorId)
+    public async Task<(bool IsSuccess, string Error)> ApproveArticleAsync(long number, string vendorId)
     {
-        if (await ExistByNumberAsync(number) is false)
+        var result = await TryGetByNumberAsync(number);
+
+        if (result.Found is false)
         {
-            return Result.Fail($"Artikel {number} nicht gefunden!");
+            return (false, $"Artikel '{number}' nicht bekannt!");
         }
 
-        var element = await GetByNumberAsync(number);
-
-        if (element.VendorId != vendorId)
+        if (result.Article.VendorId != vendorId)
         {
-            return Result.Fail($"Artikel {number} gehört nicht zu diesem Händler!");
+            return (false, $"Artikel {number} gehört nicht zu diesem Händler!");
         }
 
-        if (element.Settled.HasValue)
+        if (result.Article.Settled.HasValue)
         {
-            return Result.Fail($"Artikel {number} ist bereits abgerechnet!");
+            return (false, $"Artikel {number} ist bereits abgerechnet!");
         }
 
-        if (element.Returned.HasValue)
+        if (result.Article.Returned.HasValue)
         {
-            return Result.Fail($"Artikel {number} ist zurückgegeben!");
+            return (false, $"Artikel {number} ist zurückgegeben!");
         }
 
-        if (element.SoldAt.HasValue)
+        if (result.Article.SoldAt.HasValue)
         {
-            return Result.Fail($"Artikel {number} wurde bereits verkauft!");
+            return (false, $"Artikel {number} wurde bereits verkauft!");
         }
 
-        if (element.ApprovedForSale.HasValue)
+        if (result.Article.ApprovedForSale.HasValue)
         {
-            return Result.Ok();
+            return (true, string.Empty);
         }
 
-        element.ApprovedForSale = _systemClock.GetNow();
+        result.Article.ApprovedForSale = _systemClock.GetNow();
 
-        await UpdateAsync(element);
+        await UpdateAsync(result.Article);
 
-        await _articleHubContext.SendApproved(element);
+        await _articleHubContext.SendApproved(result.Article);
 
-        return Result.Ok();
+        return (true, string.Empty);
     }
 
-    public async Task<Result> GiveBackArticleAsync(long number, string vendorId)
+    public async Task<(bool IsSuccess, string Error)> GiveBackArticleAsync(long number, string vendorId)
     {
-        if (await ExistByNumberAsync(number) is false)
+        var result = await TryGetByNumberAsync(number);
+
+        if (result.Found is false)
         {
-            return Result.Fail($"Artikel {number} nicht gefunden!");
+            return (false, $"Artikel '{number}' nicht bekannt!");
         }
 
-        var element = await GetByNumberAsync(number);
-
-        if (element.VendorId != vendorId)
+        if (result.Article.VendorId != vendorId)
         {
-            return Result.Fail($"Artikel {number} gehört nicht zu diesem Händler!");
+            return (false, $"Artikel {number} gehört nicht zu diesem Händler!");
         }
 
-        if (element.Settled.HasValue)
+        if (result.Article.Settled.HasValue)
         {
-            return Result.Fail($"Artikel {number} ist bereits abgerechnet!");
+            return (false, $"Artikel {number} ist bereits abgerechnet!");
         }
 
-        if (element.Returned.HasValue)
+        if (result.Article.Returned.HasValue)
         {
-            return Result.Fail($"Artikel {number} ist zurückgegeben!");
+            return (false, $"Artikel {number} ist zurückgegeben!");
         }
 
-        if (element.SoldAt.HasValue)
+        if (result.Article.SoldAt.HasValue)
         {
-            return Result.Fail($"Artikel {number} wurde bereits verkauft!");
+            return (false, $"Artikel {number} wurde bereits verkauft!");
         }
 
-        if (element.ApprovedForSale.HasValue is false)
+        if (result.Article.ApprovedForSale.HasValue is false)
         {
-            return Result.Fail($"Artikel {number} war noch nicht übernommen!");
+            return (false, $"Artikel {number} war noch nicht übernommen!");
         }
 
-        if (element.Returned.HasValue)
+        if (result.Article.Returned.HasValue)
         {
-            return Result.Ok();
+            return (true, string.Empty);
         }
 
-        element.Returned = _systemClock.GetNow();
+        result.Article.Returned = _systemClock.GetNow();
 
-        await UpdateAsync(element);
+        await UpdateAsync(result.Article);
 
-        await _articleHubContext.SendReturned(element);
+        await _articleHubContext.SendReturned(result.Article);
 
-        return Result.Ok();
+        return (true, string.Empty);
     }
 
-    public async Task<Result> SettleArticlesAsync(string vendorId)
+    public async Task SettleArticlesAsync(string vendorId)
     {
         var elements = await GetAllAsync(new ArticleFilter { VendorId = vendorId });
 
@@ -261,7 +260,59 @@ public class ArticleStorage
 
             await _articleHubContext.SendReturned(element);
         }
+    }
 
-        return Result.Ok();
+
+    private async Task<(bool IsSuccess, string Error)> ValidateCreate(Article element)
+    {
+        if (await ExistByIdAsync(element.Id))
+        {
+            return (false, $"Artikel-Id '{element.Id}' existiert bereits!");
+        }
+
+        if (await ArticleNumberAlreadyInUsedByOther(element.Number))
+        {
+            return (false, $"Artikel-Nummer '{element.Number}' existiert bereits!");
+        }
+
+        if (await _vendorRepository.ExistByIdAsync(element.VendorId) is false)
+        {
+            return (false, $"Verkäufer '{element.Id}' nicht bekannt!");
+        }
+
+        return (true, string.Empty);
+    }
+
+    private async Task<(bool IsSuccess, string Error)> ValidateUpdate(Article element)
+    {
+        if (await ExistByIdAsync(element.Id) is false)
+        {
+            return (false, $"Artikel '{element.Id}' nicht bekannt!");
+        }
+
+        if (await ArticleNumberAlreadyInUsedByOther(element.Number, element.Id))
+        {
+            return (false, $"Artikel-Nummer '{element.Number}' existiert bereits!");
+        }
+
+        if (await _vendorRepository.ExistByIdAsync(element.VendorId) is false)
+        {
+            throw new InvalidDataException($"Verkäufer '{element.Id}' nicht bekannt!");
+        }
+
+        return (true, string.Empty);
+    }
+
+
+    private async Task<bool> ArticleNumberAlreadyInUsedByOther(long number, string? ownId = null)
+    {
+        var resultByNumber = await TryGetByNumberAsync(number);
+
+        if (!resultByNumber.Found)
+        {
+            return false;
+        }
+
+        return resultByNumber.Article.Id != ownId;
     }
 }

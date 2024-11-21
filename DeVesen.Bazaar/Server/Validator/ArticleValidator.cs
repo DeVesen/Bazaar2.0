@@ -81,8 +81,8 @@ public class ArticleValidator : BaseValidator<Article>
             return true;
         }
 
-        var element = await _articleStorage.GetByNumberAsync(number);
+        var result = await _articleStorage.TryGetByNumberAsync(number);
 
-        return element.Id == validateElement.Id;
+        return result.Found && result.Article.Id == validateElement.Id;
     }
 }

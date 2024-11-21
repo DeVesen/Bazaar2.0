@@ -13,21 +13,34 @@ namespace DeVesen.Bazaar.Server.Controllers;
 [Route("api/v1/[controller]")]
 public class ArticleController(ArticleStorage articleStorage, ArticleValidator articleValidator, ArticleNumberService articleNumberService) : ControllerBase
 {
-    [HttpGet("next-number")]
-    public async Task<NextArticleNumberDto> GetNextNumber()
+    [HttpGet("by-id/{id}")]
+    public async Task<IActionResult> GetByIdAsync(string id)
     {
-        var nextNumber = await articleNumberService.GetNextNumber();
+        var result = await articleStorage.TryGetByIdAsync(id);
 
-        return new NextArticleNumberDto(nextNumber);
+        return result.Found
+            ? Ok()
+            : NotFound($"Artikel '{id}' nicht bekannt!");
     }
 
-    [HttpGet]
+    [HttpGet("by-number/{number}")]
+    public async Task<IActionResult> GetByNumberAsync(long number)
+    {
+        var result = await articleStorage.TryGetByNumberAsync(number);
+
+        return result.Found
+            ? Ok(result.Article)
+            : NotFound($"Artikel '{number}' nicht bekannt!");
+    }
+
+    [HttpGet("list")]
     public async Task<IEnumerable<ArticleDto>> GetAllAsync([FromQuery] ArticleFilter? parameters)
     {
         var elements = await articleStorage.GetAllAsync(parameters ?? new ArticleFilter());
 
         return elements.Select(p => p.ToDto());
     }
+
 
     [HttpPost]
     public async Task<ActionResult> CreateAsync([FromBody] ArticleCreateDto dto)
@@ -37,7 +50,7 @@ public class ArticleController(ArticleStorage articleStorage, ArticleValidator a
 
         if (result.IsValid is false)
         {
-            return BadRequest(new FailedRequestMessage(result.Errors.First().ErrorMessage));
+            return BadRequest(result.Errors.First().ErrorMessage);
         }
 
         await articleStorage.CreateAsync(element);
@@ -58,7 +71,7 @@ public class ArticleController(ArticleStorage articleStorage, ArticleValidator a
 
         if (result.IsValid is false)
         {
-            return BadRequest(new FailedRequestMessage(result.Errors.First().ErrorMessage));
+            return BadRequest(result.Errors.First().ErrorMessage);
         }
 
         await articleStorage.UpdateAsync(element);
@@ -71,7 +84,7 @@ public class ArticleController(ArticleStorage articleStorage, ArticleValidator a
     {
         if (await articleStorage.ExistByIdAsync(id) is false)
         {
-            return NotFound(new FailedRequestMessage(ResourceText.Transform(ResourceText.Article.NotFoundById, _ => id)));
+            return NotFound(ResourceText.Transform(ResourceText.Article.NotFoundById, _ => id));
         }
 
         await articleStorage.DeleteByIdAsync(id);
@@ -79,6 +92,14 @@ public class ArticleController(ArticleStorage articleStorage, ArticleValidator a
         return Ok();
     }
 
+
+    [HttpGet("next-number")]
+    public async Task<NextArticleNumberDto> GetNextNumber()
+    {
+        var nextNumber = await articleNumberService.GetNextNumber();
+
+        return new NextArticleNumberDto(nextNumber);
+    }
 
     [HttpPost("book-sale")]
     public async Task<ActionResult> BookOrderAsync([FromBody] SalesOrderDto dto)
@@ -99,6 +120,6 @@ public class ArticleController(ArticleStorage articleStorage, ArticleValidator a
 
         return result.IsSuccess
             ? Ok()
-            : BadRequest(new FailedRequestMessage(result.Errors.First().Message));
+            : BadRequest(new FailedRequestMessage(result.Error));
     }
 }
