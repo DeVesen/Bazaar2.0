@@ -3,6 +3,7 @@ using DeVesen.Bazaar.Server.Domain;
 using DeVesen.Bazaar.Server.Infrastructure;
 using DeVesen.Bazaar.Shared;
 using DeVesen.Bazaar.Shared.Basics;
+using DeVesen.Bazaar.Shared.Statistics;
 
 namespace DeVesen.Bazaar.Server.Extensions;
 
@@ -114,7 +115,7 @@ public static class ArticleExtensions
 
     public static SalesOrder.Position ToDomain(this SalesOrderDto.Position dto)
         => new(dto.Number, dto.Price);
-
+    
     private static string ToShortHash(this ArticleCreateDto dto)
     {
         var builder = new StringBuilder();
@@ -128,5 +129,55 @@ public static class ArticleExtensions
         builder.Append(DateTime.UtcNow.Ticks);
 
         return builder.ToString().ToShortHash();
+    }
+
+    // //////////////////
+
+    public static bool IsApproved(this ArticleEntity article)
+        => article.ApprovedForSale.HasValue;
+
+    public static bool IsOnSale(this ArticleEntity article)
+        => article.ApprovedForSale.HasValue &&
+           article.Sold.HasValue is false &&
+           article.Returned.HasValue is false &&
+           article.Settled.HasValue is false;
+
+    public static bool IsSold(this ArticleEntity article)
+        => article.Sold.HasValue &&
+           article.Returned.HasValue is false &&
+           article.Settled.HasValue is false;
+
+    public static bool IsReturned(this ArticleEntity article)
+        => article.Returned.HasValue;
+
+    public static bool IsSettled(this ArticleEntity article)
+        => article.Settled.HasValue;
+
+
+    public static CountsStatistics CalculateCounts(this ArticleEntity[] articles)
+    {
+        return new()
+        {
+            Count = articles.Length,
+            Approved = articles.Count(p => p.IsApproved()),
+            OnSale = articles.Count(p => p.IsOnSale()),
+            Sold = articles.Count(p => p.IsSold()),
+            Returned = articles.Count(p => p.IsReturned()),
+            Settled = articles.Count(p => p.IsSettled())
+        };
+    }
+
+    public static ValuesStatistics CalculateValues(this ArticleEntity[] articles, double offerUnitPrice, double salesShare)
+    {
+        return new()
+        {
+            ApprovedValue = articles.Where(p => p.IsApproved())
+                .Sum(p => p.Price01),
+            SoldValue = articles.Where(p => p.IsSold())
+                .Sum(p => p.Price01),
+            OfferValue = articles.Count(p => p.IsApproved()) * offerUnitPrice,
+            ShareValue = articles.Where(p => p.IsSold())
+                .Sum(p => p.SoldAt!.Value) * salesShare
+        };
     }
 }

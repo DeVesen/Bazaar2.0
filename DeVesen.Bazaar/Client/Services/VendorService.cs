@@ -13,6 +13,7 @@ public class VendorService
     private readonly HttpClient _httpClient;
     private readonly SnackBarService _snackBarService;
 
+
     public VendorService(IWebAssemblyHostEnvironment hostEnvironment, HttpClient httpClient, SnackBarService snackBarService)
     {
         _httpClient = httpClient;
@@ -25,6 +26,7 @@ public class VendorService
         try
         {
             var requestUri = new UriBuilder(_httpClient.BaseAddress)
+                .AddUriPart("by-id")
                 .AddUriPart(id)
                 .Build();
 
@@ -49,6 +51,7 @@ public class VendorService
             return Response<VendorOverviewItem>.Invalid(ex.Message);
         }
     }
+
 
     public async Task<Response<Vendor>> CreateAsync(Vendor element)
     {

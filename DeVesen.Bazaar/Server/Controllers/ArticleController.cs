@@ -1,6 +1,7 @@
 ﻿using DeVesen.Bazaar.Server.Basics;
 using DeVesen.Bazaar.Server.Domain;
 using DeVesen.Bazaar.Server.Extensions;
+using DeVesen.Bazaar.Server.Infrastructure;
 using DeVesen.Bazaar.Server.Services;
 using DeVesen.Bazaar.Server.Storage;
 using DeVesen.Bazaar.Server.Validator;
@@ -34,11 +35,9 @@ public class ArticleController(ArticleStorage articleStorage, ArticleValidator a
     }
 
     [HttpGet("list")]
-    public async Task<IEnumerable<ArticleDto>> GetAllAsync([FromQuery] ArticleFilter? parameters)
+    public async Task<IEnumerable<ArticleEntity>> GetAllAsync([FromQuery] ArticleFilter? parameters)
     {
-        var elements = await articleStorage.GetAllAsync(parameters ?? new ArticleFilter());
-
-        return elements.Select(p => p.ToDto());
+        return await articleStorage.GetAllAsync(parameters ?? new ArticleFilter());
     }
 
 
@@ -53,7 +52,7 @@ public class ArticleController(ArticleStorage articleStorage, ArticleValidator a
             return BadRequest(result.Errors.First().ErrorMessage);
         }
 
-        await articleStorage.CreateAsync(element);
+        await articleStorage.CreateAsync(element.ToEntity());
 
         return Ok(new ArticleCreatedDto { Id = element.Id });
     }
@@ -74,7 +73,7 @@ public class ArticleController(ArticleStorage articleStorage, ArticleValidator a
             return BadRequest(result.Errors.First().ErrorMessage);
         }
 
-        await articleStorage.UpdateAsync(element);
+        await articleStorage.UpdateAsync(element.ToEntity());
 
         return Ok();
     }

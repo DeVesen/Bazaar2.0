@@ -2,6 +2,7 @@
 using DeVesen.Bazaar.Server.Domain;
 using DeVesen.Bazaar.Server.Extensions;
 using DeVesen.Bazaar.Server.Hubs;
+using DeVesen.Bazaar.Server.Infrastructure;
 using DeVesen.Bazaar.Shared.Events;
 using DeVesen.Bazaar.Shared.Services;
 
@@ -37,29 +38,29 @@ public class ArticleStorage
     }
 
 
-    public async Task<(bool Found, Article Article)> TryGetByIdAsync(string id)
+    public async Task<(bool Found, ArticleEntity Article)> TryGetByIdAsync(string id)
     {
         var element = await _articleRepository.TryGetByIdAsync(id);
         return element.Exist
-            ? (true, element.Entity!.ToDomain())
+            ? (true, element.Entity!)
             : (false, null!);
     }
 
-    public async Task<(bool Found, Article Article)> TryGetByNumberAsync(long number)
+    public async Task<(bool Found, ArticleEntity Article)> TryGetByNumberAsync(long number)
     {
         var element = await _articleRepository.TryGetByNumberAsync(number);
         return element.Exist
-            ? (true, element.Entity!.ToDomain())
+            ? (true, element.Entity!)
             : (false, null!);
     }
 
 
-    public async Task<IEnumerable<Article>> GetAllAsync()
+    public async Task<IEnumerable<ArticleEntity>> GetAllAsync()
     {
         return await GetAllAsync(new ArticleFilter());
     }
 
-    public async Task<IEnumerable<Article>> GetAllAsync(ArticleFilter articleFilter)
+    public async Task<IEnumerable<ArticleEntity>> GetAllAsync(ArticleFilter articleFilter)
     {
         var elements = await _articleRepository.GetAllAsync();
 
@@ -76,11 +77,11 @@ public class ArticleStorage
             elements = elements.Where(p => p.Description.ToLower().Contains(articleFilter.SearchText.ToLower()));
         }
 
-        return elements.Select(p => p.ToDomain());
+        return elements.Select(p => p);
     }
 
 
-    public async Task<(bool IsSuccess, string Error)> CreateAsync(Article element)
+    public async Task<(bool IsSuccess, string Error)> CreateAsync(ArticleEntity element)
     {
         var validationResult = await ValidateCreate(element);
         if (validationResult.IsSuccess is false)
@@ -88,7 +89,7 @@ public class ArticleStorage
             return (false, validationResult.Error);
         }
 
-        await _articleRepository.CreateAsync(element.ToEntity());
+        await _articleRepository.CreateAsync(element);
 
         await _articleHubContext.SendAdded(element);
 
@@ -97,7 +98,7 @@ public class ArticleStorage
         return (true, string.Empty);
     }
 
-    public async Task<(bool IsSuccess, string Error)> UpdateAsync(Article element)
+    public async Task<(bool IsSuccess, string Error)> UpdateAsync(ArticleEntity element)
     {
         var validationResult = await ValidateUpdate(element);
         if (validationResult.IsSuccess is false)
@@ -105,7 +106,7 @@ public class ArticleStorage
             return (false, validationResult.Error);
         }
 
-        await _articleRepository.UpdateAsync(element.ToEntity());
+        await _articleRepository.UpdateAsync(element);
 
         await _articleHubContext.SendUpdated(element);
 
@@ -263,7 +264,7 @@ public class ArticleStorage
     }
 
 
-    private async Task<(bool IsSuccess, string Error)> ValidateCreate(Article element)
+    private async Task<(bool IsSuccess, string Error)> ValidateCreate(ArticleEntity element)
     {
         if (await ExistByIdAsync(element.Id))
         {
@@ -283,7 +284,7 @@ public class ArticleStorage
         return (true, string.Empty);
     }
 
-    private async Task<(bool IsSuccess, string Error)> ValidateUpdate(Article element)
+    private async Task<(bool IsSuccess, string Error)> ValidateUpdate(ArticleEntity element)
     {
         if (await ExistByIdAsync(element.Id) is false)
         {

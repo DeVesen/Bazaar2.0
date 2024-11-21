@@ -6,9 +6,12 @@ public interface IVendorRepository
 {
     public Task<bool> ExistByIdAsync(string id);
 
-    public Task<VendorEntity> GetAsync(string id);
+
+    public Task<(bool Exist, VendorEntity? Entity)> TryGetByIdAsync(string id);
+
 
     public Task<IEnumerable<VendorEntity>> GetAllAsync();
+
 
     public Task CreateAsync(VendorEntity entity);
 

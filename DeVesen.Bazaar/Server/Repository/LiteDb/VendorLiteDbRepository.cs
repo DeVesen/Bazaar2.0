@@ -23,17 +23,20 @@ public class VendorLiteDbRepository : IVendorRepository
         return await Task.FromResult(element != null);
     }
 
-    public async Task<VendorEntity> GetAsync(string id)
+
+    public async Task<(bool Exist, VendorEntity? Entity)> TryGetByIdAsync(string id)
     {
-        var element = _dbCollection.FindById(id);
-        return await Task.FromResult(element);
+        var element = GetAllEntities().FirstOrDefault(x => x.Id == id);
+        return await Task.FromResult((element != null, element));
     }
+
 
     public async Task<IEnumerable<VendorEntity>> GetAllAsync()
     {
         var element = _dbCollection.FindAll();
         return await Task.FromResult(element);
     }
+
 
     public async Task CreateAsync(VendorEntity entity)
     {

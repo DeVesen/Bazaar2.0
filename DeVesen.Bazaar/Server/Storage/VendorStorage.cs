@@ -20,15 +20,21 @@ public class VendorStorage
         _vendorHubContext = vendorHubContext;
     }
 
+
     public async Task<bool> ExistByIdAsync(string id)
     {
         return await _vendorRepository.ExistByIdAsync(id);
     }
 
-    public async Task<VendorEntity> GetAsync(string vendorId)
+
+    public async Task<(bool Found, VendorEntity Vendor)> TryGetByIdAsync(string vendorId)
     {
-        return await _vendorRepository.GetAsync(vendorId);
+        var element = await _vendorRepository.TryGetByIdAsync(vendorId);
+        return element.Exist
+            ? (true, element.Entity!)
+            : (false, null!);
     }
+
 
     public async Task<IEnumerable<VendorEntity>> GetAllAsync(VendorFilter filter)
     {

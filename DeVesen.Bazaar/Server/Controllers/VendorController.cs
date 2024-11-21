@@ -1,7 +1,6 @@
 ﻿using DeVesen.Bazaar.Server.Basics;
 using DeVesen.Bazaar.Server.Domain;
 using DeVesen.Bazaar.Server.Extensions;
-using DeVesen.Bazaar.Server.Services;
 using DeVesen.Bazaar.Server.Storage;
 using DeVesen.Bazaar.Shared;
 using Microsoft.AspNetCore.Mvc;
@@ -10,9 +9,9 @@ namespace DeVesen.Bazaar.Server.Controllers;
 
 [ApiController]
 [Route("api/v1/[controller]")]
-public class VendorController(VendorStorage vendorStorage, ArticleStorage articleStorage, StatisticsService statisticsLogic) : ControllerBase
+public class VendorController(VendorStorage vendorStorage, ArticleStorage articleStorage) : ControllerBase
 {
-    [HttpGet("{id}")]
+    [HttpGet("by-id/{id}")]
     public async Task<IActionResult> GetByIdAsync(string id)
     {
         var filter = new VendorFilter { Id = id };
@@ -21,11 +20,21 @@ public class VendorController(VendorStorage vendorStorage, ArticleStorage articl
 
         if (item == null)
         {
-            return NotFound();
+            return NotFound($"Verkäufer '{id}' nicht bekannt!");
         }
 
         return Ok(item);
     }
+
+
+    [HttpGet("list")]
+    public async Task<IEnumerable<VendorDto>> GetAllAsync([FromQuery] VendorFilter? parameters)
+    {
+        var elements = await vendorStorage.GetAllAsync(parameters ?? new VendorFilter());
+
+        return elements.Select(p => p.ToDto());
+    }
+
 
     [HttpPost]
     public async Task<ActionResult> CreateAsync([FromBody] VendorCreateDto dto)
@@ -81,8 +90,8 @@ public class VendorController(VendorStorage vendorStorage, ArticleStorage articl
         return vendorView.Select(vendor => new VendorOverviewItemDto
         {
             Vendor = vendor.Vendor.ToDto(),
-            Counts = statisticsLogic.CalculateCounts(vendor.Articles),
-            Values = statisticsLogic.CalculateValues(vendor.Vendor.OfferUnitPrice, vendor.Vendor.SalesShare, vendor.Articles)
+            Counts = vendor.Articles.CalculateCounts(),
+            Values = vendor.Articles.CalculateValues(vendor.Vendor.OfferUnitPrice, vendor.Vendor.SalesShare)
         }).ToList();
     }
 
@@ -94,14 +103,14 @@ public class VendorController(VendorStorage vendorStorage, ArticleStorage articl
             return NotFound();
         }
 
-        var vendor = await vendorStorage.GetAsync(vendorId);
+        var vendor = await vendorStorage.TryGetByIdAsync(vendorId);
         var articles = (await articleStorage.GetAllAsync(new ArticleFilter { VendorId = vendorId })).ToArray();
 
         var result = new VendorStatisticsDto
         {
             VendorId = vendorId,
-            Counts = statisticsLogic.CalculateCounts(articles),
-            Values = statisticsLogic.CalculateValues(vendor.OfferUnitPrice, vendor.SalesShare, articles)
+            Counts = articles.CalculateCounts(),
+            Values = articles.CalculateValues(vendor.Vendor.OfferUnitPrice, vendor.Vendor.SalesShare)
         };
 
         return Ok(result);
