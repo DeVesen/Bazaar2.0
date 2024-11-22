@@ -6,7 +6,7 @@ namespace DeVesen.Bazaar.Client.Validator;
 
 public class VendorValidator : BaseValidator<Vendor>
 {
-    public VendorValidator()
+    public VendorValidator() : base(false)
     {
         RuleFor(x => x.FirstName)
             .NotEmpty().WithMessage("Darf nicht leer sein!")

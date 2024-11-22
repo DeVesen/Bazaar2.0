@@ -1,5 +1,5 @@
-﻿using DeVesen.Bazaar.Server.Domain;
-using DeVesen.Bazaar.Server.Storage;
+﻿using DeVesen.Bazaar.Server.Contracts;
+using DeVesen.Bazaar.Server.Infrastructure;
 using DeVesen.Bazaar.Shared.Basics;
 
 namespace DeVesen.Bazaar.Server.Extensions
@@ -10,8 +10,8 @@ namespace DeVesen.Bazaar.Server.Extensions
         {
             CheckDataDirectory();
 
-            await services.GetService<ManufacturerStorage>()!.InitializeStorage();
-            await services.GetService<ArticleCategoryStorage>()!.InitializeStorage();
+            await services.GetService<IManufacturerRepository>()!.InitializeStorage();
+            await services.GetService<IArticleCategoryRepository>()!.InitializeStorage();
 
             await Task.CompletedTask;
         }
@@ -26,7 +26,7 @@ namespace DeVesen.Bazaar.Server.Extensions
             Directory.CreateDirectory(AppEnvironment.DataDirectory);
         }
 
-        public static async Task InitializeStorage(this ManufacturerStorage storage)
+        public static async Task InitializeStorage(this IManufacturerRepository repository)
         {
             var initialManufacturer = new[]
             {
@@ -192,12 +192,12 @@ namespace DeVesen.Bazaar.Server.Extensions
 
             foreach (var item in initialManufacturer)
             {
-                if (await storage.ExistByNameAsync(item))
+                if (await repository.ExistByNameAsync(item))
                 {
                     continue;
                 }
 
-                await storage.CreateAsync(new Manufacturer
+                await repository.CreateAsync(new ManufacturerEntity
                 {
                     Id = (Guid.NewGuid() + item).ToShortHash(),
                     Name = item
@@ -205,7 +205,7 @@ namespace DeVesen.Bazaar.Server.Extensions
             }
         }
 
-        public static async Task InitializeStorage(this ArticleCategoryStorage storage)
+        public static async Task InitializeStorage(this IArticleCategoryRepository repository)
         {
             var initialCategories = new[]
             {
@@ -313,12 +313,12 @@ namespace DeVesen.Bazaar.Server.Extensions
 
             foreach (var item in initialCategories)
             {
-                if (await storage.ExistByNameAsync(item))
+                if (await repository.ExistByNameAsync(item))
                 {
                     continue;
                 }
 
-                await storage.CreateAsync(new ArticleCategory
+                await repository.CreateAsync(new ArticleCategoryEntity
                 {
                     Id = (Guid.NewGuid() + item).ToShortHash(),
                     Name = item

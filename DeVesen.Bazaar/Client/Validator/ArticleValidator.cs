@@ -10,7 +10,7 @@ public class ArticleValidator : BaseValidator<Article>
     private readonly ArticleCategoryService _articleCategoryService;
     private readonly ManufacturerService _manufacturerService;
 
-    public ArticleValidator(ArticleCategoryService articleCategoryService, ManufacturerService manufacturerService)
+    public ArticleValidator(ArticleCategoryService articleCategoryService, ManufacturerService manufacturerService) : base(false)
     {
         _articleCategoryService = articleCategoryService;
         _manufacturerService = manufacturerService;

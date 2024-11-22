@@ -10,7 +10,7 @@ public class ManufacturerValidator : BaseValidator<Manufacturer>
 {
     private readonly ManufacturerStorage _manufacturerStorage;
 
-    public ManufacturerValidator(ManufacturerStorage manufacturerStorage)
+    public ManufacturerValidator(ManufacturerStorage manufacturerStorage) : base(false)
     {
         _manufacturerStorage = manufacturerStorage;
 

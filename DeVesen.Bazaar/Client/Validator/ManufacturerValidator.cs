@@ -6,7 +6,7 @@ namespace DeVesen.Bazaar.Client.Validator;
 
 public class ManufacturerValidator : BaseValidator<Manufacturer>
 {
-    public ManufacturerValidator()
+    public ManufacturerValidator() : base(false)
     {
         RuleFor(x => x.Id)
             .NotEmpty().WithMessage("'Id' darf nicht leer sein!");

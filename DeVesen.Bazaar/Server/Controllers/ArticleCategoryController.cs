@@ -1,45 +1,34 @@
-using DeVesen.Bazaar.Server.Basics;
-using DeVesen.Bazaar.Server.Extensions;
+using DeVesen.Bazaar.Server.Infrastructure;
 using DeVesen.Bazaar.Server.Storage;
 using DeVesen.Bazaar.Server.Validator;
 using DeVesen.Bazaar.Shared;
 using Microsoft.AspNetCore.Mvc;
+using System.Text;
+using DeVesen.Bazaar.Shared.Basics;
 
 namespace DeVesen.Bazaar.Server.Controllers;
 
 [ApiController]
 [Route("api/v1/[controller]")]
-public class ArticleCategoryController : ControllerBase
+public class ArticleCategoryController(ArticleCategoryStorage articleCategoryStorage) : ControllerBase
 {
-    private readonly ArticleCategoryStorage _articleCategoryStorage;
-    private readonly ArticleCategoryValidator _articleCategoryValidator;
-
-    public ArticleCategoryController(ArticleCategoryStorage articleCategoryStorage,
-                                     ArticleCategoryValidator articleCategoryValidator)
-    {
-        _articleCategoryStorage = articleCategoryStorage;
-        _articleCategoryValidator = articleCategoryValidator;
-    }
-
     [HttpGet]
-    public async Task<IEnumerable<ArticleCategoryDto>> GetAllAsync()
-    {
-        var elements = await _articleCategoryStorage.GetAllAsync();
-        return elements.Select(p => p.ToDto());
-    }
+    public async Task<IEnumerable<ArticleCategoryEntity>> GetAllAsync()
+        => await articleCategoryStorage.GetAllAsync();
+
 
     [HttpPost]
     public async Task<ActionResult> CreateAsync([FromBody] ArticleCategoryCreateDto dto)
     {
-        var element = dto.ToDomain();
-        var result = await _articleCategoryValidator.ValidateAsync(element);
+        var entity = ToEntity(dto);
+        var result = await new ArticleCategoryValidator(true, articleCategoryStorage).ValidateAsync(entity);
 
         if (result.IsValid is false)
         {
             return BadRequest(result.Errors.First().ErrorMessage);
         }
 
-        await _articleCategoryStorage.CreateAsync(element);
+        await articleCategoryStorage.CreateAsync(entity);
 
         return Ok();
     }
@@ -47,20 +36,15 @@ public class ArticleCategoryController : ControllerBase
     [HttpPut("{id}")]
     public async Task<ActionResult> UpdateAsync(string id, [FromBody] ArticleCategoryUpdateDto dto)
     {
-        if (await _articleCategoryStorage.ExistByIdAsync(id) is false)
-        {
-            return NotFound(ResourceText.Transform(ResourceText.ArticleCategory.NotFoundById, _ => id));
-        }
-
-        var element = (id, dto).ToDomain();
-        var result = await _articleCategoryValidator.ValidateAsync(element);
+        var entity = ToEntity(id, dto);
+        var result = await new ArticleCategoryValidator(false, articleCategoryStorage).ValidateAsync(entity);
 
         if (result.IsValid is false)
         {
             return BadRequest(result.Errors.First().ErrorMessage);
         }
 
-        await _articleCategoryStorage.UpdateAsync(element);
+        await articleCategoryStorage.UpdateAsync(entity);
 
         return Ok();
     }
@@ -68,13 +52,34 @@ public class ArticleCategoryController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteAsync(string id)
     {
-        if (await _articleCategoryStorage.ExistByIdAsync(id) is false)
-        {
-            return NotFound(ResourceText.Transform(ResourceText.ArticleCategory.NotFoundById, _ => id));
-        }
-
-        await _articleCategoryStorage.DeleteAsync(id);
+        await articleCategoryStorage.DeleteAsync(id);
 
         return Ok();
+    }
+
+
+    private static ArticleCategoryEntity ToEntity(ArticleCategoryCreateDto dto)
+        => new()
+        {
+            Id = ToShortHash(dto),
+            Name = dto.Name
+        };
+
+    private static ArticleCategoryEntity ToEntity(string id, ArticleCategoryUpdateDto dto)
+        => new()
+        {
+            Id = id,
+            Name = dto.Name
+        };
+
+    private static string ToShortHash(ArticleCategoryCreateDto dto)
+    {
+        var builder = new StringBuilder();
+
+        builder.Append(dto.Name);
+        builder.Append(Guid.NewGuid().ToString());
+        builder.Append(DateTime.UtcNow.Ticks);
+
+        return builder.ToString().ToShortHash();
     }
 }

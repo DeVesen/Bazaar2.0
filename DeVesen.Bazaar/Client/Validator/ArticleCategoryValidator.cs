@@ -7,7 +7,7 @@ namespace DeVesen.Bazaar.Client.Validator;
 public class ArticleCategoryValidator : BaseValidator<ArticleCategory>
 {
 
-    public ArticleCategoryValidator()
+    public ArticleCategoryValidator() : base(false)
     {
         RuleFor(x => x.Id)
             .NotEmpty().WithMessage("'Id' darf nicht leer sein!");

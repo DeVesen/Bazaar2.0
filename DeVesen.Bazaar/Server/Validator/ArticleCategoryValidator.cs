@@ -1,30 +1,38 @@
 using DeVesen.Bazaar.Server.Basics;
-using DeVesen.Bazaar.Server.Domain;
+using DeVesen.Bazaar.Server.Infrastructure;
 using DeVesen.Bazaar.Server.Storage;
 using DeVesen.Bazaar.Shared.Basics;
 using FluentValidation;
 
 namespace DeVesen.Bazaar.Server.Validator;
 
-public class ArticleCategoryValidator : BaseValidator<ArticleCategory>
+public class ArticleCategoryValidator : BaseValidator<ArticleCategoryEntity>
 {
     private readonly ArticleCategoryStorage _articleCategoryStorage;
 
-    public ArticleCategoryValidator(ArticleCategoryStorage articleCategoryStorage)
+    public ArticleCategoryValidator(bool isCreate, ArticleCategoryStorage articleCategoryStorage) : base(isCreate)
     {
         _articleCategoryStorage = articleCategoryStorage;
 
         RuleFor(x => x.Id)
-            .NotEmpty().WithMessage(ResourceText.Global.IdMayNotBeEmpty);
+            .NotEmpty().WithMessage("'Id' darf nicht leer sein!")
+            .MustAsync(IdIsNotKnown).When(IsCreate).WithMessage("'Id' ist bereits bekannt!")
+            .MustAsync(IdIsKnown).When(IsUpdate).WithMessage("'Id' ist nicht bekannt!");
 
         RuleFor(x => x.Name)
-            .NotNull().WithMessage(ResourceText.Global.NameMayNotBeEmpty)
-            .NotEmpty().WithMessage(ResourceText.Global.NameMayNotBeEmpty)
-            .MaximumLength(20).WithMessage(ResourceText.Transform(ResourceText.Global.NameMayNotBeLongerThan, _ => 20))
-            .MustAsync(BeUniqueNameAsync).WithMessage(ResourceText.Global.NameAlreadyTaken);
+            .NotEmpty().WithMessage("'Bezeichnung' darf nicht leer sein!")
+            .MaximumLength(100).WithMessage("'Bezeichnung' darf nicht lönger 100 Zeichen sein!")
+            .MustAsync(BeUniqueNameAsync).WithMessage("'Bezeichnung' ist bereits vergeben!");
     }
 
-    private async Task<bool> BeUniqueNameAsync(ArticleCategory validateElement, string name, CancellationToken _)
+
+    private async Task<bool> IdIsKnown(string id, CancellationToken _)
+        => await _articleCategoryStorage.ExistByIdAsync(id);
+
+    private async Task<bool> IdIsNotKnown(string id, CancellationToken _)
+        => await _articleCategoryStorage.ExistByIdAsync(id) is false;
+
+    private async Task<bool> BeUniqueNameAsync(ArticleCategoryEntity validateElement, string name, CancellationToken _)
     {
         if (await _articleCategoryStorage.ExistByNameAsync(name) is false)
         {

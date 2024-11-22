@@ -7,7 +7,7 @@ namespace DeVesen.Bazaar.Server.Validator;
 
 public class VendorValidator : BaseValidator<VendorEntity>
 {
-    public VendorValidator()
+    public VendorValidator() : base(false)
     {
         RuleFor(x => x.Id)
             .NotEmpty().WithMessage(ResourceText.Global.IdMayNotBeEmpty);

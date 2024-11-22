@@ -11,7 +11,7 @@ public class ArticleValidator : BaseValidator<Article>
     private readonly ArticleStorage _articleStorage;
     private readonly VendorStorage _vendorStorage;
 
-    public ArticleValidator(ArticleStorage articleStorage, VendorStorage vendorStorage)
+    public ArticleValidator(ArticleStorage articleStorage, VendorStorage vendorStorage) : base(false)
     {
         _articleStorage = articleStorage;
         _vendorStorage = vendorStorage;

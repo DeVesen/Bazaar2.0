@@ -1,111 +1,44 @@
 ﻿using DeVesen.Bazaar.Server.Contracts;
-using DeVesen.Bazaar.Server.Domain;
-using DeVesen.Bazaar.Server.Extensions;
 using DeVesen.Bazaar.Server.Hubs;
+using DeVesen.Bazaar.Server.Infrastructure;
 
 namespace DeVesen.Bazaar.Server.Storage
 {
-    public class ArticleCategoryStorage
+    public class ArticleCategoryStorage(IArticleCategoryRepository articleCategoryRepository, ArticleCategoryHubContext articleCategoryHubContext)
     {
-        private readonly IArticleCategoryRepository _articleCategoryRepository;
-        private readonly ArticleCategoryHubContext _articleCategoryHubContext;
-
-        public ArticleCategoryStorage(IArticleCategoryRepository articleCategoryRepository, ArticleCategoryHubContext articleCategoryHubContext)
-        {
-            _articleCategoryRepository = articleCategoryRepository;
-            _articleCategoryHubContext = articleCategoryHubContext;
-        }
-
         public async Task<bool> ExistByIdAsync(string id)
-        {
-            return await _articleCategoryRepository.ExistByIdAsync(id);
-        }
+            => await articleCategoryRepository.ExistByIdAsync(id);
 
         public async Task<bool> ExistByNameAsync(string name)
+            => await articleCategoryRepository.ExistByNameAsync(name);
+
+
+        public Task<ArticleCategoryEntity> GetByNameAsync(string name)
+            => articleCategoryRepository.GetByNameAsync(name);
+
+        public async Task<IEnumerable<ArticleCategoryEntity>> GetAllAsync()
+            => await articleCategoryRepository.GetAllAsync();
+
+
+        public async Task CreateAsync(ArticleCategoryEntity entity)
         {
-            return await _articleCategoryRepository.ExistByNameAsync(name);
+            await articleCategoryRepository.CreateAsync(entity);
+
+            await articleCategoryHubContext.SendAdded();
         }
 
-        public async Task<bool> ExistByNameAsync(string name, string? allowedId)
+        public async Task UpdateAsync(ArticleCategoryEntity entity)
         {
-            return await _articleCategoryRepository.ExistByNameAsync(name, allowedId);
-        }
+            await articleCategoryRepository.UpdateAsync(entity);
 
-        public async Task<ArticleCategory> GetByIdAsync(string id)
-        {
-            if (await ExistByIdAsync(id) is false)
-            {
-                throw new InvalidDataException($"Id '{id}' not found!");
-            }
-
-            var element = await _articleCategoryRepository.GetByIdAsync(id);
-            return element.ToDomain();
-        }
-
-        public async Task<ArticleCategory> GetByNameAsync(string name)
-        {
-            if (await ExistByNameAsync(name) is false)
-            {
-                throw new InvalidDataException($"SearchText '{name}' not found!");
-            }
-
-            var element = await _articleCategoryRepository.GetByNameAsync(name);
-            return element.ToDomain();
-        }
-
-        public async Task<IEnumerable<ArticleCategory>> GetAllAsync()
-        {
-            var elements = await _articleCategoryRepository.GetAllAsync();
-            return elements.Select(p => p.ToDomain());
-        }
-
-        public async Task CreateAsync(ArticleCategory element)
-        {
-            if (await ExistByIdAsync(element.Id))
-            {
-                throw new InvalidDataException($"Id '{element.Id}' already exist!");
-            }
-            if (await ExistByNameAsync(element.Name))
-            {
-                throw new InvalidDataException($"SearchText '{element.Name}' already exist!");
-            }
-
-            await _articleCategoryRepository.CreateAsync(element.ToEntity());
-
-            await _articleCategoryHubContext.SendAdded();
-        }
-
-        public async Task UpdateAsync(ArticleCategory element)
-        {
-            if (await ExistByIdAsync(element.Id) is false)
-            {
-                throw new InvalidDataException($"Id '{element.Id}' not found!");
-            }
-            if (await ExistByNameAsync(element.Name))
-            {
-                var entity = await GetByNameAsync(element.Name);
-
-                if (entity != null && entity.Id != element.Id)
-                {
-                    throw new InvalidDataException($"SearchText '{element.Name}' already exist!");
-                }
-            }
-
-            await _articleCategoryRepository.UpdateAsync(element.ToEntity());
-
-            await _articleCategoryHubContext.SendUpdated(element.Id);
+            await articleCategoryHubContext.SendUpdated(entity.Id);
         }
 
         public async Task DeleteAsync(string id)
         {
-            if (await ExistByIdAsync(id) is false)
-            {
-                throw new InvalidDataException($"Id '{id}' not found!");
-            }
+            await articleCategoryRepository.DeleteAsync(id);
 
-            await _articleCategoryRepository.DeleteAsync(id);
-
-            await _articleCategoryHubContext.SendRemoved(id);
+            await articleCategoryHubContext.SendRemoved(id);
         }
     }
 }
