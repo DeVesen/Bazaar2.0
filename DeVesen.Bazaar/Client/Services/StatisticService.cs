@@ -1,41 +1,26 @@
-﻿using System.Net.Http.Json;
-using DeVesen.Bazaar.Client.Domain;
-using DeVesen.Bazaar.Client.Extensions;
-using DeVesen.Bazaar.Client.Models;
+﻿using DeVesen.Bazaar.Client.Models;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
 namespace DeVesen.Bazaar.Client.Services;
 
-public class StatisticService
+public class StatisticService(IWebAssemblyHostEnvironment hostEnvironment,
+                              HttpClient httpClient,
+                              SnackBarService snackBarService) : BaseService(hostEnvironment, httpClient, "api/v1/Statistic")
 {
-    private readonly HttpClient _httpClient;
-
-    public StatisticService(IWebAssemblyHostEnvironment hostEnvironment, HttpClient httpClient)
+    public async Task<StatisticSummeryView?> GetAsync()
     {
-        _httpClient = httpClient;
-        _httpClient.BaseAddress = hostEnvironment.GetApiEndpointUrl("api/v1/Statistic");
-    }
+        var requestUri = new UriBuilder(BaseAddress)
+            .Build();
 
-    public async Task<Response<StatisticSummeryView>> Get()
-    {
-        try
+        var response = await GetFromJsonAsync<StatisticSummeryView>(requestUri);
+
+        if (response.IsSuccess)
         {
-            var requestUri = new UriBuilder(_httpClient.BaseAddress)
-                .Build();
-
-            var domainElement =
-                await _httpClient.GetFromJsonAsync<StatisticSummeryView>(requestUri);
-
-            if (domainElement == null)
-            {
-                return Response<StatisticSummeryView>.Invalid("No data reseived!");
-            }
-
-            return Response<StatisticSummeryView>.Valid(domainElement);
+            snackBarService.AddError("Statistic konnte nicht geladen werden!");
+            Console.WriteLine($"Statistic Error Code: {response.StatusCode}");
+            Console.WriteLine($"Statistic Error Msg: {response.ResponseData}");
         }
-        catch (Exception ex)
-        {
-            return Response<StatisticSummeryView>.Invalid(ex.Message);
-        }
+
+        return response.Response;
     }
 }

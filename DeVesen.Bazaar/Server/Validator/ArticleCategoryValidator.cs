@@ -10,6 +10,7 @@ public class ArticleCategoryValidator : BaseValidator<ArticleCategoryEntity>
 {
     private readonly ArticleCategoryStorage _articleCategoryStorage;
 
+
     public ArticleCategoryValidator(bool isCreate, ArticleCategoryStorage articleCategoryStorage) : base(isCreate)
     {
         _articleCategoryStorage = articleCategoryStorage;

@@ -31,18 +31,20 @@
 
     private async Task SubmitAsync()
     {
-        await ArticleService.UpdateAsync(Item);
-
-        MudDialog.Close(DialogResult.Ok(true));
+        if (await ArticleService.UpdateAsync(Item))
+        {
+            MudDialog.Close(DialogResult.Ok(true));
+        }
     }
 
     private async Task DeleteAsync()
     {
         if (await DialogService.ShowMessageBox("Artikel wirklich löschen?", yesText: "YES", noText: "NO").IsYes())
         {
-            await ArticleService.DeleteAsync(Item);
-
-            MudDialog.Close(DialogResult.Ok(true));
+            if (await ArticleService.DeleteAsync(Item))
+            {
+                MudDialog.Close(DialogResult.Ok(true));
+            }
         }
     }
 

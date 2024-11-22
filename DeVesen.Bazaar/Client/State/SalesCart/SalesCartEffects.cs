@@ -38,8 +38,9 @@ public class SalesCartEffects
                 .Select(p => new SalesOrderDto.Position(p.ArticleNumber, p.SalesAmount))
                 .ToArray();
 
-        await _articleService.BookOrderAsync(soldItems);
-
-        dispatcher.Dispatch(new SalesCartActions.BookSaleCompleted());
+        if (await _articleService.BookOrderAsync(soldItems))
+        {
+            dispatcher.Dispatch(new SalesCartActions.BookSaleCompleted());
+        }
     }
 }

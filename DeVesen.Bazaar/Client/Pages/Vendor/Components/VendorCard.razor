@@ -86,13 +86,13 @@
 
     private async Task OnArticleDownload()
     {
-        var articles = await ArticleService.GetAllAsync(VendorItem.Vendor.Id);
+        var response = await ArticleService.GetAllAsync(VendorItem.Vendor.Id);
         
         var exportBuilder = new StringBuilder();
 
         exportBuilder.AppendLine(ImportExportService.ArticleToDataLineTitle());
 
-        foreach (var article in articles.Value)
+        foreach (var article in response.Articles)
         {
             exportBuilder.AppendLine(ImportExportService.ArticleToDataLine(article));
         }

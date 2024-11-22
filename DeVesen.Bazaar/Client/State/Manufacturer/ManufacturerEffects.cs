@@ -10,12 +10,12 @@ public class ManufacturerEffects(ManufacturerService manufacturerService)
     {
         var response = await manufacturerService.GetAllAsync(action.Name, action.SearchText);
 
-        if (response.IsValid is false)
+        if (response.IsSuccess is false)
         {
             dispatcher.Dispatch(new ManufacturerActions.FetchFailed());
         }
 
-        var domainElements = response.Value
+        var domainElements = response.Elements
             .OrderBy(p => p.Name)
             .Select(dtoElement => new Models.Manufacturer
             {

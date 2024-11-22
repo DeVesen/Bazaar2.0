@@ -87,7 +87,7 @@
     {
         var result = await SettlementService.GiveBackArticleAsync(VendorId, articleNumber);
 
-        if (result.IsValid)
+        if (result.IsSuccess)
         {
             SetReleaseSuccess($"Artikel {articleNumber} erfolgreich zurückgegeben!");
         }

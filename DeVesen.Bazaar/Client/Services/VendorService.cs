@@ -1,6 +1,4 @@
-﻿using System.Net.Http.Json;
-using DeVesen.Bazaar.Client.Domain;
-using DeVesen.Bazaar.Client.Extensions;
+﻿using DeVesen.Bazaar.Client.Extensions;
 using DeVesen.Bazaar.Client.Models;
 using DeVesen.Bazaar.Shared;
 using DeVesen.Bazaar.Shared.Statistics;
@@ -8,155 +6,119 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
 namespace DeVesen.Bazaar.Client.Services;
 
-public class VendorService
+public class VendorService(IWebAssemblyHostEnvironment hostEnvironment,
+                           HttpClient httpClient,
+                           SnackBarService snackBarService) : BaseService(hostEnvironment, httpClient, "api/v1/Vendor")
 {
-    private readonly HttpClient _httpClient;
-    private readonly SnackBarService _snackBarService;
-
-
-    public VendorService(IWebAssemblyHostEnvironment hostEnvironment, HttpClient httpClient, SnackBarService snackBarService)
+    public async Task<(bool Found, Vendor Vendor)> GetByIdAsync(string id)
     {
-        _httpClient = httpClient;
-        _snackBarService = snackBarService;
-        _httpClient.BaseAddress = hostEnvironment.GetApiEndpointUrl("api/v1/Vendor");
-    }
+        var requestUri = new UriBuilder(BaseAddress)
+            .AddUriPart("by-id")
+            .AddUriPart(id)
+            .Build();
 
-    public async Task<Response<VendorOverviewItem>> GetByIdAsync(string id)
-    {
-        try
-        {
-            var requestUri = new UriBuilder(_httpClient.BaseAddress)
-                .AddUriPart("by-id")
-                .AddUriPart(id)
-                .Build();
+        var response = await GetFromJsonAsync<Vendor>(requestUri);
 
-            if (string.IsNullOrWhiteSpace(id))
-            {
-                return Response<VendorOverviewItem>.Invalid("Verkäufer nicht gefunden!");
-            }
-
-            var response = await _httpClient.GetAsync(requestUri);
-
-            if (response.IsSuccessStatusCode is false)
-            {
-                return Response<VendorOverviewItem>.Invalid("Verkäufer nicht gefunden!");
-            }
-
-            var domainElement = await response.Content.ReadFromJsonAsync<VendorOverviewItem>();
-
-            return Response<VendorOverviewItem>.Valid(domainElement!);
-        }
-        catch (Exception ex)
-        {
-            return Response<VendorOverviewItem>.Invalid(ex.Message);
-        }
+        return response.IsSuccess
+            ? (true, response.Response)
+            : (false, null!);
     }
 
 
-    public async Task<Response<Vendor>> CreateAsync(Vendor element)
+    public async Task<(bool IsSuccess, Vendor Vendor, string ErrorMessage)> CreateAsync(Vendor element)
     {
-        var requestUri = new UriBuilder(_httpClient.BaseAddress)
+        var requestUri = new UriBuilder(BaseAddress)
                                 .Build();
         var createDto = element.ToCreateDto();
 
-        var response = await _httpClient.PostAsJsonAsync(requestUri, createDto);
+        var response = await PostAsJsonAsync<VendorCreateDto, Vendor>(requestUri, createDto);
 
-        if (response.IsSuccessStatusCode)
+        if (response.IsSuccess)
         {
-            var vendor = await response.Content.ReadFromJsonAsync<Vendor>();
+            snackBarService.AddInfo($"Verkäufer '{element.FirstName} {element.LastName}' erfolgreich angelegt ...");
 
-            _snackBarService.AddInfo("Erfolgreich angelegt ...");
-            return Response<Vendor>.Valid(vendor!);
+            return (true, response.Response, string.Empty);
         }
 
-        _snackBarService.AddError($"Ausnahmefehler {response.StatusCode}");
-        return Response<Vendor>.Invalid();
+        snackBarService.AddError($"Verkäufer '{element.FirstName} {element.LastName}' konnte nicht erstellt werden!");
+        Console.WriteLine($"Create {element.FirstName} {element.LastName} Error Code: {response.StatusCode}");
+        Console.WriteLine($"Create {element.FirstName} {element.LastName} Error Msg: {response.ResponseData}");
+
+        return (false, null!, response.ResponseData);
     }
 
-    public async Task<Response> UpdateAsync(Vendor element)
+    public async Task<(bool IsSuccess, string ErrorMessage)> UpdateAsync(Vendor element)
     {
-        var requestUri = new UriBuilder(_httpClient.BaseAddress)
+        var requestUri = new UriBuilder(BaseAddress)
                                 .AddUriPart(element.Id)
                                 .Build();
         var updateDto = element.ToUpdateDto();
 
-        var response = await _httpClient.PutAsJsonAsync(requestUri, updateDto);
+        var response = await PutAsJsonAsync(requestUri, updateDto);
 
-        if (response.IsSuccessStatusCode)
+        if (response.IsSuccess)
         {
-            _snackBarService.AddInfo("Erfolgreich aktualisiert ...");
-            return Response.Valid();
+            snackBarService.AddInfo("Erfolgreich aktualisiert ...");
+            return (true, string.Empty);
         }
 
-        _snackBarService.AddError($"Ausnahmefehler {response.StatusCode}");
-        return Response.Invalid();
+        snackBarService.AddError($"Verkäufer '{element.FirstName} {element.LastName}' konnte nicht geändert werden!");
+        Console.WriteLine($"Update {element.FirstName} {element.LastName} Error Code: {response.StatusCode}");
+        Console.WriteLine($"Update {element.FirstName} {element.LastName} Error Msg: {response.ResponseData}");
+
+        return (false, response.ResponseData);
     }
 
-    public async Task<Response> DeleteAsync(Vendor element)
+    public async Task<(bool IsSuccess, string ErrorMessage)> DeleteAsync(Vendor element)
     {
-        var requestUri = new UriBuilder(_httpClient.BaseAddress)
+        var requestUri = new UriBuilder(BaseAddress)
                                 .AddUriPart(element.Id)
                                 .Build();
 
-        var response = await _httpClient.DeleteAsync(requestUri);
+        var response = await DeleteAsync(requestUri);
 
-        if (response.IsSuccessStatusCode)
+        if (response.IsSuccess)
         {
-            _snackBarService.AddInfo("Erfolgreich gelöscht ...");
-            return Response.Valid();
+            snackBarService.AddInfo("Erfolgreich gelöscht ...");
+            return (true, string.Empty);
         }
 
-        _snackBarService.AddError($"Ausnahmefehler {response.StatusCode}");
-        return Response.Invalid();
+        snackBarService.AddError($"Verkäufer '{element.FirstName} {element.LastName}' konnte nicht gelöscht werden!");
+        Console.WriteLine($"Delete {element.FirstName} {element.LastName} Error Code: {response.StatusCode}");
+        Console.WriteLine($"Delete {element.FirstName} {element.LastName} Error Msg: {response.ResponseData}");
+
+        return (false, response.ResponseData);
     }
 
 
 
-    public async Task<Response<IEnumerable<VendorOverviewItem>>> GetOverviewAsync(string? id = null, string? searchText = null)
+    public async Task<(bool IsSuccess, IEnumerable<VendorOverviewItem> Vendors, string ErrorMessage)> GetOverviewAsync(string? id = null, string? searchText = null)
     {
-        try
-        {
-            var requestUri = new UriBuilder(_httpClient.BaseAddress)
-                .AddUriPart("overview")
-                .SetQueryItem("Id", id)
-                .SetQueryItem("SearchText", searchText)
-                .Build();
+        var requestUri = new UriBuilder(BaseAddress)
+            .AddUriPart("overview")
+            .SetQueryItem("Id", id)
+            .SetQueryItem("SearchText", searchText)
+            .Build();
 
-            var elements =
-                await _httpClient.GetFromJsonAsync<IEnumerable<VendorOverviewItem>>(requestUri) ?? [];
+        var response =
+            await GetFromJsonAsync<IEnumerable<VendorOverviewItem>>(requestUri);
 
-            return Response<IEnumerable<VendorOverviewItem>>.Valid(elements.ToArray());
-        }
-        catch (Exception ex)
-        {
-            return Response<IEnumerable<VendorOverviewItem>>.Invalid(ex.Message);
-        }
+        return response.IsSuccess
+            ? (true, response.Response, string.Empty)
+            : (false, [], response.ResponseData);
     }
 
-    public async Task<Response<(CountsStatistics Counts, ValuesStatistics Values)>> GetStatisticsByVendor(string vendorId)
+    public async Task<(bool IsSuccess, CountsStatistics Counts, ValuesStatistics Values, string ErrorMessage)> GetStatisticsByVendor(string vendorId)
     {
-        try
-        {
-            var requestUri = new UriBuilder(_httpClient.BaseAddress)
-                .AddUriPart(vendorId)
-                .AddUriPart("statistics")
-                .Build();
+        var requestUri = new UriBuilder(BaseAddress)
+            .AddUriPart(vendorId)
+            .AddUriPart("statistics")
+            .Build();
 
-            var response =
-                await _httpClient.GetAsync(requestUri);
+        var response = await GetFromJsonAsync<VendorStatisticsDto>(requestUri);
 
-            if (response.IsSuccessStatusCode is false)
-            {
-                return Response<(CountsStatistics Counts, ValuesStatistics Values)>.Invalid($"Verkäufer Statistik für '{vendorId}' konnte nicht geladen werden: {response.StatusCode}");
-            }
-
-            var statistics = await response.Content.ReadFromJsonAsync<VendorStatisticsDto>();
-
-            return Response<(CountsStatistics Counts, ValuesStatistics Values)>.Valid((statistics!.Counts, statistics.Values));
-        }
-        catch (Exception ex)
-        {
-            return Response<(CountsStatistics Counts, ValuesStatistics Values)>.Invalid(ex.Message);
-        }
+        return response.IsSuccess
+            ? (true, response.Response.Counts, response.Response.Values, string.Empty)
+            : (false, null!, null!, response.ResponseData);
     }
 }

@@ -44,7 +44,7 @@
 
     private async Task<IEnumerable<DvSelector.SelectorItem>> SearchItemsAsync(string searchText, CancellationToken cancellation)
     {
-        var possibleElements = (await ManufacturerService.GetAllAsync()).Value;
+        var possibleElements = (await ManufacturerService.GetAllAsync()).Elements;
 
         if (string.IsNullOrWhiteSpace(searchText) is false)
         {

@@ -1,68 +1,66 @@
-﻿using System.Net.Http.Json;
-using DeVesen.Bazaar.Client.Domain;
-using DeVesen.Bazaar.Client.Extensions;
-using DeVesen.Bazaar.Client.Models;
-using DeVesen.Bazaar.Shared;
+﻿using DeVesen.Bazaar.Client.Models;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
 namespace DeVesen.Bazaar.Client.Services;
 
-public class SettlementService
+public class SettlementService(IWebAssemblyHostEnvironment hostEnvironment,
+                               HttpClient httpClient,
+                               SnackBarService snackBarService) : BaseService(hostEnvironment, httpClient, "api/v1/Settlement")
 {
-    private readonly HttpClient _httpClient;
-
-    public SettlementService(IWebAssemblyHostEnvironment hostEnvironment, HttpClient httpClient)
+    public async Task<(bool IsSuccess, VendorSettlementItem Data)> GetAsync(string vendorId)
     {
-        _httpClient = httpClient;
-        _httpClient.BaseAddress = hostEnvironment.GetApiEndpointUrl("api/v1/Settlement");
+        var requestUri = new UriBuilder(BaseAddress)
+            .AddUriPart(vendorId)
+            .Build();
+
+        var response = await GetFromJsonAsync<VendorSettlementItem>(requestUri);
+
+        if (response.IsSuccess)
+        {
+            snackBarService.AddError($"Verkäufer {vendorId} konnte nicht geladen werden!");
+            Console.WriteLine($"Settlement-Get {vendorId} Error Code: {response.StatusCode}");
+            Console.WriteLine($"Settlement-Get {vendorId} Error Msg: {response.ResponseData}");
+        }
+
+        return (response.IsSuccess, response.Response);
     }
 
-    public async Task<Response<VendorSettlementItem>> GetAsync(string vendorId)
+    public async Task<(bool IsSuccess, string ErrorMessage)> GiveBackArticleAsync(string vendorId, long articleNumber)
     {
-        try
-        {
-            var requestUri = new UriBuilder(_httpClient.BaseAddress)
-                .AddUriPart(vendorId)
-                .Build();
+        var requestUri = new UriBuilder(BaseAddress)
+            .AddUriPart(vendorId)
+            .AddUriPart("giveback")
+            .AddUriPart(articleNumber)
+            .Build();
 
-            var element =
-                await _httpClient.GetFromJsonAsync<VendorSettlementItem>(requestUri);
+        var response = await PostAsync(requestUri, null);
 
-            return Response<VendorSettlementItem>.Valid(element!);
-        }
-        catch (Exception ex)
+        if (response.IsSuccess)
         {
-            return Response<VendorSettlementItem>.Invalid(ex.Message);
+            return (true, string.Empty);
         }
+
+        snackBarService.AddError($"Rückgabe von {articleNumber} an {vendorId} hat nicht geklappt!");
+        Console.WriteLine($"Settle {articleNumber} to {vendorId} Error Code: {response.StatusCode}");
+        Console.WriteLine($"Settle {articleNumber} to {vendorId} Error Msg: {response.ResponseData}");
+
+        return (false, response.ResponseData);
     }
 
-    public async Task<Response> GiveBackArticleAsync(string vendorId, long articleNumber)
+    public async Task SetVendorAsSettledAsync(string vendorId)
     {
-        var requestUri = _httpClient.BaseAddress + $"/{vendorId}/giveback/{articleNumber}";
-        var response = await _httpClient.PostAsync(requestUri, null);
+        var requestUri = new UriBuilder(BaseAddress)
+            .AddUriPart(vendorId)
+            .AddUriPart("settle")
+            .Build();
 
-        if (response.IsSuccessStatusCode)
+        var response = await PutAsync(requestUri, null);
+
+        if (response.IsSuccess is false)
         {
-            return Response.Valid();
+            snackBarService.AddError($"Abrechnen von {vendorId} hat nicht geklappt!");
+            Console.WriteLine($"Settle {vendorId} Error Code: {response.StatusCode}");
+            Console.WriteLine($"Settle {vendorId} Error Msg: {response.ResponseData}");
         }
-
-        var message = await response.Content.ReadFromJsonAsync<FailedRequestMessage>();
-
-        return Response.Invalid(message!.Message);
-    }
-
-    public async Task<Response> SetAsSettledAsync(string vendorId)
-    {
-        var requestUri = _httpClient.BaseAddress + $"/{vendorId}/settle";
-        var response = await _httpClient.PutAsync(requestUri, null);
-
-        if (response.IsSuccessStatusCode)
-        {
-            return Response.Valid();
-        }
-
-        var message = await response.Content.ReadFromJsonAsync<FailedRequestMessage>();
-
-        return Response.Invalid(message!.Message);
     }
 }

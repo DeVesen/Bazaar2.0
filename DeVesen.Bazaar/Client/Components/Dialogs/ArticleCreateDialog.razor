@@ -56,9 +56,10 @@
             _item!.ApprovedForSale = SystemClock.GetNow();
         }
 
-        await ArticleService.CreateAsync(_item);
-
-        MudDialog.Close();
+        if ((await ArticleService.CreateAsync(_item!)).IsSuccess)
+        {
+            MudDialog.Close();
+        }
     }
 
     private void Cancel() => MudDialog.Cancel();

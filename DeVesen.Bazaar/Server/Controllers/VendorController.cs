@@ -23,7 +23,7 @@ public class VendorController(VendorStorage vendorStorage, ArticleStorage articl
             return NotFound($"Verkäufer '{id}' nicht bekannt!");
         }
 
-        return Ok(item);
+        return Ok(item.Vendor);
     }
 
 

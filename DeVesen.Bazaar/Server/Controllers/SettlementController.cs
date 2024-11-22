@@ -43,6 +43,7 @@ public class SettlementController(VendorStorage vendorStorage, ArticleStorage ar
         };
     }
 
+
     [HttpPost("{vendorId}/giveback/{number:long}")]
     public async Task<ActionResult> GiveBackArticleAsync(string vendorId, long number)
     {

@@ -45,12 +45,12 @@ public class ArticleValidator : BaseValidator<Article>
 
     private async Task<bool> BeExistAsArticleCategoryAsync(Article dto, string value, CancellationToken _)
     {
-        return await _articleCategoryService.ExistsAsync(value) is { IsValid: true, Value: true };
+        return await _articleCategoryService.ExistsAsync(value);
     }
 
     private async Task<bool> BeExistAsManufacturerAsync(Article dto, string value, CancellationToken _)
     {
-        return await _manufacturerService.ExistsAsync(value) is { IsValid: true, Value: true };
+        return await _manufacturerService.ExistsAsync(value);
     }
 
     public new Func<object, string, Task<IEnumerable<string>>> ValidateAsync =>

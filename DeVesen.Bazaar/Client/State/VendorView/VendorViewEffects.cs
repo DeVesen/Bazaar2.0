@@ -10,13 +10,13 @@ public class VendorViewEffects(VendorService vendorService)
     {
         var response = await vendorService.GetOverviewAsync(action.Id, action.SearchText);
 
-        if (response.IsValid is false)
+        if (response.IsSuccess is false)
         {
             dispatcher.Dispatch(new VendorViewActions.FetchFailed());
             return;
         }
 
-        dispatcher.Dispatch(new VendorViewActions.SetList(response.Value));
+        dispatcher.Dispatch(new VendorViewActions.SetList(response.Vendors));
     }
 
     [EffectMethod]
@@ -26,32 +26,32 @@ public class VendorViewEffects(VendorService vendorService)
         {
             var vendorResponse = await vendorService.GetByIdAsync(action.Id);
 
-            if (vendorResponse.IsValid is false)
+            if (vendorResponse.Found is false)
             {
                 return;
             }
 
-            dispatcher.Dispatch(new VendorViewActions.SetMasterData(vendorResponse.Value.Vendor));
+            dispatcher.Dispatch(new VendorViewActions.SetMasterData(vendorResponse.Vendor));
 
             var statisticsResponse = await vendorService.GetStatisticsByVendor(action.Id);
 
-            if (statisticsResponse.IsValid is false)
+            if (statisticsResponse.IsSuccess is false)
             {
                 return;
             }
 
-            dispatcher.Dispatch(new VendorViewActions.SetStatistic(action.Id, statisticsResponse.Value.Counts, statisticsResponse.Value.Values));
+            dispatcher.Dispatch(new VendorViewActions.SetStatistic(action.Id, statisticsResponse.Counts, statisticsResponse.Values));
         }
         else if (action.StatisticData)
         {
             var statisticsResponse = await vendorService.GetStatisticsByVendor(action.Id);
 
-            if (statisticsResponse.IsValid is false)
+            if (statisticsResponse.IsSuccess is false)
             {
                 return;
             }
 
-            dispatcher.Dispatch(new VendorViewActions.SetStatistic(action.Id, statisticsResponse.Value.Counts, statisticsResponse.Value.Values));
+            dispatcher.Dispatch(new VendorViewActions.SetStatistic(action.Id, statisticsResponse.Counts, statisticsResponse.Values));
         }
     }
 }

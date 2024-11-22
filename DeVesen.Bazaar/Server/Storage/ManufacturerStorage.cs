@@ -1,110 +1,48 @@
 ﻿using DeVesen.Bazaar.Server.Contracts;
-using DeVesen.Bazaar.Server.Domain;
-using DeVesen.Bazaar.Server.Extensions;
 using DeVesen.Bazaar.Server.Hubs;
+using DeVesen.Bazaar.Server.Infrastructure;
 
 namespace DeVesen.Bazaar.Server.Storage;
 
-public class ManufacturerStorage
+public class ManufacturerStorage(IManufacturerRepository manufacturerRepository, ManufacturerHubContext manufacturerHubContext)
 {
-    private readonly IManufacturerRepository _manufacturerRepository;
-    private readonly ManufacturerHubContext _manufacturerHubContext;
-
-    public ManufacturerStorage(IManufacturerRepository manufacturerRepository, ManufacturerHubContext manufacturerHubContext)
-    {
-        _manufacturerRepository = manufacturerRepository;
-        _manufacturerHubContext = manufacturerHubContext;
-    }
-
     public async Task<bool> ExistByIdAsync(string id)
-    {
-        return await _manufacturerRepository.ExistByIdAsync(id);
-    }
+        => await manufacturerRepository.ExistByIdAsync(id);
 
     public async Task<bool> ExistByNameAsync(string name)
+        => await manufacturerRepository.ExistByNameAsync(name);
+
+
+    public async Task<ManufacturerEntity> GetByNameAsync(string name)
+        => await manufacturerRepository.GetByNameAsync(name);
+
+    public async Task<IEnumerable<ManufacturerEntity>> GetAllAsync()
+        => await manufacturerRepository.GetAllAsync();
+
+
+    public async Task CreateAsync(ManufacturerEntity entity)
     {
-        return await _manufacturerRepository.ExistByNameAsync(name);
+        await manufacturerRepository.CreateAsync(entity);
+
+        await manufacturerHubContext.SendAdded();
     }
 
-    public async Task<bool> ExistByNameAsync(string name, string? id)
+    public async Task UpdateAsync(ManufacturerEntity entity)
     {
-        return await _manufacturerRepository.ExistByNameAsync(name, id);
-    }
+        await manufacturerRepository.UpdateAsync(entity);
 
-    public async Task<Manufacturer> GetByIdAsync(string id)
-    {
-        if (await _manufacturerRepository.ExistByIdAsync(id) is false)
-        {
-            throw new InvalidDataException($"Id '{id}' not found!");
-        }
-
-        var element = await _manufacturerRepository.GetByIdAsync(id);
-        return element.ToDomain();
-    }
-
-    public async Task<Manufacturer> GetByNameAsync(string name)
-    {
-        if (await _manufacturerRepository.ExistByNameAsync(name) is false)
-        {
-            throw new InvalidDataException($"SearchText '{name}' not found!");
-        }
-
-        var element = await _manufacturerRepository.GetByNameAsync(name);
-        return element.ToDomain();
-    }
-
-    public async Task<IEnumerable<Manufacturer>> GetAllAsync()
-    {
-        var elements = await _manufacturerRepository.GetAllAsync();
-        return elements.Select(p => p.ToDomain());
-    }
-
-    public async Task CreateAsync(Manufacturer element)
-    {
-        if (await _manufacturerRepository.ExistByIdAsync(element.Id))
-        {
-            throw new InvalidDataException($"Id '{element.Id}' already exist!");
-        }
-        if (await _manufacturerRepository.ExistByNameAsync(element.Name))
-        {
-            throw new InvalidDataException($"SearchText '{element.Name}' already exist!");
-        }
-
-        await _manufacturerRepository.CreateAsync(element.ToEntity());
-
-        await _manufacturerHubContext.SendAdded();
-    }
-
-    public async Task UpdateAsync(Manufacturer element)
-    {
-        if (await _manufacturerRepository.ExistByIdAsync(element.Id) is false)
-        {
-            throw new InvalidDataException($"Id '{element.Id}' not found!");
-        }
-        if (await _manufacturerRepository.ExistByNameAsync(element.Name))
-        {
-            var entity = await _manufacturerRepository.GetByNameAsync(element.Name);
-
-            if (entity != null && entity.Id != element.Id)
-            {
-                throw new InvalidDataException($"SearchText '{element.Name}' already exist!");
-            }
-        }
-
-        await _manufacturerRepository.UpdateAsync(element.ToEntity());
-
-        await _manufacturerHubContext.SendUpdated(element.Id);
+        await manufacturerHubContext.SendUpdated(entity.Id);
     }
 
     public async Task DeleteAsync(string id)
     {
-        if (await _manufacturerRepository.ExistByIdAsync(id) is false)
+        if (await manufacturerRepository.ExistByIdAsync(id) is false)
         {
             throw new InvalidDataException($"Id '{id}' not found!");
         }
 
-        await _manufacturerRepository.DeleteAsync(id);
+        await manufacturerRepository.DeleteAsync(id);
 
-        await _manufacturerHubContext.SendRemoved(id);
+        await manufacturerHubContext.SendRemoved(id);
     }
 }

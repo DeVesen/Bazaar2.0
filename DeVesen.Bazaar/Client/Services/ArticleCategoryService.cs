@@ -1,103 +1,96 @@
 ﻿using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using System.Net.Http.Json;
-using DeVesen.Bazaar.Client.Domain;
 using DeVesen.Bazaar.Client.Extensions;
 using DeVesen.Bazaar.Client.Models;
-using DeVesen.Bazaar.Shared;
 
 namespace DeVesen.Bazaar.Client.Services;
 
-public class ArticleCategoryService
+public class ArticleCategoryService(IWebAssemblyHostEnvironment hostEnvironment,
+                                    HttpClient httpClient,
+                                    SnackBarService snackBarService) : BaseService(hostEnvironment, httpClient, "api/v1/ArticleCategory")
 {
-    private readonly HttpClient _httpClient;
-    private readonly SnackBarService _snackBarService;
-
-    public ArticleCategoryService(IWebAssemblyHostEnvironment hostEnvironment,
-                                  HttpClient httpClient,
-                                  SnackBarService snackBarService)
-    {
-        _httpClient = httpClient;
-        _snackBarService = snackBarService;
-        _httpClient.BaseAddress = hostEnvironment.GetApiEndpointUrl("api/v1/ArticleCategory");
-    }
-
-    public async Task<Response<bool>> ExistsAsync(string value)
+    public async Task<bool> ExistsAsync(string value)
     {
         var elementResult = await GetAllAsync(value);
 
-        return elementResult.IsValid
-            ? Response<bool>.Valid(elementResult.Value.Any())
-            : Response<bool>.Invalid(elementResult.ErrorMessages);
+        return elementResult.IsSuccess && elementResult.Elements.Any();
     }
 
-    public async Task<Response<IEnumerable<ArticleCategoryDto>>> GetAllAsync(string? name = null, string? searchText = null)
+    public async Task<(bool IsSuccess, IEnumerable<ArticleCategory> Elements)> GetAllAsync(string? name = null, string? searchText = null)
     {
-        try
-        {
-            var queryBuilder = new ApiQueryBuilder
-            {
-                ["Name"] = name,
-                ["SearchText"] = searchText
-            };
+        var requestUri = new UriBuilder(BaseAddress)
+            .SetQueryItem("Name", name)
+            .SetQueryItem("SearchText", searchText)
+            .Build();
 
-            var dtoElements =
-                await _httpClient.GetFromJsonAsync<IEnumerable<ArticleCategoryDto>>(queryBuilder.BuildFinal()) ?? [];
+        var response = await GetFromJsonAsync<IEnumerable<ArticleCategory>>(requestUri);
 
-            return Response<IEnumerable<ArticleCategoryDto>>.Valid(dtoElements);
-        }
-        catch (Exception ex)
-        {
-            return Response<IEnumerable<ArticleCategoryDto>>.Invalid(ex.Message);
-        }
+        return response.IsSuccess
+            ? (true, response.Response)
+            : (false, []);
     }
 
-    public async Task<Response> CreateAsync(ArticleCategory element)
+
+    public async Task<bool> CreateAsync(ArticleCategory element)
     {
-        var requestUri = _httpClient.BaseAddress;
-        var createDto = element.ToCreateDto();
+        var requestUri = new UriBuilder(BaseAddress)
+            .Build();
 
-        var response = await _httpClient.PostAsJsonAsync(requestUri, createDto);
+        var response = await PostAsJsonAsync(requestUri, element);
 
-        if (response.IsSuccessStatusCode)
+        if (response.IsSuccess)
         {
-            _snackBarService.AddInfo("Erfolgreich angelegt ...");
-            return Response.Valid();
+            snackBarService.AddInfo($"Article-Kategorie '{element.Name}' erfolgreich angelegt ...");
+            return true;
         }
 
-        _snackBarService.AddError($"Ausnahmefehler {response.StatusCode}");
-        return Response.Invalid();
+        snackBarService.AddError($"Article-Kategorie '{element.Name}' konnte nicht erstellt werden!");
+
+        Console.WriteLine($"Create {element.Name} Error Code: {response.StatusCode}");
+        Console.WriteLine($"Create {element.Name} Error Msg: {response.ResponseData}");
+
+        return false;
     }
 
-    public async Task<Response> UpdateAsync(ArticleCategory element)
+    public async Task<bool> UpdateAsync(ArticleCategory element)
     {
-        var requestUri = _httpClient.BaseAddress + $"/{element.Id}";
+        var requestUri = new UriBuilder(BaseAddress)
+            .AddUriPart(element.Id)
+            .Build();
+
         var updateDto = element.ToUpdateDto();
+        var response = await PutAsJsonAsync(requestUri, updateDto);
 
-        var response = await _httpClient.PutAsJsonAsync(requestUri, updateDto);
-
-        if (response.IsSuccessStatusCode)
+        if (response.IsSuccess)
         {
-            _snackBarService.AddInfo("Erfolgreich aktualisiert ...");
-            return Response.Valid();
+            snackBarService.AddInfo($"Article-Kategorie '{element.Name}' erfolgreich geändert ...");
+            return true;
         }
 
-        _snackBarService.AddError($"Ausnahmefehler {response.StatusCode}");
-        return Response.Invalid();
+        snackBarService.AddError($"Article-Kategorie '{element.Name}' konnte nicht geändert werden!");
+        Console.WriteLine($"Update {element.Name} Error Code: {response.StatusCode}");
+        Console.WriteLine($"Update {element.Name} Error Msg: {response.ResponseData}");
+
+        return false;
     }
 
-    public async Task<Response> DeleteAsync(ArticleCategory element)
+    public async Task<bool> DeleteAsync(ArticleCategory element)
     {
-        var requestUri = _httpClient.BaseAddress + $"/{element.Id}";
+        var requestUri = new UriBuilder(BaseAddress)
+            .AddUriPart(element.Id)
+            .Build();
 
-        var response = await _httpClient.DeleteAsync(requestUri);
+        var response = await DeleteAsync(requestUri);
 
-        if (response.IsSuccessStatusCode)
+        if (response.IsSuccess)
         {
-            _snackBarService.AddInfo("Erfolgreich gelöscht ...");
-            return Response.Valid();
+            snackBarService.AddInfo($"Article-Kategorie '{element.Name}' erfolgreich gelöscht ...");
+            return true;
         }
 
-        _snackBarService.AddError($"Ausnahmefehler {response.StatusCode}");
-        return Response.Invalid();
+        snackBarService.AddError($"Article-Kategorie '{element.Name}' konnte nicht gelöscht werden!");
+        Console.WriteLine($"Delete {element.Name} Error Code: {response.StatusCode}");
+        Console.WriteLine($"Delete {element.Name} Error Msg: {response.ResponseData}");
+
+        return false;
     }
 }

@@ -143,24 +143,23 @@
 
     private async Task RefreshData()
     {
-        var response = await StatisticService.Get();
-        var statisticInfo = response.Value;
+        var statisticInfo = await StatisticService.GetAsync();
 
-        _vendorTotalCount = statisticInfo.Vendors.TotalCount;
-        _articleTotalCount = statisticInfo.Articles.TotalCount;
+        _vendorTotalCount = statisticInfo?.Vendors.TotalCount ?? 0;
+        _articleTotalCount = statisticInfo?.Articles.TotalCount ?? 0;
 
-        _articleCount = statisticInfo.Articles.ApprovedCount;
-        _articleOnSaleCount = statisticInfo.ActualStock.IsOnSaleCount;
-        _articlesSoldCount = statisticInfo.ActualStock.IsSoldCount;
-        _articlesReturnedCount = statisticInfo.ActualStock.IsReturnedCount;
-        _articlesSettlementCount = statisticInfo.ActualStock.IsSettledCount;
+        _articleCount = statisticInfo?.Articles.ApprovedCount ?? 0;
+        _articleOnSaleCount = statisticInfo?.ActualStock.IsOnSaleCount ?? 0;
+        _articlesSoldCount = statisticInfo?.ActualStock.IsSoldCount ?? 0;
+        _articlesReturnedCount = statisticInfo?.ActualStock.IsReturnedCount ?? 0;
+        _articlesSettlementCount = statisticInfo?.ActualStock.IsSettledCount ?? 0;
 
-        _valueOfFoods = statisticInfo.Articles.ApprovedValue;
-        _turnover = statisticInfo.Income.Turnover;
-        _vendorShare = statisticInfo.Income.TurnoverVendorShare;
-        _clubShare = statisticInfo.Income.TurnoverClubShare;
-        _administrativeCharge = statisticInfo.Income.WorkingFee;
-        _totalClubIncome = statisticInfo.Income.TurnoverClubShare + statisticInfo.Income.WorkingFee;
+        _valueOfFoods = statisticInfo?.Articles.ApprovedValue ?? 0;
+        _turnover = statisticInfo?.Income.Turnover ?? 0;
+        _vendorShare = statisticInfo?.Income.TurnoverVendorShare ?? 0;
+        _clubShare = statisticInfo?.Income.TurnoverClubShare ?? 0;
+        _administrativeCharge = statisticInfo?.Income.WorkingFee ?? 0;
+        _totalClubIncome = statisticInfo?.Income.TurnoverClubShare ?? 0 + statisticInfo?.Income.WorkingFee ?? 0;
 
         StateHasChanged();
     }

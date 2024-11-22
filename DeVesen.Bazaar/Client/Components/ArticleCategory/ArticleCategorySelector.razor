@@ -9,16 +9,16 @@
 
 <CascadingValue Value="false" Name="SubscribeToParentForm" IsFixed>
     <DvSelector Label="Kategorie"
-                Required="@Required"
-                RequiredError="@RequiredError"
-                ErrorText="@ErrorText"
-                Error="@Error"
-                ErrorId="@ErrorId"
-                Value="@ActualSelectorItem"
-                SearchFunc="SearchItemsAsync"
-                AddFunc="CreateNewElement"
-                ValueChanged="OnValueChangedAsync"
-                OnBlur="OnBlurAsync" />
+    Required="@Required"
+    RequiredError="@RequiredError"
+    ErrorText="@ErrorText"
+    Error="@Error"
+    ErrorId="@ErrorId"
+    Value="@ActualSelectorItem"
+    SearchFunc="SearchItemsAsync"
+    AddFunc="CreateNewElement"
+    ValueChanged="OnValueChangedAsync"
+    OnBlur="OnBlurAsync" />
 </CascadingValue>
 
 @code {
@@ -44,7 +44,7 @@
 
     private async Task<IEnumerable<DvSelector.SelectorItem>> SearchItemsAsync(string searchText, CancellationToken cancellation)
     {
-        var possibleElements = (await ArticleCategoryService.GetAllAsync()).Value;
+        var possibleElements = (await ArticleCategoryService.GetAllAsync()).Elements;
 
         if (string.IsNullOrWhiteSpace(searchText) is false)
         {
@@ -60,9 +60,12 @@
 
     private async Task<DvSelector.SelectorItem?> CreateNewElement(string value)
     {
-        await ArticleCategoryService.CreateAsync(new ArticleCategory { Name = value });
+        if (await ArticleCategoryService.CreateAsync(new ArticleCategory { Name = value }))
+        {
+            return new DvSelector.SelectorItem { Caption = value };
+        }
 
-        return new DvSelector.SelectorItem { Caption = value };
+        return null;
     }
 
 

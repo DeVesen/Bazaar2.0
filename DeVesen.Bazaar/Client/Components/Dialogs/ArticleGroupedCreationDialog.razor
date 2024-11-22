@@ -52,10 +52,7 @@
     {
         await  base.OnInitializedAsync();
 
-        var vendorResponse = await VendorService.GetByIdAsync(VendorId);
-        _vendor = vendorResponse.IsValid
-            ? vendorResponse.Value.Vendor
-            : null;
+        _vendor = (await VendorService.GetByIdAsync(VendorId)).Vendor;
     }
 
     private void OnCloseAsync()

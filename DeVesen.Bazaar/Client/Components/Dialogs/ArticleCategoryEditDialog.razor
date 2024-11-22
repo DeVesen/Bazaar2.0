@@ -34,9 +34,10 @@
 
     private async Task SubmitAsync()
     {
-        await ArticleCategoryService.UpdateAsync(Item);
-
-        MudDialog.Close(DialogResult.Ok(true));
+        if (await ArticleCategoryService.UpdateAsync(Item))
+        {
+            MudDialog.Close(DialogResult.Ok(true));
+        }
     }
 
     private async Task DeleteAsync()

@@ -10,12 +10,12 @@ public class ArticleViewEffects(ArticleService articleService)
     {
         var response = await articleService.GetAllAsync(action.VendorId, action.Number, action.SearchText);
 
-        if (response.IsValid is false)
+        if (response.IsSuccess is false)
         {
             dispatcher.Dispatch(new ArticleViewActions.FetchFailed());
         }
 
-        var domainElements = response.Value
+        var domainElements = response.Articles
             .OrderBy(p => p.Number)
             .ThenBy(p => p.Description);
 

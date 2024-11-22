@@ -47,7 +47,7 @@ public class ImportEffects
     {
         var response = await _articleService.GetByNumber(action.Info.Article!.Number);
 
-        var success = response is { IsValid: true, Value: null };
+        var success = response is { IsSuccess: true, Article: null };
         var errorMessage = success is false
             ? new[] { "Nummer existiert bereits!" }
             : new[] { "" };
@@ -62,7 +62,7 @@ public class ImportEffects
         {
             var result = await _articleService.CreateAsync(line.Article, false);
 
-            dispatcher.Dispatch(new ImportActions.DataLineImported(line.LineIndex, result.IsValid, result.ErrorMessages));
+            dispatcher.Dispatch(new ImportActions.DataLineImported(line.LineIndex, result.IsSuccess, [result.ErrorMessage]));
         }
 
         dispatcher.Dispatch(new ImportActions.AllIDataLinesImported());

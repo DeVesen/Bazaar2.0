@@ -122,13 +122,13 @@
 
         var scannedVendor = await VendorService.GetByIdAsync(bcInput.Data);
 
-        if (scannedVendor.IsValid is false)
+        if (scannedVendor.Found is false)
         {
             await SetNewVendor(null);
             return;
         }
         
-        await SetNewVendor(scannedVendor.Value.Vendor);
+        await SetNewVendor(scannedVendor.Vendor);
     }
 
     private async Task SetNewVendor(Vendor? newItem)

@@ -10,7 +10,7 @@ public class SettlementEffects(SettlementService settlementService)
     {
         var vendorViewResult = await settlementService.GetAsync(action.VendorId);
 
-        if (vendorViewResult.IsValid is false)
+        if (vendorViewResult.IsSuccess is false)
         {
             dispatcher.Dispatch(new SettlementActions.SettlementFetchFailed());
             return;
@@ -18,17 +18,17 @@ public class SettlementEffects(SettlementService settlementService)
 
         dispatcher.Dispatch(new SettlementActions.SetSettlement
         {
-            Vendor = vendorViewResult.Value.Vendor,
-            ArticleStock = vendorViewResult.Value.ArticleStock,
-            ArticleValue = vendorViewResult.Value.ArticleValue,
-            Articles = vendorViewResult.Value.Articles.ToArray()
+            Vendor = vendorViewResult.Data.Vendor,
+            ArticleStock = vendorViewResult.Data.ArticleStock,
+            ArticleValue = vendorViewResult.Data.ArticleValue,
+            Articles = vendorViewResult.Data.Articles.ToArray()
         });
     }
 
     [EffectMethod]
     public async Task PayOut(SettlementActions.PayOut action, IDispatcher dispatcher)
     {
-        await settlementService.SetAsSettledAsync(action.VendorId);
+        await settlementService.SetVendorAsSettledAsync(action.VendorId);
 
         dispatcher.Dispatch(new SettlementActions.FetchSettlement(action.VendorId));
     }

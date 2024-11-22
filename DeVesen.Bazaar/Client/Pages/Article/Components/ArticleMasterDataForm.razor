@@ -143,7 +143,12 @@
     {
         var numberResponse = await ArticleService.GetNextNumber();
 
-        ArticleItem.Number = numberResponse.Value;
+        if (numberResponse.IsSuccess is false)
+        {
+            return;
+        }
+
+        ArticleItem.Number = numberResponse.NewNumber;
 
         if (_numberInput != null)
         {

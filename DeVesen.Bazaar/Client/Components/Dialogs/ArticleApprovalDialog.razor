@@ -87,7 +87,7 @@
     {
         var result = await ArticleService.ApproveAsync(articleNumber, VendorId);
 
-        if (result.IsValid)
+        if (result.IsSuccess)
         {
             SetReleaseSuccess($"Artikel {articleNumber} erfolgreich freigegeben!");
         }

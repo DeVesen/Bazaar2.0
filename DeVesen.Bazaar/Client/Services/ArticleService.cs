@@ -1,5 +1,4 @@
-﻿using DeVesen.Bazaar.Client.Domain;
-using DeVesen.Bazaar.Client.Extensions;
+﻿using DeVesen.Bazaar.Client.Extensions;
 using DeVesen.Bazaar.Client.Models;
 using DeVesen.Bazaar.Shared;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
@@ -10,7 +9,7 @@ public class ArticleService(IWebAssemblyHostEnvironment hostEnvironment,
                             HttpClient httpClient,
                             SnackBarService snackBarService) : BaseService(hostEnvironment, httpClient, "api/v1/Article")
 {
-    public async Task<Response<Article>> GetByNumber(long number)
+    public async Task<(bool IsSuccess, Article Article, string ErrorMessage)> GetByNumber(long number)
     {
         var requestUri = new UriBuilder(BaseAddress)
             .AddUriPart("by-number")
@@ -20,11 +19,11 @@ public class ArticleService(IWebAssemblyHostEnvironment hostEnvironment,
         var response = await GetFromJsonAsync<Article>(requestUri);
 
         return response.IsSuccess
-            ? Response<Article>.Valid(response.ResponsedData)
-            : Response<Article>.Invalid(response.ErrorMsg);
+            ? (true, response.Response, string.Empty)
+            : (false, null!, response.ResponseData);
     }
 
-    public async Task<Response<IEnumerable<Article>>> GetAllAsync(string? vendorId = null, string? number = null, string? searchText = null)
+    public async Task<(bool IsSuccess, IEnumerable<Article> Articles, string ErrorMessage)> GetAllAsync(string? vendorId = null, string? number = null, string? searchText = null)
     {
         var requestUri = new UriBuilder(BaseAddress)
             .AddUriPart("list")
@@ -36,12 +35,12 @@ public class ArticleService(IWebAssemblyHostEnvironment hostEnvironment,
         var response = await GetFromJsonAsync<IEnumerable<Article>>(requestUri);
 
         return response.IsSuccess
-            ? Response<IEnumerable<Article>>.Valid(response.ResponsedData)
-            : Response<IEnumerable<Article>>.Invalid(response.ErrorMsg);
+            ? (true, response.Response, string.Empty)
+            : (false, [], response.ResponseData);
     }
 
 
-    public async Task<Response> CreateAsync(Article element, bool showResultSnackBar = true)
+    public async Task<(bool IsSuccess, string ErrorMessage)> CreateAsync(Article element, bool showResultSnackBar = true)
     {
         var requestUri = new UriBuilder(BaseAddress)
             .Build();
@@ -53,21 +52,24 @@ public class ArticleService(IWebAssemblyHostEnvironment hostEnvironment,
         {
             if (showResultSnackBar)
             {
-                snackBarService.AddInfo($"Artikel '{element.Number}' - '{element.Description}' erfolgreich angelegt ...");
+                snackBarService.AddInfo($"Artikel '{element.Number}' erfolgreich angelegt ...");
             }
 
-            return Response.Valid();
+            return (true, string.Empty);
         }
 
         if (showResultSnackBar)
         {
-            snackBarService.AddError($"Ausnahmefehler {response.StatusCode}{Environment.NewLine}{response.ErrorMsg}");
+            snackBarService.AddError($"Artikel '{element.Number}' konnte nicht erstellt werden!");
         }
 
-        return Response.Invalid(response.ErrorMsg);
+        Console.WriteLine($"Create '{element.Number}' Error Code: {response.StatusCode}");
+        Console.WriteLine($"Create '{element.Number}' Error Msg: {response.ResponseData}");
+
+        return (false, response.ResponseData);
     }
 
-    public async Task<Response> UpdateAsync(Article element)
+    public async Task<bool> UpdateAsync(Article element)
     {
         var requestUri = new UriBuilder(BaseAddress)
             .AddUriPart(element.Id)
@@ -79,35 +81,39 @@ public class ArticleService(IWebAssemblyHostEnvironment hostEnvironment,
         if (response.IsSuccess)
         {
             snackBarService.AddInfo($"Artikel '{element.Number}' - '{element.Description}' erfolgreich geändert ...");
-            return Response.Valid();
+            return true;
         }
 
-        snackBarService.AddError($"Ausnahmefehler {response.StatusCode}{Environment.NewLine}{response.ErrorMsg}");
+        snackBarService.AddError($"Artikel '{element.Number}' konnte nicht geändert werden!");
+        Console.WriteLine($"Update {element.Number} Error Code: {response.StatusCode}");
+        Console.WriteLine($"Update {element.Number} Error Msg: {response.ResponseData}");
 
-        return Response.Invalid(response.ErrorMsg);
+        return false;
     }
 
-    public async Task<Response> DeleteAsync(Article element)
+    public async Task<bool> DeleteAsync(Article element)
     {
         var requestUri = new UriBuilder(BaseAddress)
             .AddUriPart(element.Id)
             .Build();
 
-        var response = await base.DeleteAsync(requestUri);
+        var response = await DeleteAsync(requestUri);
 
         if (response.IsSuccess)
         {
             snackBarService.AddInfo($"Artikel '{element.Number}' - '{element.Description}' erfolgreich gelöscht ...");
-            return Response.Valid();
+            return true;
         }
 
-        snackBarService.AddError($"Ausnahmefehler {response.StatusCode}{Environment.NewLine}{response.ErrorMsg}");
+        snackBarService.AddError($"Artikel '{element.Number}' konnte nicht gelöscht werden!");
+        Console.WriteLine($"Delete {element.Number} Error Code: {response.StatusCode}");
+        Console.WriteLine($"Delete {element.Number} Error Msg: {response.ResponseData}");
 
-        return Response.Invalid(response.ErrorMsg);
+        return false;
     }
 
 
-    public async Task<Response<long>> GetNextNumber()
+    public async Task<(bool IsSuccess, long NewNumber)> GetNextNumber()
     {
         var requestUri = new UriBuilder(BaseAddress)
             .AddUriPart("next-number")
@@ -115,12 +121,19 @@ public class ArticleService(IWebAssemblyHostEnvironment hostEnvironment,
 
         var response = await GetFromJsonAsync<NextArticleNumberDto>(requestUri);
 
-        return response.IsSuccess
-            ? Response<long>.Valid(response.ResponsedData.Number)
-            : Response<long>.Invalid(response.ErrorMsg);
+        if (response.IsSuccess is false)
+        {
+            return (response.IsSuccess, response.Response.Number);
+        }
+
+        snackBarService.AddError($"Es konnte keine neue Nummer ermittelt werden!");
+        Console.WriteLine($"NextNumber Error Code: {response.StatusCode}");
+        Console.WriteLine($"NextNumber Error Msg: {response.ResponseData}");
+
+        return (response.IsSuccess, response.Response.Number);
     }
 
-    public async Task<Response> BookOrderAsync(IEnumerable<SalesOrderDto.Position> soldItems)
+    public async Task<bool> BookOrderAsync(IEnumerable<SalesOrderDto.Position> soldItems)
     {
         var requestUri = new UriBuilder(BaseAddress)
             .AddUriPart("book-sale")
@@ -132,7 +145,11 @@ public class ArticleService(IWebAssemblyHostEnvironment hostEnvironment,
 
         if (response.IsSuccess is false)
         {
-            return Response.Invalid(response.ErrorMsg);
+            snackBarService.AddInfo("Artikel konnte(n) nicht verkauft werden!");
+            Console.WriteLine($"Sales Error Code: {response.StatusCode}");
+            Console.WriteLine($"Sales Error Msg: {response.ResponseData}");
+
+            return false;
         }
 
         var itemsCount = soldItemArray.Length;
@@ -140,11 +157,11 @@ public class ArticleService(IWebAssemblyHostEnvironment hostEnvironment,
 
         snackBarService.AddInfo($"{itemsCount} Artikel für {itemsTotal} € erfolgreich verkauft.");
 
-        return Response.Valid();
+        return true;
 
     }
 
-    public async Task<Response> ApproveAsync(long articleNumber, string vendorId)
+    public async Task<(bool IsSuccess, string ErrorMessage)> ApproveAsync(long articleNumber, string vendorId)
     {
         var requestUri = new UriBuilder(BaseAddress)
             .AddUriPart(articleNumber)
@@ -154,8 +171,15 @@ public class ArticleService(IWebAssemblyHostEnvironment hostEnvironment,
 
         var response = await PostAsync(requestUri);
 
-        return response.IsSuccess
-            ? Response.Valid()
-            : Response.Invalid(response.ErrorMsg);
+        if (response.IsSuccess)
+        {
+            return (true, string.Empty);
+        }
+
+        Console.WriteLine($"Approve {articleNumber} Error Code: {response.StatusCode}");
+        Console.WriteLine($"Approve {articleNumber} Error Msg: {response.ResponseData}");
+
+        return (false, response.ResponseData);
+
     }
 }

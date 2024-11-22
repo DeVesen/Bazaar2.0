@@ -1,45 +1,35 @@
-﻿using DeVesen.Bazaar.Server.Basics;
-using DeVesen.Bazaar.Server.Extensions;
+﻿using DeVesen.Bazaar.Server.Extensions;
+using DeVesen.Bazaar.Server.Infrastructure;
 using DeVesen.Bazaar.Server.Storage;
 using DeVesen.Bazaar.Server.Validator;
 using DeVesen.Bazaar.Shared;
 using Microsoft.AspNetCore.Mvc;
+using System.Text;
+using DeVesen.Bazaar.Shared.Basics;
 
 namespace DeVesen.Bazaar.Server.Controllers;
 
 [ApiController]
 [Route("api/v1/[controller]")]
-public class ManufacturerController : ControllerBase
+public class ManufacturerController(ManufacturerStorage manufacturerStorage) : ControllerBase
 {
-    private readonly ManufacturerStorage _manufacturerStorage;
-    private readonly ManufacturerValidator _manufacturerValidator;
-
-    public ManufacturerController(ManufacturerStorage manufacturerStorage,
-                                  ManufacturerValidator manufacturerValidator)
-    {
-        _manufacturerStorage = manufacturerStorage;
-        _manufacturerValidator = manufacturerValidator;
-    }
-
     [HttpGet]
-    public async Task<IEnumerable<ManufacturerDto>> GetAllAsync()
-    {
-        var elements = await _manufacturerStorage.GetAllAsync();
-        return elements.Select(p => p.ToDto());
-    }
+    public async Task<IEnumerable<ManufacturerEntity>> GetAllAsync()
+        => await manufacturerStorage.GetAllAsync();
+
 
     [HttpPost]
     public async Task<ActionResult> CreateAsync([FromBody] ManufacturerCreateDto dto)
     {
-        var element = dto.ToDomain();
-        var result = await _manufacturerValidator.ValidateAsync(element);
+        var entity = ToEntity(dto);
+        var result = await new ManufacturerValidator(true, manufacturerStorage).ValidateAsync(entity);
 
         if (result.IsValid is false)
         {
             return BadRequest(result.Errors.First().ErrorMessage);
         }
 
-        await _manufacturerStorage.CreateAsync(element);
+        await manufacturerStorage.CreateAsync(entity);
 
         return Ok();
     }
@@ -47,20 +37,15 @@ public class ManufacturerController : ControllerBase
     [HttpPut("{id}")]
     public async Task<ActionResult> UpdateAsync(string id, [FromBody] ManufacturerUpdateDto dto)
     {
-        if (await _manufacturerStorage.ExistByIdAsync(id) is false)
-        {
-            return NotFound(ResourceText.Transform(ResourceText.Manufacturer.NotFoundById, _ => id));
-        }
-
-        var element = (id, dto).ToDomain();
-        var result = await _manufacturerValidator.ValidateAsync(element);
+        var entity = ToEntity(id, dto);
+        var result = await new ManufacturerValidator(false, manufacturerStorage).ValidateAsync(entity);
 
         if (result.IsValid is false)
         {
             return BadRequest(result.Errors.First().ErrorMessage);
         }
 
-        await _manufacturerStorage.UpdateAsync(element);
+        await manufacturerStorage.UpdateAsync(entity);
 
         return Ok();
     }
@@ -68,13 +53,34 @@ public class ManufacturerController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteAsync(string id)
     {
-        if (await _manufacturerStorage.ExistByIdAsync(id) is false)
-        {
-            return NotFound(ResourceText.Transform(ResourceText.Manufacturer.NotFoundById, _ => id));
-        }
-
-        await _manufacturerStorage.DeleteAsync(id);
+        await manufacturerStorage.DeleteAsync(id);
 
         return Ok();
+    }
+
+
+    private static ManufacturerEntity ToEntity(ManufacturerCreateDto dto)
+        => new()
+        {
+            Id = ToShortHash(dto),
+            Name = dto.Name
+        };
+
+    private static ManufacturerEntity ToEntity(string id, ManufacturerUpdateDto dto)
+        => new()
+        {
+            Id = id,
+            Name = dto.Name
+        };
+
+    private static string ToShortHash(ManufacturerCreateDto dto)
+    {
+        var builder = new StringBuilder();
+
+        builder.Append(dto.Name);
+        builder.Append(Guid.NewGuid().ToString());
+        builder.Append(DateTime.UtcNow.Ticks);
+
+        return builder.ToString().ToShortHash();
     }
 }

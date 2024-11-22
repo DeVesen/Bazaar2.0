@@ -1,104 +1,96 @@
-﻿using System.Net.Http.Json;
-using DeVesen.Bazaar.Client.Domain;
-using DeVesen.Bazaar.Client.Extensions;
+﻿using DeVesen.Bazaar.Client.Extensions;
 using DeVesen.Bazaar.Client.Models;
-using DeVesen.Bazaar.Shared;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
 namespace DeVesen.Bazaar.Client.Services;
 
-public class ManufacturerService
+public class ManufacturerService(IWebAssemblyHostEnvironment hostEnvironment,
+                                 HttpClient httpClient,
+                                 SnackBarService snackBarService) : BaseService(hostEnvironment, httpClient, "api/v1/Manufacturer")
 {
-    private readonly HttpClient _httpClient;
-    private readonly SnackBarService _snackBarService;
-
-    public ManufacturerService(
-        IWebAssemblyHostEnvironment hostEnvironment,
-        HttpClient httpClient,
-        SnackBarService snackBarService)
-    {
-        _httpClient = httpClient;
-        _snackBarService = snackBarService;
-        _httpClient.BaseAddress = hostEnvironment.GetApiEndpointUrl("api/v1/Manufacturer");
-    }
-
-    public async Task<Response<bool>> ExistsAsync(string value)
+    public async Task<bool> ExistsAsync(string value)
     {
         var elementResult = await GetAllAsync(value);
 
-        return elementResult.IsValid
-            ? Response<bool>.Valid(elementResult.Value.Any())
-            : Response<bool>.Invalid(elementResult.ErrorMessages);
+        return elementResult.IsSuccess && elementResult.Elements.Any();
     }
 
-    public async Task<Response<IEnumerable<ManufacturerDto>>> GetAllAsync(string? name = null, string? searchText = null)
+    public async Task<(bool IsSuccess, IEnumerable<Manufacturer> Elements)> GetAllAsync(string? name = null, string? searchText = null)
     {
-        try
-        {
-            var queryBuilder = new ApiQueryBuilder
-            {
-                ["Name"] = name,
-                ["SearchText"] = searchText
-            };
+        var requestUri = new UriBuilder(BaseAddress)
+            .SetQueryItem("Name", name)
+            .SetQueryItem("SearchText", searchText)
+            .Build();
 
-            var dtoElements =
-                await _httpClient.GetFromJsonAsync<IEnumerable<ManufacturerDto>>(queryBuilder.BuildFinal()) ?? [];
+        var response = await GetFromJsonAsync<IEnumerable<Manufacturer>>(requestUri);
 
-            return Response<IEnumerable<ManufacturerDto>>.Valid(dtoElements);
-        }
-        catch (Exception ex)
-        {
-            return Response<IEnumerable<ManufacturerDto>>.Invalid(ex.Message);
-        }
+        return response.IsSuccess
+            ? (true, response.Response)
+            : (false, []);
     }
 
-    public async Task<Response> CreateAsync(Manufacturer element)
+
+    public async Task<bool> CreateAsync(Manufacturer element)
     {
-        var requestUri = _httpClient.BaseAddress;
-        var createDto = element.ToCreateDto();
+        var requestUri = new UriBuilder(BaseAddress)
+            .Build();
 
-        var response = await _httpClient.PostAsJsonAsync(requestUri, createDto);
+        var response = await PostAsJsonAsync(requestUri, element);
 
-        if (response.IsSuccessStatusCode)
+        if (response.IsSuccess)
         {
-            _snackBarService.AddInfo("Erfolgreich angelegt ...");
-            return Response.Valid();
+            snackBarService.AddInfo($"Hersteller '{element.Name}' erfolgreich angelegt ...");
+            return true;
         }
 
-        _snackBarService.AddError($"Ausnahmefehler {response.StatusCode}");
-        return Response.Invalid();
+        snackBarService.AddError($"Hersteller '{element.Name}' konnte nicht erstellt werden!");
+
+        Console.WriteLine($"Create {element.Name} Error Code: {response.StatusCode}");
+        Console.WriteLine($"Create {element.Name} Error Msg: {response.ResponseData}");
+
+        return false;
     }
 
-    public async Task<Response> UpdateAsync(Manufacturer element)
+    public async Task<bool> UpdateAsync(Manufacturer element)
     {
-        var requestUri = _httpClient.BaseAddress + $"/{element.Id}";
-        var updateDto = element.ToCreateDto();
+        var requestUri = new UriBuilder(BaseAddress)
+            .AddUriPart(element.Id)
+            .Build();
 
-        var response = await _httpClient.PutAsJsonAsync(requestUri, updateDto);
+        var updateDto = element.ToUpdateDto();
+        var response = await PutAsJsonAsync(requestUri, updateDto);
 
-        if (response.IsSuccessStatusCode)
+        if (response.IsSuccess)
         {
-            _snackBarService.AddInfo("Erfolgreich aktualisiert ...");
-            return Response.Valid();
+            snackBarService.AddInfo($"Hersteller '{element.Name}' erfolgreich geändert ...");
+            return true;
         }
 
-        _snackBarService.AddError($"Ausnahmefehler {response.StatusCode}");
-        return Response.Invalid();
+        snackBarService.AddError($"Hersteller '{element.Name}' konnte nicht geändert werden!");
+        Console.WriteLine($"Update {element.Name} Error Code: {response.StatusCode}");
+        Console.WriteLine($"Update {element.Name} Error Msg: {response.ResponseData}");
+
+        return false;
     }
 
-    public async Task<Response> DeleteAsync(Manufacturer element)
+    public async Task<bool> DeleteAsync(Manufacturer element)
     {
-        var requestUri = _httpClient.BaseAddress + $"/{element.Id}";
+        var requestUri = new UriBuilder(BaseAddress)
+            .AddUriPart(element.Id)
+            .Build();
 
-        var response = await _httpClient.DeleteAsync(requestUri);
+        var response = await DeleteAsync(requestUri);
 
-        if (response.IsSuccessStatusCode)
+        if (response.IsSuccess)
         {
-            _snackBarService.AddInfo("Erfolgreich gelöscht ...");
-            return Response.Valid();
+            snackBarService.AddInfo($"Hersteller '{element.Name}' erfolgreich gelöscht ...");
+            return true;
         }
 
-        _snackBarService.AddError($"Ausnahmefehler {response.StatusCode}");
-        return Response.Invalid();
+        snackBarService.AddError($"Hersteller '{element.Name}' konnte nicht gelöscht werden!");
+        Console.WriteLine($"Delete {element.Name} Error Code: {response.StatusCode}");
+        Console.WriteLine($"Delete {element.Name} Error Msg: {response.ResponseData}");
+
+        return false;
     }
 }

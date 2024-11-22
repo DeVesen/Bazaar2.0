@@ -115,8 +115,7 @@ else
     {
         await base.OnInitializedAsync();
 
-        var vendorResult = await VendorService.GetByIdAsync(VendorId);
-        _vendor = vendorResult.IsValid ? vendorResult.Value.Vendor : null;
+        _vendor = (await VendorService.GetByIdAsync(VendorId)).Vendor;
 
         FetchArticleList();
 

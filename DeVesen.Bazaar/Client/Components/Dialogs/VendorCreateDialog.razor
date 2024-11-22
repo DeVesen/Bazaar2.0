@@ -37,7 +37,7 @@
 
     private VendorForm? _vendorForm;
     private Vendor _item = Vendor.New;
-    private bool _preFilled = false;
+    private bool _preFilled;
     private bool _isValid;
     private bool _isTouched;
 
@@ -80,9 +80,9 @@
     {
         var vendorCreated = await VendorService.CreateAsync(_item);
 
-        if (vendorCreated.IsValid)
+        if (vendorCreated.IsSuccess)
         {
-            MudDialog.Close(DialogResult.Ok(new OkResult(ForceNext, vendorCreated.Value)));
+            MudDialog.Close(DialogResult.Ok(new OkResult(ForceNext, vendorCreated.Vendor)));
         }
     }
 
