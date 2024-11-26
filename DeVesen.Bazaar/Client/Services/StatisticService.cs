@@ -14,7 +14,7 @@ public class StatisticService(IWebAssemblyHostEnvironment hostEnvironment,
 
         var response = await GetFromJsonAsync<StatisticSummeryView>(requestUri);
 
-        if (response.IsSuccess)
+        if (response.IsSuccess is false)
         {
             snackBarService.AddError("Statistic konnte nicht geladen werden!");
             Console.WriteLine($"Statistic Error Code: {response.StatusCode}");
