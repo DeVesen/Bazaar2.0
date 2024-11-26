@@ -44,7 +44,7 @@
                                Disabled="@(HasVendorSelected is false)"
                                Size="Size.Large"
                                Class="action-short-button h-100"
-                               OnClick="OnPrintOverviewAsync"/>
+                               OnClick="GoToPrintOverview"/>
             </MudTooltip>
             <MudTooltip Text="Artikel zurück geben" Disabled="@(HasVendorSelected is false)">
                 <MudIconButton Icon="@GiveBackIconPath"
@@ -58,7 +58,7 @@
                                Disabled="@(HasArticlesToGiveBack || HasArticlesToSettle is false)"
                                Size="Size.Large"
                                Class="action-short-button h-100"
-                               OnClick="OnPayOutAsync"/>
+                               OnClick="PayOutAsync"/>
             </MudTooltip>
         </MudButtonGroup>
     </ArticleOverviewToolbar>
@@ -201,9 +201,9 @@
                searchText.BiContainsIgnoreCase(article.Description);
     }
 
-    private async Task OnPrintOverviewAsync()
+    private void GoToPrintOverview()
     {
-        await NavigationService.ToVendorPrintSettlement(_vendor!.Id);
+        NavigationService.ToVendorPrintSettlement(_vendor!.Id);
     }
 
     private async Task OnGiveBackAsync()
@@ -213,7 +213,7 @@
         FetchVendorSettlement();
     }
 
-    private async Task OnPayOutAsync()
+    private async Task PayOutAsync()
     {
         var openSales = SettlementState.Value.ArticleValue!.TotalSalesValue;
         var shareOfSales = SettlementState.Value.ArticleValue!.TotalSalesCommission;
@@ -225,7 +225,7 @@
         {
             SettlementFacade.PayOut(_vendor!.Id);
             
-            await NavigationService.ToVendorPrintSettlement(_vendor!.Id);
+            NavigationService.ToVendorPrintSettlement(_vendor!.Id);
         }
         else
         {

@@ -58,7 +58,7 @@
                                Disabled="@(_vendor == null)"
                                Size="Size.Large"
                                Class="action-short-button h-100"
-                               OnClick="PrintOverviewAsync"/>
+                               OnClick="GoToPrintOverview"/>
             </MudTooltip>
             <MudMenu Icon="@Icons.Material.Filled.ArrowDropDown"
                      Disabled="@(_vendor == null)"
@@ -141,9 +141,9 @@
         await DialogService.ApproveArticleAsync(_vendor!.Id);
     }
 
-    private async Task PrintOverviewAsync()
+    private void GoToPrintOverview()
     {
-        await NavigationService.ToVendorPrint(_vendor!.Id);
+        NavigationService.ToVendorPrint(_vendor!.Id);
     }
 
     private void SetPageCaption()
