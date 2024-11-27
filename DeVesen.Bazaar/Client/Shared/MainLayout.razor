@@ -10,8 +10,8 @@
 @* Needed for snackbars *@
 <MudSnackbarProvider />
 
-<div class="vw-100 vh-100 d-flex flex-column">
-    <MudPaper Outlined Class="m-1 p-2 rounded-lg d-flex flex-row justify-space-between" Elevation="2">
+<div class="main-layout-area">
+    <MudPaper Outlined Elevation="2" Class="m-1 p-2 d-flex flex-row justify-space-between">
         <div class="w-100 align-content-center">
             <MainLayoutTitleBar/>
         </div>
@@ -21,15 +21,22 @@
             </button>
         </div>
     </MudPaper>
-    <div Class="d-flex flex-row flex-grow-1">
-        <div Class="flex-grow-0 sidebar sidebar-toggler">
-            <MudPaper Outlined Class="m-1 p-2 rounded-lg" Elevation="2">
-                <NavMenu />
+    <div Class="main-layout-body-area-lg">
+        <div class="main-layout-body-area-sidebar p-1">
+            <MudPaper Outlined Class="h-100 p-2" Elevation="2">
+                <NavMenu/>
             </MudPaper>
         </div>
-        <MudPaper Outlined Class="m-1 p-2 rounded-lg flex-grow-1" Elevation="2">
+        <div class="main-layout-body-area-content p-1">
+            <MudPaper Outlined Class="p-2 h-100" Elevation="2">
+                @Body
+            </MudPaper>
+        </div>
+    </div>
+    <div Class="main-layout-body-area-xs">
+        <div class="p-2">
             @Body
-        </MudPaper>
+        </div>
     </div>
 </div>
 
