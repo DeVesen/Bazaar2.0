@@ -1,0 +1,52 @@
+﻿@using SmartBazaar.Client.Models
+@using SmartBazaar.Client.Shared.Components.DvTextField
+@using SmartBazaar.Client.Validator
+
+@inject ArticlePriceValidator ArticlePriceValidator
+
+<MudForm @ref="_form"
+         IsValidChanged="@IsValidChanged"
+         IsTouchedChanged="@IsTouchedChanged"
+         FieldChanged="@(async x => await ItemChanged.InvokeAsync(Item))"
+         Model="Item"
+         Validation="@ArticlePriceValidator.Validate"
+         Style="margin-bottom: 20px;">
+
+    <MudGrid Spacing="2">
+        <MudItem xs="12" sm="6">
+            <DvTextField T="double"
+                         Required
+                         Label="Preis"
+                         @bind-Value="Item.Price01"
+                         For="@(() => Item.Price01)" />
+        </MudItem>
+
+        <MudItem xs="12" sm="6">
+            <DvTextField T="double?"
+                         Label="Preis alternative"
+                         @bind-Value="Item.Price02"
+                         For="@(() => Item.Price02)" />
+        </MudItem>
+    </MudGrid>
+
+</MudForm>
+
+@code {
+    private MudForm _form = null!;
+
+    public bool IsValid => _form.IsValid;
+
+    public bool IsTouched => _form.IsTouched;
+
+    [Parameter]
+    public EventCallback<bool> IsValidChanged { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> IsTouchedChanged { get; set; }
+
+    [Parameter]
+    public required ArticlePrice Item { get; set; }
+
+    [Parameter]
+    public required EventCallback<ArticlePrice> ItemChanged { get; set; }
+}

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using DeVesen.Bazaar.Client.Models;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
 using DeVesen.Bazaar.Shared.Events;
 
@@ -54,6 +55,9 @@ namespace DeVesen.Bazaar.Client.Extensions
             .WithAutomaticReconnect()
             .Build();
 
+        public bool IsWorking()
+            => _connection.State != HubConnectionState.Disconnected;
+
         public async Task StartAsync()
             => await _connection.StartAsync();
 
@@ -85,6 +89,9 @@ namespace DeVesen.Bazaar.Client.Extensions
             .WithAutomaticReconnect()
             .Build();
 
+        public bool IsWorking()
+            => _connection.State != HubConnectionState.Disconnected;
+
         public async Task StartAsync()
             => await _connection.StartAsync();
 
@@ -112,12 +119,15 @@ namespace DeVesen.Bazaar.Client.Extensions
         }
     }
 
-    public class ManufacturerHubConnectionService(Uri uri)
+    public class ManufacturerHubConnectionService(Uri uri) : IAsyncDisposable
     {
         private readonly HubConnection _connection = new HubConnectionBuilder()
             .WithUrl(uri)
             .WithAutomaticReconnect()
             .Build();
+
+        public bool IsWorking()
+            => _connection.State != HubConnectionState.Disconnected;
 
         public async Task StartAsync()
             => await _connection.StartAsync();
@@ -125,12 +135,12 @@ namespace DeVesen.Bazaar.Client.Extensions
         public async ValueTask StopAsync()
             => await _connection.DisposeAsync();
 
-        public IDisposable RegisterOnAdded(Action handler)
+        public IDisposable RegisterOnAdded(Action<Manufacturer> handler)
         {
             return _connection.On("Added", handler);
         }
 
-        public IDisposable RegisterOnUpdated(Action<string> handler)
+        public IDisposable RegisterOnUpdated(Action<Manufacturer> handler)
         {
             return _connection.On("Updated", handler);
         }
@@ -138,6 +148,13 @@ namespace DeVesen.Bazaar.Client.Extensions
         public IDisposable RegisterOnRemoved(Action<string> handler)
         {
             return _connection.On("Removed", handler);
+        }
+
+        public async ValueTask DisposeAsync()
+        {
+            await _connection.DisposeAsync();
+
+            await StartAsync();
         }
     }
 
@@ -148,18 +165,21 @@ namespace DeVesen.Bazaar.Client.Extensions
             .WithAutomaticReconnect()
             .Build();
 
+        public bool IsWorking()
+            => _connection.State != HubConnectionState.Disconnected;
+
         public async Task StartAsync()
             => await _connection.StartAsync();
 
         public async ValueTask StopAsync()
             => await _connection.DisposeAsync();
 
-        public IDisposable RegisterOnAdded(Action handler)
+        public IDisposable RegisterOnAdded(Action<ArticleCategory> handler)
         {
             return _connection.On("Added", handler);
         }
 
-        public IDisposable RegisterOnUpdated(Action<string> handler)
+        public IDisposable RegisterOnUpdated(Action<ArticleCategory> handler)
         {
             return _connection.On("Updated", handler);
         }

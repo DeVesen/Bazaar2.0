@@ -1,0 +1,43 @@
+﻿
+<MudButton Color="@Color"
+          Disabled="@Disabled"
+          FullWidth="@FullWidth"
+          IconSize="@(IconSize ?? Size)"
+          Size="@Size"
+          Variant="@Variant"
+          EndIcon="@EndIcon"
+          OnClick="@OnClick"
+          Style="@Style">
+    <MudText>@(Value.HasValue ? Value : "-")</MudText>
+</MudButton>
+
+@code {
+    private string? EndIcon => Value.HasValue ? BazaarIcons.SalesPrice : null;
+
+    [Parameter]
+    public double? Value { get; set; }
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    [Parameter]
+    public bool FullWidth { get; set; } = true;
+
+    [Parameter]
+    public Size? IconSize { get; set; } = Size.Medium;
+
+    [Parameter]
+    public Size Size { get; set; } = Size.Medium;
+
+    [Parameter]
+    public Variant Variant { get; set; } = Variant.Filled;
+
+    [Parameter]
+    public Color Color { get; set; } = Color.Tertiary;
+
+    [Parameter]
+    public string? Style { get; set; }
+
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnClick { get; set; }
+}

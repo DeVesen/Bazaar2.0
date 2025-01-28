@@ -1,0 +1,108 @@
+﻿
+<style>
+    .article-list-row:hover {
+        background-color: #cccccc !important;
+    }
+
+    .mud-data-grid .mud-table-cell.sticky-left {
+        background-color: transparent !important;
+    }
+</style>
+
+<MudDataGrid T="ArticleListItem"
+             Hover
+             Dense
+             Items="@ArticleListItems"
+             RowClick="OnRowClickAsync"
+             RowClass="article-list-row">
+    <Columns>
+        <PropertyColumn Property="x => x.Number"
+                        Title="#"
+                        Resizable="false" 
+                        StickyLeft="true"
+                        CellStyle="width: 100px;" />
+        <PropertyColumn Property="x => x.ArticleBrand"
+                        Title="Hersteller"
+                        Resizable="false"
+                        CellStyle="width: 125px;" />
+        <PropertyColumn Property="x => x.ArticleCategory"
+                        Title="Kategorie"
+                        Resizable="false"
+                        CellStyle="width: 125px;" />
+        <PropertyColumn Property="x => x.Title"
+                        Title="Description" />
+        <PropertyColumn Property="x => x.Price01"
+                        Title="Preis"
+                        Resizable="false"
+                        CellStyle="width: 100px;" />
+        <PropertyColumn Property="x => x.Vendor"
+                        Title="Verkäufer"
+                        CellStyle="width: 150px;" />
+    </Columns>
+</MudDataGrid>
+
+@code {
+    private string _searchString = "";
+
+    [Parameter, EditorRequired]
+    public List<ArticleListItem> ArticleListItems { get; set; } = [];
+
+    [Parameter]
+    public EventCallback<ArticleListItem> OnArticleClick { get; set; }
+
+    private async Task OnRowClickAsync(DataGridRowClickEventArgs<ArticleListItem> row)
+    {
+        await OnArticleClick.InvokeAsync(row.Item);
+    }
+
+    private bool FilterFunc(ArticleListItem element)
+    {
+        if (string.IsNullOrWhiteSpace(_searchString))
+        {
+            return true;
+        }
+
+        var searchParts = _searchString.Split(" ", StringSplitOptions.RemoveEmptyEntries)
+                                       .Where(p => string.IsNullOrWhiteSpace(p) is false)
+                                       .ToArray();
+
+        return searchParts.All(p => FilterPart(element, p));
+    }
+
+    private bool FilterPart(ArticleListItem element, string filterPart)
+    {
+        if (element.Number.Contains(filterPart, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (element.Vendor.Contains(filterPart, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (element.ArticleBrand.Contains(filterPart, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (element.ArticleCategory.Contains(filterPart, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (element.Title.Contains(filterPart, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        return false;
+    }
+
+    public class ArticleListItem
+    {
+        public required string Id { get; init; }
+        public required string Vendor { get; init; }
+
+        public required string Number { get; init; }
+        public required string ArticleBrand { get; init; }
+        public required string ArticleCategory { get; init; }
+        public required string Title { get; init; }
+
+        public required double Price01 { get; init; }
+        public required double? Price02 { get; init; }
+
+        public required string Status { get; init; }
+    }
+
+}

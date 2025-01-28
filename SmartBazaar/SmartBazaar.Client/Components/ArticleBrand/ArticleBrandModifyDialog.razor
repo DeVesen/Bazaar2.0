@@ -1,0 +1,63 @@
+﻿@using SmartBazaar.Client.Models
+@using SmartBazaar.Client.Services
+
+@inject IArticleBrandService ArticleBrandService
+@inject ISnackBarService SnackBarService
+
+<MudDialog>
+    <DialogContent>
+        <ArticleBrandForm @bind-Item="ArticleBrand"
+        IsValidChanged="@(x => _inputIsValid = x)"
+        IsTouchedChanged="@(x => _inputIsTouched = x)" />
+    </DialogContent>
+    <DialogActions>
+        <MudGrid>
+            <MudItem xs="4">
+                <DvButtonSave Disabled="@((_inputIsValid && _inputIsTouched) is false)" OnClick="SubmitAsync"/>
+            </MudItem>
+            <MudItem xs="4">
+                <DvButtonDelete OnClick="DeleteAsync"/>
+            </MudItem>
+            <MudItem xs="4">
+                <DvButtonCancel OnClick="@(() => MudDialog.Cancel())"/>
+            </MudItem>
+        </MudGrid>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    private bool _inputIsValid;
+    private bool _inputIsTouched;
+
+
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; } = null!;
+
+    [Parameter]
+    public ArticleBrand ArticleBrand { get; set; } = null!;
+
+
+    private async Task SubmitAsync()
+    {
+        var result = await ArticleBrandService.UpdateAsync(ArticleBrand);
+
+        if (result.IsSuccess)
+        {
+            SnackBarService.AddInfo($"Hersteller {ArticleBrand.Title} geändert ...");
+
+            MudDialog.Close(DialogResult.Ok(result.Value.Id));
+        }
+    }
+
+    private async Task DeleteAsync()
+    {
+        var result = await ArticleBrandService.DeleteAsync(ArticleBrand.Id);
+
+        if (result.IsSuccess)
+        {
+            SnackBarService.AddInfo($"Hersteller {ArticleBrand.Title} gelöscht ...");
+
+            MudDialog.Close(DialogResult.Ok(ArticleBrand.Id));
+        }
+    }
+}

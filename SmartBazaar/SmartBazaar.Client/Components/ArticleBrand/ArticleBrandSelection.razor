@@ -1,0 +1,135 @@
+﻿@using Fluxor
+@using SmartBazaar.Client.Services
+@using SmartBazaar.Client.Shared.Components.DvAutocompleteSelect
+
+@inherits MudBaseInput<string>
+
+@inject IArticleBrandService ArticleBrandService
+@inject IState<ArticleBrandState> ArticleBrandState
+
+<CascadingValue Value="false" Name="SubscribeToParentForm" IsFixed>
+    <DvAutocompleteSelect ShrinkLabel="@ShrinkLabel"
+    Label="@Label"
+    Required="@Required"
+    RequiredError="@RequiredError"
+    ErrorText="@ErrorText"
+    Error="@Error"
+    ErrorId="@ErrorId"
+    Value="@_selectedItem"
+    Class="@Class"
+    Style="@Style"
+    MaxItems="@MaxItems"
+    MinCharacters="@MinCharacters"
+
+    OnKeyDown="InvokeKeyDownAsync"
+    OnKeyUp="InvokeKeyUpAsync"
+    OnBlur="OnBlurredAsync"
+    ValueChanged="OnValueChanged"
+    TextChanged="OnTextChanged"
+
+    SearchFunc="SearchFuncAsync"
+    AddFunc="AddFuncAsync"/>
+</CascadingValue>
+
+@code {
+    private DvAutocompleteSelect.SelectorItem? _selectedItem;
+    private bool _valueWillBeChanged;
+
+    [Parameter]
+    public int? MaxItems { get; set; } = 30;
+
+    [Parameter]
+    public int MinCharacters { get; set; }
+
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+
+        if (_valueWillBeChanged)
+        {
+            return;
+        }
+
+        if (_selectedItem?.Caption != _value)
+        {
+            _selectedItem = await GetByCaption(_value);
+        }
+    }
+
+
+    private Task<IEnumerable<DvAutocompleteSelect.SelectorItem>> SearchFuncAsync(string searchValue, CancellationToken cancellationToken)
+    {
+        var potentialItems = ArticleBrandState.GetAll(searchValue)
+            .Select(CreateSelectorItem)
+            .ToArray()
+            .AsEnumerable();
+
+        return Task.FromResult(potentialItems);
+    }
+
+    private async Task<DvAutocompleteSelect.SelectorItem?> AddFuncAsync(string title)
+    {
+        var result = await ArticleBrandService.CreateAsync(title);
+
+        return result.IsSuccess
+            ? CreateSelectorItem(result.Value)
+            : null;
+    }
+
+    private async Task<DvAutocompleteSelect.SelectorItem?> GetByCaption(string? caption)
+    {
+        if (string.IsNullOrWhiteSpace(_value))
+        {
+            return null;
+        }
+
+        var result = await ArticleBrandService.GetByTitleAsync(caption!);
+
+        return result.IsSuccess
+            ? CreateSelectorItem(result.Value)
+            : CreateSelectorItem(caption ?? string.Empty);
+    }
+
+
+    private async Task OnValueChanged(DvAutocompleteSelect.SelectorItem? newElement)
+    {
+        if (_value == newElement?.Caption)
+        {
+            return;
+        }
+
+        _valueWillBeChanged = true;
+
+        _selectedItem = newElement;
+        await SetValueAsync(newElement?.Caption, true, true);
+
+        _valueWillBeChanged = false;
+    }
+
+    private async Task OnTextChanged(string newText)
+    {
+        if (Text == newText)
+        {
+            return;
+        }
+
+        _valueWillBeChanged = true;
+
+        await SetTextAsync(newText);
+
+        _valueWillBeChanged = false;
+    }
+
+
+    private static DvAutocompleteSelect.SelectorItem CreateSelectorItem(SmartBazaar.Client.Models.ArticleBrand element)
+        => CreateSelectorItem(element.Title, element.ImgSrc);
+
+    private static DvAutocompleteSelect.SelectorItem CreateSelectorItem(string caption, string? imgSrc = null)
+        => new()
+        {
+            Caption = caption,
+            ImgSrc = imgSrc ?? string.Empty
+        };
+
+}

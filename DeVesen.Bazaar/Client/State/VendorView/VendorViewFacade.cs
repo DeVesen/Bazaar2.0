@@ -15,6 +15,11 @@ public class VendorViewFacade(IDispatcher dispatcher, VendorHubConnectionService
 
     public async Task StartCallbacks()
     {
+        if (vendorHub.IsWorking())
+        {
+            return;
+        }
+
         await vendorHub.StartAsync();
 
         vendorHub.RegisterOnAdded(OnAdded);

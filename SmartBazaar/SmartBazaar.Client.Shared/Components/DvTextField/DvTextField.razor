@@ -1,0 +1,116 @@
+﻿@using System.Linq.Expressions
+@typeparam T
+
+<MudTextField T="T"
+              @ref="_innerTextField"
+              InputType="@InputType"
+              Required="@Required"
+              ShrinkLabel
+              Variant="Variant.Filled"
+              DebounceInterval="@DebounceInterval"
+              Label="@Label"
+              Value="@Value"
+              ValueChanged="@ValueChanged"
+              OnKeyDown="@OnKeyDown"
+              OnKeyUp="@OnKeyUp"
+              OnBlur="@OnBlur"
+              Lines="@Lines"
+              MaxLength="@MaxLength"
+              Placeholder="@Placeholder"
+              HelperText="@HelperText"
+              FullWidth="@FullWidth"
+              ReadOnly="@ReadOnly"
+              Disabled="@Disabled"
+              Clearable="@Clearable"
+              Adornment="@Adornment"
+              AdornmentText="@AdornmentText"
+              AdornmentIcon="@AdornmentIcon"
+              AutoGrow="@AutoGrow"
+              MaxLines="@MaxLines"
+              For="@For" />
+
+@code {
+    private MudTextField<T> _innerTextField = null!;
+
+    [Parameter]
+    public InputType InputType { get; set; } = InputType.Text;
+
+    [Parameter]
+    public bool Required { get; set; }
+
+    [Parameter]
+    public string? Label { get; set; }
+
+    [Parameter]
+    public T? Value { get; set; }
+
+    [Parameter]
+    public double DebounceInterval { get; set; } = 600;
+
+    [Parameter]
+    public EventCallback<T> ValueChanged { get; set; }
+    
+    [Parameter]
+    public EventCallback<KeyboardEventArgs> OnKeyDown { get; set; }
+
+    [Parameter]
+    public EventCallback<KeyboardEventArgs> OnKeyUp { get; set; }
+
+    [Parameter]
+    public EventCallback<FocusEventArgs> OnBlur { get; set; }
+
+    [Parameter]
+    public int Lines { get; set; } = 1;
+
+    [Parameter]
+    public int MaxLength { get; set; } = 524288;
+
+    [Parameter]
+    public string? Placeholder { get; set; }
+    
+    [Parameter]
+    public string? HelperText { get; set; }
+    
+    [Parameter]
+    public bool FullWidth { get; set; }
+    
+    [Parameter]
+    public bool ReadOnly { get; set; }
+    
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    [Parameter]
+    public bool Clearable { get; set; } = true;
+    
+    [Parameter]
+    public Adornment Adornment { get; set; } = Adornment.None;
+    
+    [Parameter]
+    public string? AdornmentText { get; set; }
+    
+    [Parameter]
+    public string? AdornmentIcon { get; set; }
+
+    [Parameter]
+    public bool AutoGrow { get; set; }
+
+    [Parameter]
+    public int MaxLines { get; set; }
+
+    [Parameter]
+    public Expression<Func<T>>? For { get; set; }
+
+
+    public ValueTask FocusAsync() => _innerTextField.FocusAsync();
+
+    public ValueTask SelectAsync() => _innerTextField.SelectAsync();
+
+    public ValueTask SelectRangeAsync(int pos1, int pos2) => _innerTextField.SelectRangeAsync(pos1, pos2);
+
+    public Task ResetAsync() => _innerTextField.ResetAsync();
+
+    public void ResetValidation() => _innerTextField.ResetValidation();
+
+    public Task ClearAsync() => _innerTextField.Clear();
+}

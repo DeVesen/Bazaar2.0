@@ -6,9 +6,9 @@ namespace DeVesen.Bazaar.Client.State.ArticleCategory;
 public class ArticleCategoryEffects(ArticleCategoryService articleCategoryService)
 {
     [EffectMethod]
-    public async Task FetchVendors(ArticleCategoryActions.Fetch action, IDispatcher dispatcher)
+    public async Task Fetch(ArticleCategoryActions.Fetch action, IDispatcher dispatcher)
     {
-        var response = await articleCategoryService.GetAllAsync(action.Name, action.SearchText);
+        var response = await articleCategoryService.GetAllAsync();
 
         if (response.IsSuccess is false)
         {

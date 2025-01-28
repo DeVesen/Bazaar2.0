@@ -40,10 +40,10 @@ builder.Services.AddTransient<TitleFacade>();
 
 builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
-builder.Services.AddTransient(HubConnectionProviderExtensions.CreateVendorHubConnectionService)
-                .AddTransient(HubConnectionProviderExtensions.CreateArticleHubConnectionService)
-                .AddTransient(HubConnectionProviderExtensions.CreateManufacturerHubConnectionService)
-                .AddTransient(HubConnectionProviderExtensions.CreateArticleCategoryHubConnectionService);
+builder.Services.AddSingleton(HubConnectionProviderExtensions.CreateVendorHubConnectionService)
+                .AddSingleton(HubConnectionProviderExtensions.CreateArticleHubConnectionService)
+                .AddSingleton(HubConnectionProviderExtensions.CreateManufacturerHubConnectionService)
+                .AddSingleton(HubConnectionProviderExtensions.CreateArticleCategoryHubConnectionService);
 
 builder.Services.AddTransient<AuthService>();
 builder.Services.AddTransient<ImportExportService>();

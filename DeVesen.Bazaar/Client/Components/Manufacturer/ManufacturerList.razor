@@ -1,0 +1,71 @@
+﻿@using DeVesen.Bazaar.Client.Models
+@using DeVesen.Bazaar.Client.State.Manufacturer
+
+@inject ManufacturerFacade ManufacturerFacade
+@inject IState<ManufacturerState> ManufacturerState
+
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+
+@if (IsDataLoading)
+{
+    <MudProgressLinear Color="Color.Secondary" Indeterminate="true" />
+}
+else
+{
+    <MudPaper Outlined Elevation="0" Class="flex-grow-1 overflow-auto">
+        <MudGrid Spacing="2">
+            @foreach (var element in Elements)
+            {
+                <MudItem xs="12" sm="6" md="4" lg="3">
+                    <MudButton FullWidth
+                    Variant="Variant.Outlined"
+                    Class="h-100 py-3"
+                    OnClick="@(() => ModifyElementAsync(element))">
+                        <MudText Align="Align.Center">@element.Name</MudText>
+                    </MudButton>
+                </MudItem>
+            }
+        </MudGrid>
+    </MudPaper>
+}
+
+@code {
+    private bool _wasInitialized = false;
+
+    private bool IsDataLoading => ManufacturerState.IsLoading();
+    private IEnumerable<Manufacturer> Elements => ManufacturerState.GetAllElements(SearchText);
+
+    [Parameter]
+    public string? SearchText { get; set; }
+
+    [Parameter]
+    public EventCallback<Manufacturer> OnElementSelected { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        if (_wasInitialized)
+        {
+            return;
+        }
+        
+        _wasInitialized = true;
+
+        ManufacturerFacade.Fetch();
+
+        await ManufacturerFacade.StartCallbacks();
+    }
+
+    protected override async ValueTask DisposeAsyncCore(bool disposing)
+    {
+        await base.DisposeAsyncCore(disposing);
+
+        await ManufacturerFacade.StopCallbacks();
+    }
+
+    private async Task ModifyElementAsync(Manufacturer element)
+    {
+        await OnElementSelected.InvokeAsync(element);
+    }
+}

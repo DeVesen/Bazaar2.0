@@ -1,0 +1,119 @@
+﻿@using SmartBazaar.Client.Models
+@using SmartBazaar.Client.Shared.Components.DvTextField
+
+<MudForm IsValidChanged="@IsValidChanged"
+         IsTouchedChanged="@IsTouchedChanged"
+         FieldChanged="OnFormFieldChangedAsync"
+         Model="Item"
+         Validation="@Validation"
+         Style="margin-bottom: 20px;">
+
+    <MudGrid Spacing="2">
+        <MudItem xs="12" sm="6">
+            <DvTextField T="string"
+                         @ref="_firstNameTxt"
+                         Required
+                         Label="Vorname"
+                         @bind-Value="Item.FirstName"
+                         For="@(() => Item.FirstName)"/>
+        </MudItem>
+        <MudItem xs="12" sm="6">
+            <DvTextField T="string"
+                         @ref="_lastNameTxt"
+                         Required
+                         Label="Nachname"
+                         @bind-Value="Item.LastName"
+                         For="@(() => Item.LastName)"/>
+        </MudItem>
+
+        <MudItem xs="12" sm="12">
+            <DvTextField T="string"
+                         @ref="_addressTxt"
+                         Required
+                         Label="Anschrift"
+                         Lines="2"
+                         MaxLines="2"
+                         AutoGrow="false"
+                         @bind-Value="Item.Address"
+                         For="@(() => Item.Address)" />
+        </MudItem>
+
+        <MudItem xs="12" sm="6">
+            <DvTextField T="string"
+                         Label="E-Mail"
+                         @bind-Value="Item.EMail"
+                         For="@(() => Item.EMail)" />
+        </MudItem>
+        <MudItem xs="12" sm="6">
+            <DvTextField T="string"
+                         DebounceInterval="600"
+                         Label="Telefon"
+                         @bind-Value="Item.Phone"
+                         For="@(() => Item.Phone)" />
+        </MudItem>
+
+        <MudItem xs="12" sm="6">
+            <DvTextField T="double"
+                         Label="Umsatzanteil"
+                         Value="@(Item.SalesShare * 100)"
+                         ValueChanged="@(x => Item.SalesShare = x / 100)"
+                         Adornment="Adornment.End"
+                         AdornmentText="%"
+                         HelperText="Entfällt auf die Summe des Verkaufserlös."
+                         For="@(() => Item.SalesShare)" />
+        </MudItem>
+        <MudItem xs="12" sm="6">
+            <DvTextField T="double"
+                         Label="Arbeitskosten"
+                         @bind-Value="Item.OfferUnitPrice"
+                         Adornment="Adornment.End"
+                         AdornmentText="€ pro Stück"
+                         HelperText="Entfällt auf jeden Artikel der nicht verkauft aber angeboten wurde."
+                         For="@(() => Item.OfferUnitPrice)" />
+        </MudItem>
+
+        <MudItem xs="12" sm="12">
+            <DvTextField T="string"
+                         Label="Notiz"
+                         @bind-Value="Item.Note"
+                         Lines="4"
+                         MaxLines="4"
+                         AutoGrow="false"
+                         For="@(() => Item.Note)" />
+        </MudItem>
+    </MudGrid>
+
+</MudForm>
+
+@code {
+    private DvTextField<string> _firstNameTxt = null!;
+    private DvTextField<string> _lastNameTxt = null!;
+    private DvTextField<string> _addressTxt = null!;
+
+    [Parameter]
+    public EventCallback<bool> IsValidChanged { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> IsTouchedChanged { get; set; }
+
+    [Parameter]
+    public required Dealer Item { get; set; }
+
+    [Parameter]
+    public required EventCallback<Dealer> ItemChanged { get; set; }
+
+    [Parameter]
+    [Category(CategoryTypes.FormComponent.Validation)]
+    public object? Validation { get; set; } = null;
+
+    private async Task OnFormFieldChangedAsync()
+    {
+        await ItemChanged.InvokeAsync(Item);
+    }
+
+    private void FocusFirstNameAsync() => _firstNameTxt?.FocusAsync();
+
+    private void FocusLastNameAsync() => _lastNameTxt?.FocusAsync();
+
+    private void FocusAddressAsync() => _addressTxt?.FocusAsync();
+}

@@ -1,0 +1,112 @@
+﻿@using SmartBazaar.Client.Models
+@using SmartBazaar.Client.Shared.Components.DvTextField
+@using SmartBazaar.Client.Validator
+@using SmartBazaar.Client.Components.ArticleBrand
+@using SmartBazaar.Client.Components.ArticleCategory
+@using SmartBazaar.Client.Services
+
+@inject IArticleService ArticleService
+@inject ArticleDescriptionValidator ArticleDescriptionValidator
+
+<MudForm @ref="_form"
+         IsValidChanged="@IsValidChanged"
+         IsTouchedChanged="@IsTouchedChanged"
+         FieldChanged="@(async _ => await ItemChanged.InvokeAsync(Item))"
+         Model="Item"
+         Validation="@ArticleDescriptionValidator.Validate"
+         Style="margin-bottom: 20px;">
+
+    <MudGrid Spacing="2">
+        <MudItem xs="12" sm="6">
+            <DvTextField T="string"
+                         Required
+                         Label="Nummer"
+                         @bind-Value="Item.Number"
+                         For="@(() => Item.Number)" />
+        </MudItem>
+
+        <MudItem xs="12" sm="6">
+            <MudStack AlignItems="AlignItems.Start"
+                      Justify="Justify.FlexStart"
+                      Row="true">
+                @if (IsUpdate is false)
+                {
+                    <MudButton StartIcon="@Icons.Material.TwoTone.PublishedWithChanges"
+                               Variant="Variant.Filled"
+                               IconSize="Size.Large"
+                               Size="Size.Large"
+                               Color="Color.Primary"
+                               Style="height: 56px;"
+                               OnClick="OnCreateNewNumber"/>
+
+                    <MudButton StartIcon="@Icons.Material.TwoTone.QrCode"
+                               Variant="Variant.Filled"
+                               IconSize="Size.Large"
+                               Size="Size.Large"
+                               Color="Color.Secondary"
+                               Style="height: 56px;"
+                               OnClick="OnScanNumber" />
+                }
+            </MudStack>
+        </MudItem>
+
+        <MudItem xs="12" sm="6">
+            <ArticleCategorySelection Required
+                                      @bind-Value="Item.ArticleCategory"
+                                      For="@(() => Item.ArticleCategory)" />
+        </MudItem>
+
+        <MudItem xs="12" sm="6">
+            <ArticleBrandSelection Required
+                                   @bind-Value="Item.ArticleBrand"
+                                   For="@(() => Item.ArticleBrand)"/>
+        </MudItem>
+
+        <MudItem xs="12" sm="12">
+            <DvTextField T="string"
+                         Required
+                         Label="Beschreibung"
+                         @bind-Value="Item.Description"
+                         For="@(() => Item.Description)" />
+        </MudItem>
+    </MudGrid>
+
+</MudForm>
+
+@code {
+    private MudForm _form = null!;
+
+    public bool IsValid => _form.IsValid;
+
+    public bool IsTouched => _form.IsTouched;
+
+    [Parameter]
+    public EventCallback<bool> IsValidChanged { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> IsTouchedChanged { get; set; }
+
+    [Parameter]
+    public required ArticleDescription Item { get; set; }
+
+    [Parameter]
+    public required EventCallback<ArticleDescription> ItemChanged { get; set; }
+
+    [Parameter]
+    public bool IsUpdate { get; set; }
+
+
+    private async Task OnCreateNewNumber()
+    {
+        var newNumberResult = await ArticleService.GetNextFreeNumber();
+
+        Item.Number = newNumberResult.IsSuccess
+            ? newNumberResult.Value
+            : string.Empty;
+    }
+
+    private async Task OnScanNumber()
+    {
+        await Task.FromResult(1);
+    }
+}

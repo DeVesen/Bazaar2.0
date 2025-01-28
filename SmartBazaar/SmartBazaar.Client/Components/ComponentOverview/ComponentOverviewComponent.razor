@@ -1,0 +1,24 @@
+﻿
+<MudPaper Elevation="5" Style="background-color: #ffffff;">
+    <MudPaper Square="true"
+              Outlined="false"
+              Elevation="0"
+              Class="p-4 py-1 mb-2"
+              Style="color: #ffffff; background-color: #777777;">
+        <MudText Typo="Typo.h6">
+            @ComponentName
+        </MudText>
+    </MudPaper>
+    <MudPaper Square="true"
+              Outlined="false"
+              Elevation="0"
+              Class="p-2 pt-0">
+        @ChildContent
+    </MudPaper>
+</MudPaper>
+
+@code {
+    [Parameter] public string ComponentName { get; set; } = string.Empty;
+
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+}

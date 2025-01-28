@@ -24,14 +24,14 @@ public class ManufacturerStorage(IManufacturerRepository manufacturerRepository,
     {
         await manufacturerRepository.CreateAsync(entity);
 
-        await manufacturerHubContext.SendAdded();
+        await manufacturerHubContext.SendAdded(entity);
     }
 
     public async Task UpdateAsync(ManufacturerEntity entity)
     {
         await manufacturerRepository.UpdateAsync(entity);
 
-        await manufacturerHubContext.SendUpdated(entity.Id);
+        await manufacturerHubContext.SendUpdated(entity);
     }
 
     public async Task DeleteAsync(string id)

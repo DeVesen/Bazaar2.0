@@ -1,0 +1,40 @@
+﻿@using SmartBazaar.Client.Models
+@using SmartBazaar.Client.Services
+
+@inject IArticleBrandService ArticleBrandService
+@inject ISnackBarService SnackBarService
+
+<MudDialog>
+    <DialogContent>
+        <ArticleBrandForm @bind-Item="_articleBrand"
+                          IsValidChanged="@(x => _inputIsValid = x)"
+                          IsTouchedChanged="@(x => _inputIsTouched = x)" />
+    </DialogContent>
+    <DialogActions>
+        <DvButtonSave Disabled="@((_inputIsValid && _inputIsTouched) is false)"
+                      OnClick="SubmitAsync" />
+        <DvButtonCancel OnClick="@(() => MudDialog.Cancel())" />
+    </DialogActions>
+</MudDialog>
+
+@code {
+    private bool _inputIsValid;
+    private bool _inputIsTouched;
+
+    private ArticleBrand _articleBrand = ArticleBrand.CreateEmptyNew();
+
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; } = null!;
+
+    private async Task SubmitAsync()
+    {
+        var result = await ArticleBrandService.CreateAsync(_articleBrand);
+
+        if (result.IsSuccess)
+        {
+            SnackBarService.AddInfo($"Hersteller {_articleBrand.Title} erstellt ...");
+
+            MudDialog.Close(DialogResult.Ok(result.Value.Id));
+        }
+    }
+}

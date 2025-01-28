@@ -25,9 +25,9 @@
 
         await ArticleCategoryHub.StartAsync();
         
-        _addedActionHandle = ArticleCategoryHub.RegisterOnAdded(OnAdded);
-        _updatedActionHandle = ArticleCategoryHub.RegisterOnUpdated(OnUpdated);
-        _removedActionHandle = ArticleCategoryHub.RegisterOnRemoved(OnRemoved);
+        // _addedActionHandle = ArticleCategoryHub.RegisterOnAdded(OnAdded);
+        // _updatedActionHandle = ArticleCategoryHub.RegisterOnUpdated(OnUpdated);
+        // _removedActionHandle = ArticleCategoryHub.RegisterOnRemoved(OnRemoved);
     }
 
     private void OnAdded()

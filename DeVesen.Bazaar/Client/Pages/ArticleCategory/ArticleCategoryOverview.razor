@@ -1,49 +1,38 @@
 ﻿@using DeVesen.Bazaar.Client.Models
-@using DeVesen.Bazaar.Client.Pages.ArticleCategory.Components
-@using DeVesen.Bazaar.Client.State.ArticleCategory
 @using DeVesen.Bazaar.Client.State.Title
-@using DeVesen.Bazaar.Client.Components.HubHandler
+@using DeVesen.Bazaar.Client.Components.Common.TextField
+@using DeVesen.Bazaar.Client.Components.ArticleCategory
 
 @page "/article-category"
 @attribute [Authorize]
 
-@inherits Fluxor.Blazor.Web.Components.FluxorComponent
-
 @inject TitleFacade TitleFacade
-@inject ArticleCategoryFacade ArticleCategoryFacade
-@inject IState<ArticleCategoryState> ArticleCategoryState
 @inject Services.DialogService DialogService
 
-<ArticleCategoryHubActionHandler Added="FetchArticleCategoryList" Updated="FetchArticleCategoryList" Removed="FetchArticleCategoryList" />
+<div class="h-100 d-flex flex-column gap-3">
+    <div class="d-flex gap-3">
+        <DvTextField T="string"
+                     Label="Suche"
+                     FullWidth="true"
+                     Clearable="true"
+                     @bind-Value="@SearchText" />
+        <MudButton StartIcon="@Icons.Material.TwoTone.NoteAdd"
+                   Color="Color.Primary"
+                   Variant="Variant.Filled"
+                   OnClick="CreateArticleCategoryAsync">Neu</MudButton>
+    </div>
 
-<ArticleCategoryOverviewToolbar @bind-SearchText="@_searchText"
-                                @bind-SearchText:after="@FetchArticleCategoryList"
-                                OnCreateBtnClick="@CreateArticleCategoryAsync" />
-
-<MudTable T="ArticleCategory"
-          FixedHeader
-          Hover
-          Loading="@(ArticleCategoryState.Value.IsLoaded is false)"
-          Items="@ArticleCategoryState.Value.Items"
-          SortLabel="Sort By"
-          OnRowClick="ModifyArticleCategoryAsync">
-    <HeaderContent>
-        <MudTh><MudTableSortLabel SortBy="new Func<ArticleCategory, object>(x => x.Name)">Bezeichnung</MudTableSortLabel></MudTh>
-    </HeaderContent>
-    <RowTemplate>
-        <MudTd DataLabel="Bezeichnung">@context.Name</MudTd>
-    </RowTemplate>
-</MudTable>
+    <ArticleCategoryList SearchText="@SearchText"
+                         OnElementSelected="ModifyArticleCategoryAsync" />
+</div>
 
 @code {
 
-    private string? _searchText;
+    private string? SearchText { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-
-        FetchArticleCategoryList();
 
         TitleFacade.SetCaption("Kategorien");
     }
@@ -51,21 +40,10 @@
     private async Task CreateArticleCategoryAsync()
     {
         await DialogService.CreateArticleCategoryAsync();
-        
-        FetchArticleCategoryList();
     }
 
-    private async Task ModifyArticleCategoryAsync(TableRowClickEventArgs<ArticleCategory> args)
+    private async Task ModifyArticleCategoryAsync(ArticleCategory element)
     {
-        await DialogService.ModifyArticleCategoryAsync(args.Item!);
-
-        FetchArticleCategoryList();
-    }
-
-    private void FetchArticleCategoryList()
-    {
-        ArticleCategoryFacade.Fetch();
-
-        StateHasChanged();
+        await DialogService.ModifyArticleCategoryAsync(element);
     }
 }

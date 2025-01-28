@@ -1,0 +1,46 @@
+﻿
+@if (IsDataLoading)
+{
+    <MudProgressLinear Color="Color.Secondary" Indeterminate="true" />
+}
+else
+{
+    <MudPaper Outlined="false" Elevation="0" Class="flex-grow-1 overflow-auto">
+        <MudGrid Spacing="1">
+            @if (Elements.Any())
+            {
+                @foreach (var element in Elements)
+                {
+                    <MudItem xs="12" sm="4" md="4" lg="3" xl="2">
+                        <DvSimpleListElement Element="@element"
+                                             ElementSelected="OnElementClicked"/>
+                    </MudItem>
+                }
+            }
+            else
+            {
+                <MudItem xs="12">
+                    <DvSimpleListNoElement/>
+                </MudItem>
+            }
+        </MudGrid>
+    </MudPaper>
+}
+
+@code {
+    [Parameter]
+    public bool IsDataLoading { get; set; }
+
+    [Parameter]
+    public IEnumerable<Element> Elements { get; set; } = [];
+
+    [Parameter]
+    public EventCallback<Element> ElementClick { get; set; }
+
+    private async Task OnElementClicked(Element element)
+    {
+        await ElementClick.InvokeAsync(element);
+    }
+
+
+}

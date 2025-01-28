@@ -24,14 +24,14 @@ namespace DeVesen.Bazaar.Server.Storage
         {
             await articleCategoryRepository.CreateAsync(entity);
 
-            await articleCategoryHubContext.SendAdded();
+            await articleCategoryHubContext.SendAdded(entity);
         }
 
         public async Task UpdateAsync(ArticleCategoryEntity entity)
         {
             await articleCategoryRepository.UpdateAsync(entity);
 
-            await articleCategoryHubContext.SendUpdated(entity.Id);
+            await articleCategoryHubContext.SendUpdated(entity);
         }
 
         public async Task DeleteAsync(string id)

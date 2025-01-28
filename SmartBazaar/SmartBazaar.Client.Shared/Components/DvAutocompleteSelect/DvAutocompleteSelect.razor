@@ -1,0 +1,134 @@
+﻿@inherits MudBaseInput<DvAutocompleteSelect.SelectorItem>
+
+<CascadingValue Value="false" Name="SubscribeToParentForm" IsFixed>
+    <MudAutocomplete T="SelectorItemBase"
+                     ShrinkLabel="@ShrinkLabel"
+                     Label="@Label"
+                     Required="@Required"
+                     RequiredError="@RequiredError"
+                     ErrorText="@ErrorText"
+                     Error="@Error"
+                     ErrorId="@ErrorId"
+                     Class="@Class"
+                     Style="@Style"
+                     Value="_value"
+                     MaxItems="@MaxItems"
+                     MinCharacters="@MinCharacters"
+                     Clearable="true"
+                     ShowProgressIndicator="true"
+                     ResetValueOnEmptyText="true"
+                     Variant="Variant.Filled"
+                     
+                     OnKeyDown="InvokeKeyDownAsync"
+                     OnKeyUp="InvokeKeyUpAsync"
+                     OnBlur="OnBlurredAsync"
+                     ValueChanged="OnValueChangedAsync"
+                     TextChanged="@(text => SetTextAsync(text))"
+
+                     SearchFunc="SearchItemsAsync"
+                     ToStringFunc="ItemToString">
+        <ItemTemplate Context="e">
+            <div class="d-flex align-content-center gap-2">
+                @if (string.IsNullOrWhiteSpace(e.ImgSrc) is false)
+                {
+                    <MudImage Src="@e.ImgSrc" Width="30" Height="30" />
+                }
+                else
+                {
+                    <div style="width: 30px; height: 30px;"></div>
+                }
+                <MudText>@($"{ItemToString(e)}")</MudText>
+            </div>
+        </ItemTemplate>
+        <NoItemsTemplate>
+            <MudText Align="Align.Center" Class="px-4 py-1">
+                Keine Elemente gefunden
+            </MudText>
+        </NoItemsTemplate>
+    </MudAutocomplete>
+</CascadingValue>
+
+@code {
+    private bool _setValueIsLocked = false;
+
+    [Parameter]
+    public int? MaxItems { get; set; } = 30;
+
+    [Parameter]
+    public int MinCharacters { get; set; } = 0;
+
+    [Parameter]
+    public Func<string, CancellationToken, Task<IEnumerable<SelectorItem>>> SearchFunc { get; set; } = null!;
+
+    [Parameter]
+    public Func<string, Task<SelectorItem?>>? AddFunc { get; set; }
+
+
+
+    private async Task OnValueChangedAsync(SelectorItemBase selectedItem)
+    {
+        if (selectedItem is SelectorItemNew)
+        {
+            var createdItem = await CreateNewElement(selectedItem.Caption);
+
+            SetValue(createdItem);
+        }
+        else
+        {
+            await SetValueAsync((SelectorItem)selectedItem, true, true);
+        }
+    }
+
+
+    private async Task<IEnumerable<SelectorItemBase>> SearchItemsAsync(string searchText, CancellationToken cancellation)
+    {
+        var possibleElements = (await SearchFunc.Invoke(searchText, cancellation)).ToArray()
+                                                                                  .AsEnumerable();
+
+        var possibleElementList = possibleElements.OfType<SelectorItemBase>()
+                                                  .OrderBy(p => p.Caption)
+                                                  .ToList();
+
+        if (string.IsNullOrWhiteSpace(searchText) is false && AddFunc != null)
+        {
+            possibleElementList.Add(new SelectorItemNew { Caption = searchText });
+        }
+
+        return possibleElementList;
+    }
+
+    private async Task<SelectorItem> CreateNewElement(string value)
+    {
+        await AddFunc!.Invoke(value);
+
+        return new SelectorItem { Caption = value };
+    }
+
+
+    private void SetValue(SelectorItem? item)
+    {
+        Task.Run(async () =>
+        {
+            await SetValueAsync(item, true, true);
+            Touched = true;
+        });
+    }
+
+
+    protected override void OnConversionErrorOccurred(string error)
+    {
+        /* Descendants can override this method to catch conversion errors */
+    }
+
+
+    private static string ItemToString(SelectorItemBase arg)
+    {
+        return arg switch
+        {
+            SelectorItem => arg.Caption,
+            SelectorItemNew => $"\"{arg.Caption}\" erstellen ...",
+            _ => throw new NotImplementedException()
+        };
+    }
+
+}

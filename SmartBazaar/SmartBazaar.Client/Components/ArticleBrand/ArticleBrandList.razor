@@ -1,0 +1,32 @@
+﻿@using Fluxor
+@using SmartBazaar.Client.Models
+@using SmartBazaar.Client.Shared.Components.DvSimpleList
+
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+
+@inject IState<ArticleBrandState> ArticleBrandState
+
+<DvSimpleList IsDataLoading="@IsDataLoading"
+              Elements="@Elements"
+              ElementClick="@OnElementClicked" />
+
+@code {
+    private IEnumerable<DvSimpleList.Element> Elements
+        => ArticleBrandState.Value.Elements.Select(p => new DvSimpleList.Element
+        {
+            Id = p.Id,
+            Title = p.Title,
+            ImgSrc = p.ImgSrc,
+            Tag = p
+        }).OrderBy(p => p.Title).ToArray();
+
+    public bool IsDataLoading => ArticleBrandState.Value.IsLoading;
+
+    [Parameter]
+    public EventCallback<ArticleBrand> ElementClick { get; set; }
+
+    private async Task OnElementClicked(DvSimpleList.Element element)
+    {
+        await ElementClick.InvokeAsync((ArticleBrand)element.Tag!);
+    }
+}

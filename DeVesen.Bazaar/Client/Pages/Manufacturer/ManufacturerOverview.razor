@@ -1,69 +1,49 @@
 ﻿@using DeVesen.Bazaar.Client.Models
-@using DeVesen.Bazaar.Client.Pages.Manufacturer.Components
-@using DeVesen.Bazaar.Client.State.Manufacturer
 @using DeVesen.Bazaar.Client.State.Title
-@using DeVesen.Bazaar.Client.Components.HubHandler
+@using DeVesen.Bazaar.Client.Components.Common.TextField
+@using DeVesen.Bazaar.Client.Components.Manufacturer
 
 @page "/article-manufacturer"
 @attribute [Authorize]
 
-@inherits Fluxor.Blazor.Web.Components.FluxorComponent
-
 @inject TitleFacade TitleFacade
-@inject ManufacturerFacade ManufacturerFacade
-@inject IState<ManufacturerState> ManufacturerState
 @inject Services.DialogService DialogService
 
-<ManufacturerHubActionHandler Added="FetchManufacturerList" Updated="FetchManufacturerList" Removed="FetchManufacturerList" />
+<div class="h-100 d-flex flex-column gap-3">
+    <div class="d-flex gap-3">
+        <DvTextField T="string"
+                     Label="Suche"
+                     FullWidth="true"
+                     Clearable="true"
+                     @bind-Value="@SearchText" />
+        <MudButton StartIcon="@Icons.Material.TwoTone.NoteAdd"
+                   Color="Color.Primary"
+                   Variant="Variant.Filled"
+                   OnClick="CreateManufacturerAsync">Neu</MudButton>
+    </div>
 
-<ManufacturerOverviewToolbar @bind-SearchText="@_searchText"
-                             @bind-SearchText:after="@FetchManufacturerList"
-                             OnCreateBtnClick="@CreateManufacturerAsync" />
-
-<MudTable T="Manufacturer"
-          FixedHeader
-          Hover
-          Loading="@(ManufacturerState.Value.IsLoaded is false)"
-          Items="@ManufacturerState.Value.Items"
-          SortLabel="Sort By"
-          OnRowClick="ModifyManufacturerAsync">
-    <HeaderContent>
-        <MudTh><MudTableSortLabel SortBy="new Func<Manufacturer, object>(x => x.Name)">Bezeichnung</MudTableSortLabel></MudTh>
-    </HeaderContent>
-    <RowTemplate>
-        <MudTd DataLabel="Bezeichnung">@context.Name</MudTd>
-    </RowTemplate>
-</MudTable>
+    <ManufacturerList SearchText="@SearchText"
+                      OnElementSelected="ModifyManufacturerAsync" />
+</div>
 
 @code {
 
-    private string? _searchText;
+    private string? SearchText { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
 
-        FetchManufacturerList();
-
-        TitleFacade.SetCaption("Verkauf");
+        TitleFacade.SetCaption("Marke / Brand / Label");
     }
 
     private async Task CreateManufacturerAsync()
     {
         await DialogService.CreateManufacturerAsync();
-
-        FetchManufacturerList();
     }
 
-    private async Task ModifyManufacturerAsync(TableRowClickEventArgs<Manufacturer> args)
+    private async Task ModifyManufacturerAsync(Manufacturer element)
     {
-        await DialogService.ModifyManufacturerAsync(args.Item!);
-
-        FetchManufacturerList();
-    }
-
-    private void FetchManufacturerList()
-    {
-        ManufacturerFacade.Fetch();
+        await DialogService.ModifyManufacturerAsync(element);
     }
 }

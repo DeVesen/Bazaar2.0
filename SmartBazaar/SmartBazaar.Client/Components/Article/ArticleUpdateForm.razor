@@ -1,0 +1,40 @@
+﻿@using SmartBazaar.Client.Models
+
+<div>
+    <ArticleDescriptionForm @ref="_articleDescriptionForm"
+                            @bind-Item="Article.Description"
+                            @bind-Item:after="@(async () => await ArticleChanged.InvokeAsync(Article))"
+                            IsUpdate="true"
+                            IsValidChanged="OnFormIsChanged"
+                            IsTouchedChanged="OnFormIsChanged" />
+    <ArticlePriceForm @ref="_articlePriceForm"
+                      @bind-Item="Article.Price"
+                      @bind-Item:after="@(async () => await ArticleChanged.InvokeAsync(Article))"
+                      IsValidChanged="OnFormIsChanged"
+                      IsTouchedChanged="OnFormIsChanged" />
+</div>
+
+
+
+@code {
+    private ArticleDescriptionForm _articleDescriptionForm = null!;
+    private ArticlePriceForm _articlePriceForm = null!;
+
+    [Parameter]
+    public EventCallback<bool> IsValidChanged { get; set; }
+
+    [Parameter]
+    public required Article Article { get; set; }
+
+    [Parameter]
+    public required EventCallback<Article> ArticleChanged { get; set; }
+
+
+    private async Task OnFormIsChanged()
+    {
+        var descriptionIsValid = _articleDescriptionForm.IsTouched is false || _articleDescriptionForm.IsValid;
+        var priceIsValid = _articlePriceForm.IsTouched is false || _articlePriceForm.IsValid;
+
+        await IsValidChanged.InvokeAsync(descriptionIsValid && priceIsValid);
+    }
+}

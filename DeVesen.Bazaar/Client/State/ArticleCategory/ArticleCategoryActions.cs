@@ -2,9 +2,16 @@
 
 public class ArticleCategoryActions
 {
-    public record Fetch(string? Name, string? SearchText);
+    public record Fetch;
 
-    public record Set(IEnumerable<Models.ArticleCategory> Items);
+    public record Set(IEnumerable<Models.ArticleCategory> Elements);
 
-    public record FetchFailed();
+    public record FetchFailed;
+
+
+    public record AppendElement(Models.ArticleCategory Element);
+
+    public record UpdateElement(Models.ArticleCategory Element);
+
+    public record RemoveElement(string Id);
 }

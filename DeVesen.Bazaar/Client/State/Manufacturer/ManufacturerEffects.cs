@@ -6,7 +6,7 @@ namespace DeVesen.Bazaar.Client.State.Manufacturer;
 public class ManufacturerEffects(ManufacturerService manufacturerService)
 {
     [EffectMethod]
-    public async Task FetchVendors(ManufacturerActions.Fetch action, IDispatcher dispatcher)
+    public async Task Fetch(ManufacturerActions.Fetch action, IDispatcher dispatcher)
     {
         var response = await manufacturerService.GetAllAsync(action.Name, action.SearchText);
 
@@ -17,11 +17,6 @@ public class ManufacturerEffects(ManufacturerService manufacturerService)
 
         var domainElements = response.Elements
             .OrderBy(p => p.Name)
-            .Select(dtoElement => new Models.Manufacturer
-            {
-                Id = dtoElement.Id,
-                Name = dtoElement.Name
-            })
             .ToArray();
 
         dispatcher.Dispatch(new ManufacturerActions.Set(domainElements));

@@ -28,6 +28,11 @@ public class ArticleViewFacade
 
     public async Task StartCallbacks()
     {
+        if (_vendorHub.IsWorking())
+        {
+            return;
+        }
+
         await _vendorHub.StartAsync();
         await _articleHub.StartAsync();
 

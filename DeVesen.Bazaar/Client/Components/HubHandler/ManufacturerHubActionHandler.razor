@@ -25,9 +25,9 @@
 
         await ManufacturerHub.StartAsync();
         
-        _addedActionHandle = ManufacturerHub.RegisterOnAdded(OnAdded);
-        _updatedActionHandle = ManufacturerHub.RegisterOnUpdated(OnUpdated);
-        _removedActionHandle = ManufacturerHub.RegisterOnRemoved(OnRemoved);
+        // _addedActionHandle = ManufacturerHub.RegisterOnAdded(OnAdded);
+        // _updatedActionHandle = ManufacturerHub.RegisterOnUpdated(OnUpdated);
+        // _removedActionHandle = ManufacturerHub.RegisterOnRemoved(OnRemoved);
     }
 
     private void OnAdded()

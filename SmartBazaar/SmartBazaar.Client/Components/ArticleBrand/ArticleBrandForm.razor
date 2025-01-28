@@ -1,0 +1,41 @@
+﻿@using SmartBazaar.Client.Models
+@using SmartBazaar.Client.Shared.Components.DvTextField
+@using SmartBazaar.Client.Validator
+
+@inject ArticleBrandValidator ArticleBrandValidator
+
+<MudForm IsValidChanged="@IsValidChanged"
+         IsTouchedChanged="@IsTouchedChanged"
+         FieldChanged="@(async _ => await ItemChanged.InvokeAsync(Item))"
+         Model="Item"
+         Validation="@ArticleBrandValidator.Validate"
+         Style="margin-bottom: 20px;">
+
+    <MudGrid Spacing="2">
+        <MudItem xs="12">
+            <DvTextField T="string"
+                         Required
+                         Label="Bezeichnung"
+                         @bind-Value="Item.Title"
+                         For="@(() => Item.Title)" />
+        </MudItem>
+    </MudGrid>
+
+</MudForm>
+
+@code {
+    [Parameter]
+    public EventCallback<bool> IsValidChanged { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> IsTouchedChanged { get; set; }
+
+    [Parameter]
+    public required ArticleBrand Item { get; set; }
+
+    [Parameter]
+    public required EventCallback<ArticleBrand> ItemChanged { get; set; }
+
+    [Parameter]
+    public object? Validation { get; set; }
+}

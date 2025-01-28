@@ -358,3 +358,4 @@ serviceDependencies.local.json
 **/__mismatch__/*
 /
 **/Api/v1/DebugController.cs
+/SmartBazaar.States/ArticleBrand/ArticleCategoryActions.cs

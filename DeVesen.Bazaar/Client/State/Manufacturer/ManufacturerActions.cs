@@ -6,5 +6,12 @@ public class ManufacturerActions
 
     public record Set(IEnumerable<Models.Manufacturer> Items);
 
-    public record FetchFailed();
+    public record FetchFailed;
+
+
+    public record AppendElement(Models.Manufacturer Element);
+
+    public record UpdateElement(Models.Manufacturer Element);
+
+    public record RemoveElement(string Id);
 }
