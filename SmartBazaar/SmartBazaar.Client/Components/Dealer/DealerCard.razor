@@ -1,0 +1,98 @@
+﻿@using SmartBazaar.Client.Services
+@using SmartBazaar.Shared.Extensions
+@using SmartBazaar.Shared.Models
+
+@inject DlgService DlgService
+
+<MudCard>
+    <MudCardHeader>
+        <CardHeaderAvatar>
+            <MudAvatar Color="Color.Secondary">
+                <MudIcon Icon="@DealerModel.GetTypeIcon()" />
+            </MudAvatar>
+        </CardHeaderAvatar>
+        <CardHeaderContent>
+            <MudText Typo="Typo.body1">@DealerModel.GetFullName()</MudText>
+            <MudText Typo="Typo.body2">@DealerModel.Address.City</MudText>
+            <MudText Typo="Typo.body2">@DealerModel.GetTypeName()</MudText>
+        </CardHeaderContent>
+        <CardHeaderActions>
+            <MudIconButton Icon="@Icons.Material.Filled.Settings"
+                           Color="Color.Default"
+                           OnClick="@(_ => DlgService.DealerModifyAsync(DealerModel.Id))" />
+        </CardHeaderActions>
+    </MudCardHeader>
+    <MudCardContent>
+        <MudGrid Spacing="0">
+            <MudItem xs="12">
+                <MudStack Row>
+                    <MudText Style="width: 120px"
+                             Typo="Typo.subtitle2">
+                        Anzahl:
+                    </MudText>
+                    <MudText Typo="Typo.body2">
+                        @($"{StatisticModel.ArticlesApprovedCount} ({StatisticModel.ArticleCount - StatisticModel.ArticlesApprovedCount})")
+                    </MudText>
+                </MudStack>
+            </MudItem>
+            <MudItem xs="12">
+                <MudStack Row>
+                    <MudText Style="width: 120px"
+                             Typo="Typo.subtitle2">
+                        Im Verkauft:
+                    </MudText>
+                    <MudText Typo="Typo.body2">
+                        @($"{StatisticModel.ArticlesInSaleCount}")
+                    </MudText>
+                </MudStack>
+            </MudItem>
+            <MudItem xs="12">
+                <MudStack Row>
+                    <MudText Style="width: 120px"
+                             Typo="Typo.subtitle2">
+                        Verkauft:
+                    </MudText>
+                    <MudText Typo="Typo.body2">
+                        @($"{StatisticModel.ArticlesSoldCount}")
+                    </MudText>
+                </MudStack>
+            </MudItem>
+            <MudItem xs="12">
+                <MudStack Row>
+                    <MudText Style="width: 120px"
+                             Typo="Typo.subtitle2">
+                        Zurückgegeben:
+                    </MudText>
+                    <MudText Typo="Typo.body2">
+                        @($"{StatisticModel.ArticlesReturnedCount}")
+                    </MudText>
+                </MudStack>
+            </MudItem>
+            <MudItem xs="12">
+                <MudStack Row>
+                    <MudText Style="width: 120px"
+                             Typo="Typo.subtitle2">
+                        Abgerechnet:
+                    </MudText>
+                    <MudText Typo="Typo.body2">
+                        @($"{StatisticModel.ArticlesSettledCount}")
+                    </MudText>
+                </MudStack>
+            </MudItem>
+        </MudGrid>
+    </MudCardContent>
+    <MudCardActions>
+        @* <MudIconButton Icon="@Icons.Material.Filled.Favorite" Color="Color.Default" />
+        <MudIconButton Icon="@Icons.Material.Filled.Share" Color="Color.Default" /> *@
+    </MudCardActions>
+</MudCard>
+
+@code {
+
+    [Parameter]
+    public DealerModel DealerModel { get; set; } = null!;
+
+    [Parameter]
+    public StatisticModel StatisticModel { get; set; } = new();
+
+}

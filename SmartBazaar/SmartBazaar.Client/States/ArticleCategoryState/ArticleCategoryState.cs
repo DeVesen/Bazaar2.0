@@ -1,10 +1,10 @@
 ﻿using Fluxor;
-using SmartBazaar.Client.Models;
+using SmartBazaar.Shared.Models;
 
 namespace SmartBazaar.Client.States.ArticleCategoryState;
 
 [FeatureState]
-public record ArticleCategoryState(IEnumerable<ArticleCategory> Elements, bool IsLoading)
+public record ArticleCategoryState(IEnumerable<ArticleCategoryModel> Elements, bool IsLoading)
 {
     private ArticleCategoryState() : this([], false) { }
 }

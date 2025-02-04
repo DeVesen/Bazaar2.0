@@ -1,6 +1,5 @@
 ﻿@using Fluxor
-@using SmartBazaar.Client.Models
-@using SmartBazaar.Client.Shared.Components.DvSimpleList
+@using SmartBazaar.Shared.Models
 
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 
@@ -23,10 +22,10 @@
     public bool IsDataLoading => ArticleBrandState.Value.IsLoading;
 
     [Parameter]
-    public EventCallback<ArticleBrand> ElementClick { get; set; }
+    public EventCallback<ArticleBrandModel> ElementClick { get; set; }
 
     private async Task OnElementClicked(DvSimpleList.Element element)
     {
-        await ElementClick.InvokeAsync((ArticleBrand)element.Tag!);
+        await ElementClick.InvokeAsync((ArticleBrandModel)element.Tag!);
     }
 }

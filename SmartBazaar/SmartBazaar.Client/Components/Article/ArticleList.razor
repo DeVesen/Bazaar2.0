@@ -1,18 +1,26 @@
-﻿
+﻿@using Fluxor
+@using SmartBazaar.Client.States.ArticleState
+@using SmartBazaar.Client.States.DealerInfoState
+@using SmartBazaar.Shared.Models
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+
+@inject IState<DealerInfoState> DealerState
+@inject IState<ArticleState> ArticleState
+
 <style>
     .article-list-row:hover {
-        background-color: #cccccc !important;
+    background-color: #cccccc !important;
     }
 
     .mud-data-grid .mud-table-cell.sticky-left {
-        background-color: transparent !important;
+    background-color: transparent !important;
     }
 </style>
 
 <MudDataGrid T="ArticleListItem"
              Hover
              Dense
-             Items="@ArticleListItems"
+             Items="@ArticleElements"
              RowClick="OnRowClickAsync"
              RowClass="article-list-row">
     <Columns>
@@ -31,12 +39,15 @@
                         CellStyle="width: 125px;" />
         <PropertyColumn Property="x => x.Title"
                         Title="Description" />
-        <PropertyColumn Property="x => x.Price01"
+        <PropertyColumn Property="@(x => $"{x.Price01} €")"
                         Title="Preis"
                         Resizable="false"
                         CellStyle="width: 100px;" />
         <PropertyColumn Property="x => x.Vendor"
                         Title="Verkäufer"
+                        CellStyle="width: 150px;" />
+        <PropertyColumn Property="x => x.Vendor"
+                        Title="Status"
                         CellStyle="width: 150px;" />
     </Columns>
 </MudDataGrid>
@@ -44,15 +55,29 @@
 @code {
     private string _searchString = "";
 
-    [Parameter, EditorRequired]
-    public List<ArticleListItem> ArticleListItems { get; set; } = [];
+    private IEnumerable<ArticleListItem> ArticleElements
+        => ArticleState.GetAll().Select(p => new ArticleListItem
+            {
+                Vendor = DealerState.GetDealerNameById(p.DealerId),
+                Number = p.Number,
+                ArticleBrand = p.Description.ArticleBrand,
+                ArticleCategory = p.Description.ArticleCategory,
+                Title = p.Description.Description,
+                Price01 = p.Price.Price01,
+                Price02 = p.Price.Price02,
+                Status = string.Empty,
+                Model = p
+            }).OrderBy(p => p.Title).ToArray();
+
+    public bool IsDataLoading => DealerState.IsLoading() || ArticleState.IsLoading();
 
     [Parameter]
-    public EventCallback<ArticleListItem> OnArticleClick { get; set; }
+    public EventCallback<ArticleModel> OnArticleClick { get; set; }
+
 
     private async Task OnRowClickAsync(DataGridRowClickEventArgs<ArticleListItem> row)
     {
-        await OnArticleClick.InvokeAsync(row.Item);
+        await OnArticleClick.InvokeAsync(row.Item.Model);
     }
 
     private bool FilterFunc(ArticleListItem element)
@@ -89,9 +114,9 @@
         return false;
     }
 
+
     public class ArticleListItem
     {
-        public required string Id { get; init; }
         public required string Vendor { get; init; }
 
         public required string Number { get; init; }
@@ -103,6 +128,7 @@
         public required double? Price02 { get; init; }
 
         public required string Status { get; init; }
+        
+        public required ArticleModel Model { get; init; }
     }
-
 }

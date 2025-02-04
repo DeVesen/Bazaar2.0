@@ -1,6 +1,7 @@
 ﻿@using Fluxor
-@using SmartBazaar.Client.Services
 @using SmartBazaar.Client.Shared.Components.DvAutocompleteSelect
+@using SmartBazaar.Shared.Contracts
+@using SmartBazaar.Shared.Models
 
 @inherits MudBaseInput<string>
 
@@ -9,26 +10,26 @@
 
 <CascadingValue Value="false" Name="SubscribeToParentForm" IsFixed>
     <DvAutocompleteSelect ShrinkLabel="@ShrinkLabel"
-    Label="@Label"
-    Required="@Required"
-    RequiredError="@RequiredError"
-    ErrorText="@ErrorText"
-    Error="@Error"
-    ErrorId="@ErrorId"
-    Value="@_selectedItem"
-    Class="@Class"
-    Style="@Style"
-    MaxItems="@MaxItems"
-    MinCharacters="@MinCharacters"
+                          Label="@Label"
+                          Required="@Required"
+                          RequiredError="@RequiredError"
+                          ErrorText="@ErrorText"
+                          Error="@Error"
+                          ErrorId="@ErrorId"
+                          Value="@_selectedItem"
+                          Class="@Class"
+                          Style="@Style"
+                          MaxItems="@MaxItems"
+                          MinCharacters="@MinCharacters"
 
-    OnKeyDown="InvokeKeyDownAsync"
-    OnKeyUp="InvokeKeyUpAsync"
-    OnBlur="OnBlurredAsync"
-    ValueChanged="OnValueChanged"
-    TextChanged="OnTextChanged"
+                          OnKeyDown="InvokeKeyDownAsync"
+                          OnKeyUp="InvokeKeyUpAsync"
+                          OnBlur="OnBlurredAsync"
+                          ValueChanged="OnValueChanged"
+                          TextChanged="OnTextChanged"
 
-    SearchFunc="SearchFuncAsync"
-    AddFunc="AddFuncAsync"/>
+                          SearchFunc="SearchFuncAsync"
+                          AddFunc="AddFuncAsync"/>
 </CascadingValue>
 
 @code {
@@ -122,7 +123,7 @@
     }
 
 
-    private static DvAutocompleteSelect.SelectorItem CreateSelectorItem(SmartBazaar.Client.Models.ArticleBrand element)
+    private static DvAutocompleteSelect.SelectorItem CreateSelectorItem(ArticleBrandModel element)
         => CreateSelectorItem(element.Title, element.ImgSrc);
 
     private static DvAutocompleteSelect.SelectorItem CreateSelectorItem(string caption, string? imgSrc = null)

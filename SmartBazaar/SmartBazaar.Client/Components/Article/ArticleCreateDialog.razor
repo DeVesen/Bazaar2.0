@@ -1,0 +1,69 @@
+﻿@using SmartBazaar.Client.Services
+@using SmartBazaar.Shared.Contracts
+@using SmartBazaar.Shared.Extensions
+@using SmartBazaar.Shared.Models
+@using SmartBazaar.Shared.Validator
+
+@inject IArticleService ArticleService
+@inject ArticleCreateValidator ArticleValidator
+@inject SnackBarService SnackBarService
+
+<MudDialog>
+    <DialogContent>
+        <ArticleForm Item="@_model"
+                     ItemChanged="OnAfterModelChangedAsync"
+                     Validation="@ArticleValidator.Validate" />
+    </DialogContent>
+    <DialogActions>
+        <DvButtonSave Disabled="@(_inputIsValid is false)"
+                      OnClick="SubmitAsync" />
+        <DvButtonCancel OnClick="@(() => MudDialog.Cancel())" />
+    </DialogActions>
+</MudDialog>
+
+@code {
+    private bool _inputIsValid;
+
+    private ArticleCreateModel _model = null!;
+
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; } = null!;
+
+    [Parameter]
+    public string VendorId { get; set; } = null!;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+
+        _model = new ArticleCreateModel
+        {
+            DealerId = VendorId,
+            Status = new()
+            {
+                ApprovedForSale = DateTime.Now
+            }
+        };
+    }
+
+    private async Task OnAfterModelChangedAsync(ArticleDataModel data)
+    {
+        _model.Adapt(data);
+
+        var validationResult = await ArticleValidator.ValidateAsync(_model);
+        _inputIsValid = validationResult.IsValid;
+    }
+
+    private async Task SubmitAsync()
+    {
+        var result = await ArticleService.CreateAsync(_model);
+        if (result.IsSuccess is false)
+        {
+            SnackBarService.AddInfo($"Fehler beim erstellen:\r\n{result.Value}");
+            return;
+        }
+        
+        SnackBarService.AddInfo($"Artikel {_model.Number} erstellt ...");
+        MudDialog.Close(DialogResult.Ok(result.Value.Id));
+    }
+}

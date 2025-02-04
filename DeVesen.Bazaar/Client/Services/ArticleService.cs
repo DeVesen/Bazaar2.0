@@ -27,7 +27,7 @@ public class ArticleService(IWebAssemblyHostEnvironment hostEnvironment,
     {
         var requestUri = new UriBuilder(BaseAddress)
             .AddUriPart("list")
-            .SetQueryItem("VendorId", vendorId)
+            .SetQueryItem("DealerId", vendorId)
             .SetQueryItem("Number", number)
             .SetQueryItem("SearchText", searchText)
             .Build();

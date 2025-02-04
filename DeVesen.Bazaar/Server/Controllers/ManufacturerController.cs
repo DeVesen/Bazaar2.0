@@ -1,5 +1,4 @@
-﻿using DeVesen.Bazaar.Server.Extensions;
-using DeVesen.Bazaar.Server.Infrastructure;
+﻿using DeVesen.Bazaar.Server.Infrastructure;
 using DeVesen.Bazaar.Server.Storage;
 using DeVesen.Bazaar.Server.Validator;
 using DeVesen.Bazaar.Shared;

@@ -9,7 +9,7 @@ public static class ArticleExtensions
     {
         return new ArticleCreateDto
         {
-            VendorId = data.VendorId,
+            VendorId = data.DealerId,
             Number = data.Number,
 
             ArticleCategory = data.ArticleCategory,
@@ -26,7 +26,7 @@ public static class ArticleExtensions
     {
         return new ArticleUpdateDto
         {
-            VendorId = data.VendorId,
+            VendorId = data.DealerId,
             Number = data.Number,
 
             ArticleCategory = data.ArticleCategory,
@@ -50,7 +50,7 @@ public static class ArticleExtensions
         return new Article
         {
             Id = data.Id,
-            VendorId = data.VendorId,
+            DealerId = data.VendorId,
             Number = data.Number,
 
             ArticleCategory = data.ArticleCategory,

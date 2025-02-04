@@ -1,17 +1,20 @@
-﻿@using SmartBazaar.Client.Models
-@using SmartBazaar.Client.Services
+﻿@using SmartBazaar.Client.Services
+@using SmartBazaar.Shared.Contracts
+@using SmartBazaar.Shared.Extensions
+@using SmartBazaar.Shared.Models
+@using SmartBazaar.Shared.Validator
 
 @inject IArticleBrandService ArticleBrandService
-@inject ISnackBarService SnackBarService
+@inject ArticleBrandValidator ArticleBrandValidator
+@inject SnackBarService SnackBarService
 
 <MudDialog>
     <DialogContent>
-        <ArticleBrandForm @bind-Item="_articleBrand"
-                          IsValidChanged="@(x => _inputIsValid = x)"
-                          IsTouchedChanged="@(x => _inputIsTouched = x)" />
+        <ArticleBrandForm Item="@_model"
+                          ItemChanged="OnAfterModelChangedAsync"/>
     </DialogContent>
     <DialogActions>
-        <DvButtonSave Disabled="@((_inputIsValid && _inputIsTouched) is false)"
+        <DvButtonSave Disabled="@(_inputIsValid is false)"
                       OnClick="SubmitAsync" />
         <DvButtonCancel OnClick="@(() => MudDialog.Cancel())" />
     </DialogActions>
@@ -19,22 +22,28 @@
 
 @code {
     private bool _inputIsValid;
-    private bool _inputIsTouched;
 
-    private ArticleBrand _articleBrand = ArticleBrand.CreateEmptyNew();
+    private ArticleBrandCreateModel _model = new();
 
     [CascadingParameter]
     MudDialogInstance MudDialog { get; set; } = null!;
 
+    private async Task OnAfterModelChangedAsync(ArticleBrandDataModel data)
+    {
+        _model.Adapt(data);
+        _inputIsValid = (await ArticleBrandValidator.ValidateAsync(_model)).IsValid;
+    }
+
     private async Task SubmitAsync()
     {
-        var result = await ArticleBrandService.CreateAsync(_articleBrand);
-
-        if (result.IsSuccess)
+        var result = await ArticleBrandService.CreateAsync(_model);
+        if (result.IsSuccess is false)
         {
-            SnackBarService.AddInfo($"Hersteller {_articleBrand.Title} erstellt ...");
-
-            MudDialog.Close(DialogResult.Ok(result.Value.Id));
+            SnackBarService.AddInfo($"Fehler beim erstellen:\r\n{result.ErrorMessage}");
+            return;
         }
+        
+        SnackBarService.AddInfo($"Hersteller {_model.Title} erstellt ...");
+        MudDialog.Close(DialogResult.Ok(result.Value.Id));
     }
 }

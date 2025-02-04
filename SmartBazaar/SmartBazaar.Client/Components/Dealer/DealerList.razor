@@ -1,0 +1,42 @@
+﻿@using Fluxor
+@using SmartBazaar.Client.States.DealerInfoState
+@using SmartBazaar.Shared.Extensions
+@using SmartBazaar.Shared.Models
+
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+
+@inject IState<DealerInfoState> DealerState
+
+@if (IsDataLoading)
+{
+    <MudProgressLinear Color="Color.Secondary" Indeterminate="true" />
+}
+else
+{
+    <MudPaper Outlined="false" Elevation="0" Class="flex-grow-1 overflow-auto">
+        <MudGrid Spacing="2">
+            @if (Elements.Any())
+            {
+                @foreach (var element in Elements)
+                {
+                    <MudItem xs="12" sm="4" md="3" lg="2" Style="min-width: 250px;">
+                        <DealerCard DealerModel="@element.Dealer" StatisticModel="@element.Statistic" />
+                    </MudItem>
+                }
+            }
+            else
+            {
+                <MudItem xs="12">
+                    <DvSimpleListNoElement />
+                </MudItem>
+            }
+        </MudGrid>
+    </MudPaper>
+}
+
+@code {
+    private IEnumerable<DealerInfoAggregate> Elements
+        => DealerState.GetAll().OrderBy(p => p.Dealer.GetFullName()).ToArray();
+
+    public bool IsDataLoading => DealerState.IsLoading();
+}

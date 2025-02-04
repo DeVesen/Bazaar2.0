@@ -1,0 +1,43 @@
+﻿<MudButton StartIcon="@IconView"
+           Color="@ColorView"
+           FullWidth="@FullWidth"
+           Disabled="@Disabled"
+           Size="@Size"
+           OnClick="@(() => ToggledChanged.InvokeAsync(!Toggled))">
+    @ChildContent
+</MudButton>
+
+@code {
+    private string? IconView => Toggled ? ToggledIcon : Icon;
+    private Color ColorView => Toggled ? ToggledColor : Color;
+
+    [Parameter]
+    public bool Toggled { get; set; }
+
+    [Parameter]
+    public string? Icon { get; set; }
+
+    [Parameter]
+    public Color Color { get; set; } = Color.Default;
+
+    [Parameter]
+    public string? ToggledIcon { get; set; }
+
+    [Parameter]
+    public Color ToggledColor { get; set; } = Color.Default;
+
+    [Parameter]
+    public bool FullWidth { get; set; }
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    [Parameter]
+    public Size Size { get; set; } = Size.Small;
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> ToggledChanged { get; set; }
+}

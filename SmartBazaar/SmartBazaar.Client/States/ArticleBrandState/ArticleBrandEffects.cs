@@ -1,7 +1,5 @@
 ﻿using Fluxor;
-using Mapster;
-using SmartBazaar.Client.Models;
-using SmartBazaar.Client.Services;
+using SmartBazaar.Shared.Contracts;
 
 namespace SmartBazaar.Client.States.ArticleBrandState;
 
@@ -18,7 +16,6 @@ public class ArticleBrandEffects(IArticleBrandService articleBrandService)
         }
 
         var domainElements = response.Value
-            .Select(p => p.Adapt<ArticleBrand>())
             .OrderBy(p => p.Title)
             .ToArray();
 

@@ -1,0 +1,94 @@
+﻿@using SmartBazaar.Client.Services
+@using SmartBazaar.Shared.Contracts
+@using SmartBazaar.Shared.Extensions
+@using SmartBazaar.Shared.Models
+@using SmartBazaar.Shared.Types
+@using SmartBazaar.Shared.Validator
+
+@inject IDealerService DealerService
+@inject DealerValidator DealerValidator
+@inject DlgService DlgService
+@inject SnackBarService SnackBarService
+
+<MudDialog>
+    <DialogContent>
+        <DealerForm Item="@_model"
+                    ItemChanged="OnAfterModelChangedAsync" />
+    </DialogContent>
+    <DialogActions>
+        <MudGrid Spacing="1">
+            <MudItem xs="4" Class="d-flex justify-center">
+                <DvButtonSave Disabled="@(_inputIsValid is false)" OnClick="SubmitAsync" />
+            </MudItem>
+            <MudItem xs="4" Class="d-flex justify-center">
+                <DvButtonDelete IconOnly OnClick="DeleteAsync" />
+            </MudItem>
+            <MudItem xs="4" Class="d-flex justify-center">
+                <DvButtonCancel OnClick="@(() => MudDialog.Cancel())" />
+            </MudItem>
+        </MudGrid>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    private bool _inputIsValid;
+    private DealerModel _model = null!;
+
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; } = null!;
+
+    [Parameter]
+    public string DealerId { get; set; } = null!;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await DealerService.GetByIdAsync(DealerId);
+        if (result.IsSuccess is false)
+        {
+            SnackBarService.AddInfo($"Fehler beim laden des Händlers:\r\n{result.ErrorMessage}");
+            MudDialog.Cancel();
+            return;
+        }
+        _model = result.Value;
+    }
+
+
+    private async Task OnAfterModelChangedAsync(DealerDataModel data)
+    {
+        _model.Adapt(data);
+        _inputIsValid = (await DealerValidator.ValidateAsync(_model)).IsValid;
+    }
+
+    private async Task SubmitAsync()
+    {
+        var result = await DealerService.UpdateAsync(_model);
+        if (result.IsSuccess is false)
+        {
+            SnackBarService.AddInfo($"Fehler beim speichern:\r\n{result.ErrorMessage}");
+            return;
+        }
+        
+        SnackBarService.AddInfo($"Verkäufer {_model.GetFullName()} geändert ...");
+        MudDialog.Close(DialogResult.Ok(result.Value.Id));
+    }
+
+    private async Task DeleteAsync()
+    {
+        var questionResult = await DlgService.ShowMessageBoxAsync($"Verkäufer {_model.Name.LastName}, {_model.Name.FirstName} wirklich löschen?", "Löschen", "Löschen", "Nein");
+        if (questionResult != MessageBoxResultType.Yes)
+        {
+            return;
+        }
+
+        var result = await DealerService.DeleteAsync(_model.Id);
+        if (result.IsSuccess is false)
+        {
+            SnackBarService.AddInfo($"Fehler beim löschen:\r\n{result.ErrorMessage}");
+            return;
+        }
+        
+        SnackBarService.AddInfo($"Verkäufer {_model.GetFullName()} gelöscht ...");
+        MudDialog.Close(DialogResult.Ok(_model.Id));
+    }
+}

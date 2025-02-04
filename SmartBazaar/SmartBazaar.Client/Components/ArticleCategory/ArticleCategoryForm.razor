@@ -1,12 +1,9 @@
-﻿@using SmartBazaar.Client.Models
-@using SmartBazaar.Client.Shared.Components.DvTextField
-@using SmartBazaar.Client.Validator
+﻿@using SmartBazaar.Shared.Models
+@using SmartBazaar.Shared.Validator
 
 @inject ArticleCategoryValidator ArticleCategoryValidator
 
-<MudForm IsValidChanged="@IsValidChanged"
-         IsTouchedChanged="@IsTouchedChanged"
-         FieldChanged="OnFormFieldChangedAsync"
+<MudForm FieldChanged="OnFormFieldChangedAsync"
          Model="Item"
          Validation="@ArticleCategoryValidator.Validate"
          Style="margin-bottom: 20px;">
@@ -25,16 +22,10 @@
 
 @code {
     [Parameter]
-    public EventCallback<bool> IsValidChanged { get; set; }
+    public required ArticleCategoryDataModel Item { get; set; }
 
     [Parameter]
-    public EventCallback<bool> IsTouchedChanged { get; set; }
-
-    [Parameter]
-    public required ArticleCategory Item { get; set; }
-
-    [Parameter]
-    public required EventCallback<ArticleCategory> ItemChanged { get; set; }
+    public required EventCallback<ArticleCategoryDataModel> ItemChanged { get; set; }
 
     private async Task OnFormFieldChangedAsync()
     {

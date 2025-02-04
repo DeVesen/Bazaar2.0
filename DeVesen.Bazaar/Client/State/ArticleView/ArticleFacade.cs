@@ -1,0 +1,91 @@
+﻿using DeVesen.Bazaar.Client.Extensions;
+using DeVesen.Bazaar.Shared.Events;
+using Fluxor;
+
+namespace DeVesen.Bazaar.Client.State.ArticleView;
+
+public class ArticleFacade
+{
+    private readonly IDispatcher _dispatcher;
+    private readonly VendorHubConnectionService _vendorHub;
+    private readonly ArticleHubConnectionService _articleHub;
+
+    public ArticleFacade(IDispatcher dispatcher,
+                             VendorHubConnectionService vendorHub,
+                             ArticleHubConnectionService articleHub)
+    {
+        _dispatcher = dispatcher;
+        _vendorHub = vendorHub;
+        _articleHub = articleHub;
+    }
+
+    public void Fetch(string? vendorId = null, string? number = null, string? searchText = null)
+        => _dispatcher.Dispatch(new ArticleActions.Fetch(vendorId, number, searchText));
+
+    public void Clear()
+        => _dispatcher.Dispatch(new ArticleActions.Clear());
+
+
+    public async Task StartCallbacks()
+    {
+        if (_vendorHub.IsWorking())
+        {
+            return;
+        }
+
+        await _vendorHub.StartAsync();
+        await _articleHub.StartAsync();
+
+        _vendorHub.RegisterOnRemoved(OnVendorRemoved);
+
+        _articleHub.RegisterOnAdded(OnArticleAdded);
+        _articleHub.RegisterOnUpdated(OnArticleUpdated);
+        _articleHub.RegisterOnStatusChanged(OnArticleStatusChanged);
+        _articleHub.RegisterOnRemoved(OnArticleRemoved);
+    }
+
+    public async Task StopCallbacks()
+    {
+        await _vendorHub.StopAsync();
+        await _articleHub.StopAsync();
+    }
+
+
+    private void OnVendorRemoved(VendorRemovedArgs args)
+    {
+        _dispatcher.Dispatch(new ArticleActions.SetBadDealer(args.Id));
+    }
+
+
+    private void OnArticleAdded(IEnumerable<ArticleAddedArgs> args)
+    {
+        foreach (var arg in args)
+        {
+            _dispatcher.Dispatch(new ArticleActions.SetItem(arg.Article.ToModel()));
+        }
+    }
+
+    private void OnArticleUpdated(IEnumerable<ArticleUpdatedArgs> args)
+    {
+        foreach (var arg in args)
+        {
+            _dispatcher.Dispatch(new ArticleActions.SetItem(arg.Article.ToModel()));
+        }
+    }
+
+    private void OnArticleStatusChanged(IEnumerable<ArticleStatusChangedArgs> args)
+    {
+        foreach (var arg in args)
+        {
+            _dispatcher.Dispatch(new ArticleActions.SetItem(arg.Article.ToModel()));
+        }
+    }
+
+    private void OnArticleRemoved(IEnumerable<ArticleRemovedArgs> args)
+    {
+        foreach (var arg in args)
+        {
+            _dispatcher.Dispatch(new ArticleActions.SetItem(arg.Article.ToModel()));
+        }
+    }
+}

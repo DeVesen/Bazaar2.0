@@ -17,7 +17,7 @@ public class ImportExportService(SystemClock systemClock)
 
         value = new Models.Article
         {
-            VendorId = vendorId,
+            DealerId = vendorId,
             Number = int.Parse(lineParts[0]),
             Description = lineParts[1],
             ArticleCategory = lineParts[2],

@@ -2,13 +2,13 @@
 
 public static class Supporter
 {
-    public static async Task WaitUntil(Func<bool> condition, int timeoutMs = 800)
+    public static void WaitUntil(Func<bool> condition, int timeoutMs = 800)
     {
         const int delay = 100;
 
         while (condition() is false && timeoutMs >= 0)
         {
-            await Task.Delay(delay);
+            Task.Delay(delay).Wait();
             timeoutMs -= delay;
         }
 

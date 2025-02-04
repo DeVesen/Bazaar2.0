@@ -1,119 +1,196 @@
-﻿@using SmartBazaar.Client.Models
-@using SmartBazaar.Client.Shared.Components.DvTextField
+﻿
+@using SmartBazaar.Shared.Extensions
+@using SmartBazaar.Shared.Models
+@using SmartBazaar.Shared.Types
+@using SmartBazaar.Shared.Validator
 
-<MudForm IsValidChanged="@IsValidChanged"
-         IsTouchedChanged="@IsTouchedChanged"
-         FieldChanged="OnFormFieldChangedAsync"
+@inject DealerValidator DealerValidator
+
+<MudForm FieldChanged="OnFormFieldChangedAsync"
          Model="Item"
-         Validation="@Validation"
+         Validation="@DealerValidator.Validate"
          Style="margin-bottom: 20px;">
 
-    <MudGrid Spacing="2">
-        <MudItem xs="12" sm="6">
-            <DvTextField T="string"
-                         @ref="_firstNameTxt"
-                         Required
-                         Label="Vorname"
-                         @bind-Value="Item.FirstName"
-                         For="@(() => Item.FirstName)"/>
-        </MudItem>
-        <MudItem xs="12" sm="6">
-            <DvTextField T="string"
-                         @ref="_lastNameTxt"
-                         Required
-                         Label="Nachname"
-                         @bind-Value="Item.LastName"
-                         For="@(() => Item.LastName)"/>
-        </MudItem>
+    <MudStack Spacing="2">
 
-        <MudItem xs="12" sm="12">
-            <DvTextField T="string"
-                         @ref="_addressTxt"
-                         Required
-                         Label="Anschrift"
-                         Lines="2"
-                         MaxLines="2"
-                         AutoGrow="false"
-                         @bind-Value="Item.Address"
-                         For="@(() => Item.Address)" />
-        </MudItem>
+        <MudGrid Spacing="2">
+            
+            @if (Item.IsCompany())
+            {
+                <MudItem xs="12" sm="12">
+                    <DvTextField T="string"
+                                 Required="@FirstNameRequired"
+                                 Label="Firma"
+                                 @bind-Value="Item.Name.LastName"
+                                 For="@(() => Item.Name.LastName)" />
+                </MudItem>
+            }
+            else
+            {
+                <MudItem xs="12" sm="6">
+                    <DvTextField T="string"
+                                 Required="@FirstNameRequired"
+                                 Label="Vorname"
+                                 @bind-Value="Item.Name.FirstName"
+                                 For="@(() => Item.Name.FirstName)"/>
+                </MudItem>
 
-        <MudItem xs="12" sm="6">
-            <DvTextField T="string"
-                         Label="E-Mail"
-                         @bind-Value="Item.EMail"
-                         For="@(() => Item.EMail)" />
-        </MudItem>
-        <MudItem xs="12" sm="6">
-            <DvTextField T="string"
-                         DebounceInterval="600"
-                         Label="Telefon"
-                         @bind-Value="Item.Phone"
-                         For="@(() => Item.Phone)" />
-        </MudItem>
+                <MudItem xs="12" sm="6">
+                    <DvTextField T="string"
+                                 Required
+                                 Label="Nachname"
+                                 @bind-Value="Item.Name.LastName"
+                                 For="@(() => Item.Name.LastName)"/>
+                </MudItem>
+            }
 
-        <MudItem xs="12" sm="6">
-            <DvTextField T="double"
-                         Label="Umsatzanteil"
-                         Value="@(Item.SalesShare * 100)"
-                         ValueChanged="@(x => Item.SalesShare = x / 100)"
-                         Adornment="Adornment.End"
-                         AdornmentText="%"
-                         HelperText="Entfällt auf die Summe des Verkaufserlös."
-                         For="@(() => Item.SalesShare)" />
-        </MudItem>
-        <MudItem xs="12" sm="6">
-            <DvTextField T="double"
-                         Label="Arbeitskosten"
-                         @bind-Value="Item.OfferUnitPrice"
-                         Adornment="Adornment.End"
-                         AdornmentText="€ pro Stück"
-                         HelperText="Entfällt auf jeden Artikel der nicht verkauft aber angeboten wurde."
-                         For="@(() => Item.OfferUnitPrice)" />
-        </MudItem>
+        </MudGrid>
 
-        <MudItem xs="12" sm="12">
-            <DvTextField T="string"
-                         Label="Notiz"
-                         @bind-Value="Item.Note"
-                         Lines="4"
-                         MaxLines="4"
-                         AutoGrow="false"
-                         For="@(() => Item.Note)" />
-        </MudItem>
-    </MudGrid>
+        <MudGrid Class="pt-3" Spacing="2">
+
+            <MudItem xs="12" sm="12">
+                <DvTextField T="string"
+                             Label="Straße"
+                             AutoGrow="false"
+                             @bind-Value="Item.Address.Street"
+                             For="@(() => Item.Address.Street)" />
+            </MudItem>
+
+            <MudItem xs="2" sm="4">
+                <DvTextField T="string"
+                             Label="Postleitzahl"
+                             AutoGrow="false"
+                             @bind-Value="Item.Address.ZipCode"
+                             For="@(() => Item.Address.ZipCode)" />
+            </MudItem>
+
+            <MudItem xs="10" sm="8">
+                <DvTextField T="string"
+                             Required
+                             Label="Stadt/Ort"
+                             AutoGrow="false"
+                             @bind-Value="Item.Address.City"
+                             For="@(() => Item.Address.City)" />
+            </MudItem>
+
+        </MudGrid>
+
+        <MudGrid Class="pt-3" Spacing="2">
+
+            <MudItem xs="12" sm="6">
+                <DvTextField T="string"
+                             Label="E-Mail"
+                             @bind-Value="Item.Contact.EMail"
+                             For="@(() => Item.Contact.EMail)" />
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <DvTextField T="string"
+                             DebounceInterval="600"
+                             Label="Telefon"
+                             @bind-Value="Item.Contact.Phone"
+                             For="@(() => Item.Contact.Phone)" />
+            </MudItem>
+
+        </MudGrid>
+
+        <MudGrid Class="pt-3" Spacing="2">
+
+            <MudItem xs="12" sm="12">
+                <MudToggleGroup T="DealerTypes"
+                                Outlined
+                                Delimiters
+                                CheckMark
+                                FixedContent
+                                Color="Color.Surface"
+                                Size="Size.Medium"
+                                Style="max-width: 552px"
+                                @bind-Value="Item.SalesShareRatio.Type"
+                                @bind-Value:after="OnIsPrivateChanged">
+                    <MudToggleItem SelectedIcon="@Icons.Material.TwoTone.PersonOutline"
+                                   UnselectedIcon="@Icons.Material.TwoTone.PersonOutline"
+                                   Text="Privat" Value="@(DealerTypes.Private)" />
+                    <MudToggleItem SelectedIcon="@Icons.Material.TwoTone.Business"
+                                   UnselectedIcon="@Icons.Material.TwoTone.Business"
+                                   Text="Händler" Value="@(DealerTypes.Company)" />
+                    <MudToggleItem SelectedIcon="@Icons.Material.TwoTone.ChildCare"
+                                   UnselectedIcon="@Icons.Material.TwoTone.ChildCare"
+                                   Text="Verein" Value="@(DealerTypes.Association)" />
+                </MudToggleGroup>
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <DvTextField T="double"
+                             Required
+                             Label="Umsatzanteil"
+                             Value="@(Item.SalesShareRatio.SalesShare * 100)"
+                             ValueChanged="@(x => Item.SalesShareRatio.SalesShare = x / 100)"
+                             Adornment="Adornment.End"
+                             AdornmentText="%"
+                             HelperText="Entfällt auf die Summe des Verkaufserlös."
+                             For="@(() => Item.SalesShareRatio.SalesShare)" />
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <DvTextField T="double"
+                             Required
+                             Label="Arbeitskosten"
+                             @bind-Value="Item.SalesShareRatio.OfferUnitPrice"
+                             Adornment="Adornment.End"
+                             AdornmentText="€ pro Stück"
+                             HelperText="Entfällt auf jeden Artikel der nicht verkauft aber angeboten wurde."
+                             For="@(() => Item.SalesShareRatio.OfferUnitPrice)" />
+            </MudItem>
+
+        </MudGrid>
+
+        <MudGrid Class="pt-3" Spacing="2">
+
+            <MudItem xs="12" sm="12">
+                <DvTextField T="string"
+                             Label="Notiz"
+                             @bind-Value="Item.Note"
+                             Lines="4"
+                             MaxLines="4"
+                             AutoGrow="false"
+                             For="@(() => Item.Note)" />
+            </MudItem>
+
+        </MudGrid>
+
+    </MudStack>
 
 </MudForm>
 
 @code {
-    private DvTextField<string> _firstNameTxt = null!;
-    private DvTextField<string> _lastNameTxt = null!;
-    private DvTextField<string> _addressTxt = null!;
+    public bool FirstNameRequired => Item.SalesShareRatio.Type != DealerTypes.Company;
 
     [Parameter]
-    public EventCallback<bool> IsValidChanged { get; set; }
+    public required DealerDataModel Item { get; set; }
 
     [Parameter]
-    public EventCallback<bool> IsTouchedChanged { get; set; }
-
-    [Parameter]
-    public required Dealer Item { get; set; }
-
-    [Parameter]
-    public required EventCallback<Dealer> ItemChanged { get; set; }
-
-    [Parameter]
-    [Category(CategoryTypes.FormComponent.Validation)]
-    public object? Validation { get; set; } = null;
+    public required EventCallback<DealerDataModel> ItemChanged { get; set; }
 
     private async Task OnFormFieldChangedAsync()
     {
         await ItemChanged.InvokeAsync(Item);
     }
 
-    private void FocusFirstNameAsync() => _firstNameTxt?.FocusAsync();
-
-    private void FocusLastNameAsync() => _lastNameTxt?.FocusAsync();
-
-    private void FocusAddressAsync() => _addressTxt?.FocusAsync();
+    private void OnIsPrivateChanged()
+    {
+        switch (Item.SalesShareRatio.Type)
+        {
+            case DealerTypes.Private:
+                Item.SalesShareRatio.SalesShare = 0.15d;
+                Item.SalesShareRatio.OfferUnitPrice = 0.50d;
+                break;
+            case DealerTypes.Company:
+                Item.SalesShareRatio.SalesShare = 0.10d;
+                Item.SalesShareRatio.OfferUnitPrice = 0.0d;
+                break;
+            case DealerTypes.Association:
+                Item.SalesShareRatio.SalesShare = 0.0d;
+                Item.SalesShareRatio.OfferUnitPrice = 0.0d;
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+    }
 }

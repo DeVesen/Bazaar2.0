@@ -1,5 +1,5 @@
 ﻿using Fluxor;
-using SmartBazaar.Client.Models;
+using SmartBazaar.Shared.Models;
 
 namespace SmartBazaar.Client.States.ArticleBrandState;
 
@@ -8,14 +8,12 @@ public static class ArticleBrandSelector
     public static bool IsLoading(this IState<ArticleBrandState> state)
         => state.Value.IsLoading;
 
+
     public static void WaitLoadingIsDone(this IState<ArticleBrandState> state)
-    {
-        Supporter.WaitUntil(() => state.IsLoading() is false)
-                 .Wait();
-    }
+        => Supporter.WaitUntil(() => state.IsLoading() is false);
 
 
-    public static IEnumerable<ArticleBrand> GetAll(this IState<ArticleBrandState> state, string? filterValue = null)
+    public static IEnumerable<ArticleBrandModel> GetAll(this IState<ArticleBrandState> state, string? filterValue = null)
     {
         state.WaitLoadingIsDone();
 
@@ -25,14 +23,14 @@ public static class ArticleBrandSelector
     }
 
 
-    public static ArticleBrand? GetByIdAsync(this IState<ArticleBrandState> state, string id)
+    public static ArticleBrandModel? GetByIdAsync(this IState<ArticleBrandState> state, string id)
     {
         state.WaitLoadingIsDone();
 
         return state.Value.Elements.FirstOrDefault(p => p.Id.Equals(id, StringComparison.OrdinalIgnoreCase));
     }
 
-    public static ArticleBrand? GetByTitleAsync(this IState<ArticleBrandState> state, string title)
+    public static ArticleBrandModel? GetByTitleAsync(this IState<ArticleBrandState> state, string title)
     {
         state.WaitLoadingIsDone();
 
@@ -40,7 +38,7 @@ public static class ArticleBrandSelector
     }
 
 
-    public static bool TryGetByIdAsync(this IState<ArticleBrandState> state, string id, out ArticleBrand element)
+    public static bool TryGetByIdAsync(this IState<ArticleBrandState> state, string id, out ArticleBrandModel element)
     {
         var foundElement = state.GetByIdAsync(id);
 
@@ -49,7 +47,7 @@ public static class ArticleBrandSelector
         return foundElement != null;
     }
 
-    public static bool TryGetByTitleAsync(this IState<ArticleBrandState> state, string title, out ArticleBrand element)
+    public static bool TryGetByTitleAsync(this IState<ArticleBrandState> state, string title, out ArticleBrandModel element)
     {
         var foundElement = state.GetByTitleAsync(title);
 

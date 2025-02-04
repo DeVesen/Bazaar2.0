@@ -1,86 +1,108 @@
-﻿@using SmartBazaar.Client.Models
+﻿@using SmartBazaar.Shared.Extensions
+@using SmartBazaar.Shared.Models
 
-<MudForm IsValidChanged="@IsValidChanged"
-         IsTouchedChanged="@IsTouchedChanged"
-         FieldChanged="@(async x => await ItemChanged.InvokeAsync(Item))"
-         Model="Item"
-         Style="margin-bottom: 20px;">
+<MudGrid Spacing="2">
+    <MudItem xs="12">
+        <MudField Label="Erstellt um:"
+        Variant="Variant.Filled">
+            <MudText Align="Align.Center" Style="height: 24px;">
+                @GetDateTimeFormated(Item.Created)
+            </MudText>
+        </MudField>
+    </MudItem>
 
-    <MudGrid Spacing="2">
-        <MudItem xs="12" sm="3">
-            <MudField Label="Erstellt um:"
-                      Variant="Variant.Filled">
-                <MudText Align="Align.Center" Style="height: 24px;">
-                    @GetDateTimeFormated(Item.Created)
-                </MudText>
-            </MudField>
-        </MudItem>
+    <MudItem xs="12">
+        <MudField Label="Freigegeben um:"
+        Variant="Variant.Filled"
+        Adornment="@ShowApprovedAdornment()"
+        AdornmentIcon="@GetApprovedAdornmentIcon()"
+        OnAdornmentClick="OnApprovedAdornmentClicked">
+            <MudText Align="Align.Center" Style="height: 24px;">
+                @GetDateTimeFormated(Item.ApprovedForSale)
+            </MudText>
+        </MudField>
+    </MudItem>
 
-        <MudItem xs="12" sm="3">
-            <MudField Label="Freigegeben um:"
-                      Variant="Variant.Filled"
-                      Adornment="@ShowAdornment(Item.IsInSale() || Item.IsApprovedForSale() is false)"
-                      AdornmentIcon="@GetApprovedAdornmentIcon()"
-                      OnAdornmentClick="OnApprovedAdornmentClicked">
-                <MudText Align="Align.Center" Style="height: 24px;">
-                    @GetDateTimeFormated(Item.ApprovedForSale)
-                </MudText>
-            </MudField>
-        </MudItem>
+    <MudItem xs="12">
+        <MudField Label="Verkauft um:"
+        Variant="Variant.Filled"
+        Adornment="@ShowSoldAdornment()"
+        AdornmentIcon="@Icons.Material.TwoTone.Delete"
+        OnAdornmentClick="@(_ => Item.Sold = null)">
+            <MudText Align="Align.Center" Style="height: 24px;">
+                @GetDateTimeFormated(Item.Sold)
+            </MudText>
+        </MudField>
+    </MudItem>
 
-        <MudItem xs="12" sm="3">
-            <MudField Label="Verkauft um:"
-                      Variant="Variant.Filled"
-                      Adornment="@ShowAdornment(Item.IsSold() && Item.IsReturned() is false && Item.IsSettled() is false)"
-                      AdornmentIcon="@Icons.Material.TwoTone.Delete"
-                      OnAdornmentClick="@(_ => Item.Sold = null)">
-                <MudText Align="Align.Center" Style="height: 24px;">
-                    @GetDateTimeFormated(Item.Sold)
-                </MudText>
-            </MudField>
-        </MudItem>
+    <MudItem xs="12">
+        <MudField Label="Zurückgegeben um:"
+        Variant="Variant.Filled"
+        Adornment="@ShowReturnedAdornment()"
+        AdornmentIcon="@GetReturnedAdornmentIcon()"
+        OnAdornmentClick="OnReturnedAdornmentClicked">
+            <MudText Align="Align.Center" Style="height: 24px;">
+                @GetDateTimeFormated(Item.Returned)
+            </MudText>
+        </MudField>
+    </MudItem>
 
-        <MudItem xs="12" sm="3">
-            <MudField Label="Zurückgegeben um:"
-                      Variant="Variant.Filled"
-                      Adornment="@ShowAdornment(Item.IsSold() is false && Item.IsSettled() is false || Item.IsReturned())"
-                      AdornmentIcon="@GetReturnedAdornmentIcon()"
-                      OnAdornmentClick="OnReturnedAdornmentClicked">
-                <MudText Align="Align.Center" Style="height: 24px;">
-                    @GetDateTimeFormated(Item.Returned)
-                </MudText>
-            </MudField>
-        </MudItem>
+    <MudItem xs="12">
+        <MudField Label="Abgerechnet um:"
+        Variant="Variant.Filled"
+        Adornment="@ShowSettledAdornment()"
+        AdornmentIcon="@Icons.Material.TwoTone.Delete"
+        OnAdornmentClick="OnSettledAdornmentClicked">
+            <MudText Align="Align.Center" Style="height: 24px;">
+                @GetDateTimeFormated(Item.Settled)
+            </MudText>
+        </MudField>
 
-        <MudItem xs="12" sm="3">
-            <MudField Label="Abgerechnet um:"
-                      Variant="Variant.Filled"
-                      Adornment="@ShowAdornment(Item.IsSettled())"
-                      AdornmentIcon="@Icons.Material.TwoTone.Delete"
-                      OnAdornmentClick="OnSettledAdornmentClicked">
-                <MudText Align="Align.Center" Style="height: 24px;">
-                    @GetDateTimeFormated(Item.Settled)
-                </MudText>
-            </MudField>
-
-        </MudItem>
-    </MudGrid>
-
-</MudForm>
+    </MudItem>
+</MudGrid>
 
 @code {
-
-    [Parameter]
-    public EventCallback<bool> IsValidChanged { get; set; }
-
-    [Parameter]
-    public EventCallback<bool> IsTouchedChanged { get; set; }
 
     [Parameter]
     public required ArticleStatus Item { get; set; }
 
     [Parameter]
     public required EventCallback<ArticleStatus> ItemChanged { get; set; }
+
+
+    private async Task OnFormFieldChangedAsync()
+    {
+        await ItemChanged.InvokeAsync(Item);
+    }
+
+
+    private Adornment ShowApprovedAdornment()
+    {
+        return Item.IsInSale() || Item.IsApprovedForSale() is false
+            ? Adornment.End
+            : Adornment.None;
+    }
+
+    private Adornment ShowSoldAdornment()
+    {
+        return Item.IsSold() && Item.IsReturned() is false && Item.IsSettled() is false
+            ? Adornment.End
+            : Adornment.None;
+    }
+
+    private Adornment ShowReturnedAdornment()
+    {
+        return Item.IsApprovedForSale() && Item.IsSold() is false && Item.IsSettled() is false
+            ? Adornment.End
+            : Adornment.None;
+    }
+
+    private Adornment ShowSettledAdornment()
+    {
+        return Item.IsSettled()
+            ? Adornment.End
+            : Adornment.None;
+    }
 
 
     private string GetApprovedAdornmentIcon()
@@ -115,6 +137,8 @@
         {
             Item.ApprovedForSale = null;
         }
+
+        ItemChanged.InvokeAsync(Item);
     }
 
     private void OnReturnedAdornmentClicked()
@@ -127,11 +151,15 @@
         {
             Item.Returned = null;
         }
+
+        ItemChanged.InvokeAsync(Item);
     }
 
     private void OnSettledAdornmentClicked()
     {
         Item.Settled = null;
+
+        ItemChanged.InvokeAsync(Item);
     }
 
 
@@ -140,12 +168,5 @@
         return dt.HasValue
             ? dt.Value.ToString("dd.MM.yyyy HH:mm:ss")
             : string.Empty;
-    }
-
-    private static Adornment ShowAdornment(bool show)
-    {
-        return show
-            ? Adornment.End
-            : Adornment.None;
     }
 }

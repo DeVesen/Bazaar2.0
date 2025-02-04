@@ -1,88 +1,67 @@
-﻿@using System.Text.Json
-@using SmartBazaar.Client.Components.Layout
-@using SmartBazaar.Client.Models
-@using SmartBazaar.Client.Shared.Components.DvAutocompleteSelect
+﻿@using SmartBazaar.Client.Components.Layout
 @using SmartBazaar.Client.Components.ComponentOverview
 @using SmartBazaar.Client.Components.ArticleBrand
-@using SmartBazaar.Client.Components.Article
 @using SmartBazaar.Client.Services
 @using SmartBazaar.Client.Components.ArticleCategory
 @using SmartBazaar.Client.States.ArticleCategoryState
+@using SmartBazaar.Client.Components.Dealer
+@using SmartBazaar.Client.Components.Article
+@using SmartBazaar.Client.States.ArticleState
+@using SmartBazaar.Client.States.DealerInfoState
 
 @layout ComponentOverviewLayout
 @page "/component-overview"
 
-@inject IDlgService DlgService
+@inject DlgService DlgService
 
-@inject ArticleBrandFacade ArticleBrandFacade;
-@inject ArticleCategoryFacade ArticleCategoryFacade;
+@inject ArticleBrandFacade ArticleBrandFacade
+@inject ArticleCategoryFacade ArticleCategoryFacade
+@inject DealerInfoFacade DealerFacade
+@inject ArticleFacade ArticleFacade
 
 <PageTitle>component-overview</PageTitle>
 
 <MudPaper Outlined="false" Elevation="0" Class="d-flex flex-column gap-2 px-5">
-    @* 
-
-    <MudDivider DividerType="DividerType.FullWidth" Style="height: 2px" Class="mt-2 mb-2" />
-
-
-    <ComponentOverviewComponent ComponentName="ArticleCreateForm">
-        <ArticleCreateForm IsValidChanged="@(x => _articleCreateIsValid = x)"
-                           @bind-Article="_articleCreate" />
-        <MudText>@ToJsonString(new { Valid = _articleCreateIsValid, Article = _articleCreate })</MudText>
-    </ComponentOverviewComponent>
-
-    <ComponentOverviewComponent ComponentName="ArticleUpdateForm">
-        <ArticleUpdateForm IsValidChanged="@(x => _articleUpdateIsValid = x)"
-                           @bind-Article="_articleUpdate"/>
-        <MudText>@ToJsonString(new { Valid = _articleUpdateIsValid, Article = _articleUpdate })</MudText>
-    </ComponentOverviewComponent>
-
-    <ComponentOverviewComponent ComponentName="ArticleDescriptionForm">
-        <ArticleDescriptionForm IsValidChanged="@(x => _articleDescriptionIsValid = x)"
-                                IsTouchedChanged="@(x => _articleDescriptionIsTouched = x)"
-                                @bind-Item="_articleDescription" />
-        <MudText>@ToJsonString(new { Valid = _articleDescriptionIsValid, Touched = _articleDescriptionIsTouched, ArticleDescription = _articleDescription })</MudText>
-    </ComponentOverviewComponent>
-
-    <ComponentOverviewComponent ComponentName="ArticlePriceForm">
-        <ArticlePriceForm IsValidChanged="@(x => _articlePriceIsValid = x)"
-                          IsTouchedChanged="@(x => _articlePriceIsTouched = x)"
-                          @bind-Item="_articlePrice" />
-        <MudText>@ToJsonString(new { Valid = _articlePriceIsValid, Touched = _articlePriceIsTouched, ArticlePrice = _articlePrice })</MudText>
-    </ComponentOverviewComponent>
-
-    <ComponentOverviewComponent ComponentName="ArticleStatusForm">
-        <ArticleStatusForm IsValidChanged="@(x => _articleStatusIsValid = x)"
-                           IsTouchedChanged="@(x => _articleStatusIsTouched = x)"
-                           @bind-Item="_articleStatus" />
-        <MudText>@ToJsonString(new { Valid = _articleStatusIsValid, Touched = _articleStatusIsTouched, ArticleStatus = _articleStatus })</MudText>
-    </ComponentOverviewComponent>
-
-    <ComponentOverviewComponent ComponentName="ArticleList">
-        <ArticleList ArticleListItems="@_articleListItemElements" />
-    </ComponentOverviewComponent>
 
 
     <MudDivider DividerType="DividerType.FullWidth" Style="height: 2px" Class="mt-2 mb-2" />
 
 
-    <ComponentOverviewComponent ComponentName="DealerForm">
-        <DealerForm @bind-Item="_dealerElement"/>
-    </ComponentOverviewComponent>
-
-   *@
-
-    <MudDivider DividerType="DividerType.FullWidth" Style="height: 2px" Class="mt-2 mb-2" />
-
-    <ComponentOverviewComponent ComponentName="Article Brand Dlg">
+    <ComponentOverviewComponent ComponentName="DlgService.DealerCreateAsync">
         <MudButton FullWidth
-                   OnClick="@(() => DlgService.ArticleBrandCreate())">
-            <MudText>RUN</MudText>
+                   OnClick="@(() => DlgService.DealerCreateAsync())">
+            <MudText>Create</MudText>
         </MudButton>
     </ComponentOverviewComponent>
 
-    <ComponentOverviewComponent ComponentName="ArticleBrandForm">
-        <ArticleBrandForm @bind-Item="_articleBrand"/>
+    <ComponentOverviewComponent ComponentName="DealerList">
+        <DealerList />
+    </ComponentOverviewComponent>
+
+
+    <MudDivider DividerType="DividerType.FullWidth" Style="height: 2px" Class="mt-2 mb-2" />
+
+
+    <ComponentOverviewComponent ComponentName="DlgService.ArticleCreateAsync">
+        <MudButton FullWidth
+                   OnClick="@(() => DlgService.ArticleCreateAsync("23E2903D-0D02-4632-85E5-374F62FE6BA5"))">
+            <MudText>Create</MudText>
+        </MudButton>
+    </ComponentOverviewComponent>
+
+    <ComponentOverviewComponent ComponentName="DealerList">
+        <ArticleList OnArticleClick="@(x => DlgService.ArticleModifyAsync(x.Id))" />
+    </ComponentOverviewComponent>
+
+
+    <MudDivider DividerType="DividerType.FullWidth" Style="height: 2px" Class="mt-2 mb-2" />
+
+
+    <ComponentOverviewComponent ComponentName="Article Brand Dlg">
+        <MudButton FullWidth
+                   OnClick="@(() => DlgService.ArticleBrandCreateAsync())">
+            <MudText>RUN</MudText>
+        </MudButton>
     </ComponentOverviewComponent>
 
     <ComponentOverviewComponent ComponentName="ArticleBrandSelection">
@@ -90,24 +69,20 @@
                                ValueChanged="@(x => _articleBrandValue = x)" />
         <MudText>@_articleBrandValue</MudText>
     </ComponentOverviewComponent>
-    
+
     <ComponentOverviewComponent ComponentName="ArticleBrandList">
-        <ArticleBrandList ElementClick="@(element => DlgService.ArticleBrandModify(element))" />
+        <ArticleBrandList ElementClick="@(x => DlgService.ArticleBrandModifyAsync(x.Id))" />
     </ComponentOverviewComponent>
 
 
     <MudDivider DividerType="DividerType.FullWidth" Style="height: 2px" Class="mt-2 mb-2" />
-    
+
 
     <ComponentOverviewComponent ComponentName="Article Category Dlg">
         <MudButton FullWidth
-                   OnClick="@(() => DlgService.ArticleCategoryCreate())">
+                   OnClick="@(() => DlgService.ArticleCategoryCreateAsync())">
             <MudText>CREATE</MudText>
         </MudButton>
-    </ComponentOverviewComponent>
-
-    <ComponentOverviewComponent ComponentName="ArticleCategoryForm">
-        <ArticleCategoryForm @bind-Item="_articleCategory" />
     </ComponentOverviewComponent>
 
     <ComponentOverviewComponent ComponentName="ArticleCategorySelection">
@@ -116,73 +91,14 @@
     </ComponentOverviewComponent>
 
     <ComponentOverviewComponent ComponentName="ArticleCategoryList">
-        <ArticleCategoryList ElementClick="@(element => DlgService.ArticleCategoryModify(element))" />
+        <ArticleCategoryList ElementClick="@(x => DlgService.ArticleCategoryModifyAsync(x.Id))" />
     </ComponentOverviewComponent>
 
-    @* 
-    <MudDivider DividerType="DividerType.FullWidth" Style="height: 2px" Class="mt-2 mb-2" />
-
-
-    <ComponentOverviewComponent ComponentName="DvTextField">
-        <DvTextField T="string"
-                     Label="Please enter hear:"
-                     HelperText="Hier kannst du etwas eingeben..."
-                     @bind-Value="_dvTextFieldValue" />
-
-        <MudText>@(string.IsNullOrWhiteSpace(_dvTextFieldValue) ? "<no input>" : _dvTextFieldValue)</MudText>
-    </ComponentOverviewComponent>
-
-
-    <MudDivider DividerType="DividerType.FullWidth" Style="height: 2px" Class="mt-2 mb-2" />
-
-
-    <ComponentOverviewComponent ComponentName="AutocompleteSelect">
-        <DvAutocompleteSelect Label="Auto-Complete-Select"
-                              SearchFunc="SearchFuncAsync"
-                              @bind-Value="_selectedAutocomplete" />
-
-        <MudText>@(_selectedAutocomplete != null ? _selectedAutocomplete.Caption : "<no selection>")</MudText>
-    </ComponentOverviewComponent>
-
-    <ComponentOverviewComponent ComponentName="AutocompleteSelect">
-        <DvAutocompleteSelect Label="Auto-Complete-Select"
-                              SearchFunc="SearchFuncAsync"
-                              AddFunc="AddFuncAsync"
-                              @bind-Value="_selectedAutocomplete" />
-
-        <MudText>@(_selectedAutocomplete != null ? _selectedAutocomplete.Caption : "<no selection>")</MudText>
-    </ComponentOverviewComponent> *@
 </MudPaper>
 
 @code {
-    private Article _articleCreate = null!;
-    private Article _articleUpdate = null!;
-    private ArticleDescription _articleDescription = null!;
-    private ArticlePrice _articlePrice = null!;
-    private ArticleStatus _articleStatus = null!;
-    private bool _articleCreateIsValid;
-    private bool _articleUpdateIsValid;
-    private bool _articleDescriptionIsValid;
-    private bool _articleDescriptionIsTouched;
-    private bool _articlePriceIsValid;
-    private bool _articlePriceIsTouched;
-    private bool _articleStatusIsValid;
-    private bool _articleStatusIsTouched;
-
-    private readonly List<ArticleList.ArticleListItem> _articleListItemElements = [];
-    private readonly List<ArticleBrand> _articleBrandElements = [];
-    private readonly List<ArticleCategory> _articleCategoryElements = [];
-    private readonly List<DvAutocompleteSelect.SelectorItem> _autocompleteElements = [];
-
-    private string _dvTextFieldValue = string.Empty;
-
     private string _articleCategoryValue = "Head";
     private string _articleBrandValue = "Head";
-    private ArticleBrand _articleBrand = ArticleBrand.CreateEmptyNew();
-    private ArticleCategory _articleCategory = ArticleCategory.CreateEmptyNew();
-    private Dealer _dealerElement = Dealer.New;
-
-    private DvAutocompleteSelect.SelectorItem? _selectedAutocomplete;
 
     protected override async Task OnInitializedAsync()
     {
@@ -190,177 +106,7 @@
 
         ArticleBrandFacade.FetchAll();
         ArticleCategoryFacade.FetchAll();
-
-        // SetArticles();
-        // SetArticleBrands();
-        // SetArticleCategories();
-        // SetAutocompleteElements();
-    }
-
-    private void SetArticles()
-    {
-        _articleCreate = Article.CreateEmpty();
-
-        _articleUpdate = new()
-        {
-            Description = new()
-            {
-                Number = "123",
-                Description = "K2 Ski",
-                ArticleBrand = "K2",
-                ArticleCategory = "Ski",
-            },
-            Price = new()
-            {
-                    Price01 = 10,
-                Price02 = null
-            },
-            Status = new()
-            {
-                Created = DateTime.Now,
-                ApprovedForSale = DateTime.Now,
-                Sold = DateTime.Now,
-                Settled = DateTime.Now,
-            }
-        };
-
-        _articleDescription = new()
-        {
-            Number = "123",
-            Description = "K2 Ski",
-            ArticleBrand = "K2",
-            ArticleCategory = "Ski",
-        };
-
-        _articlePrice = new()
-        {
-            Price01 = 0,
-            Price02 = null
-        };
-
-        _articleStatus = new()
-        {
-            Created = DateTime.Now,
-            ApprovedForSale = DateTime.Now,
-            Sold = DateTime.Now,
-            Settled = DateTime.Now,
-        };
-
-        _articleListItemElements.Add(new ArticleList.ArticleListItem
-        {
-            Id = "1",
-            Vendor = "Reichert, Sven",
-            Number = "00000",
-            Title = "K2 Ski",
-            ArticleBrand = "K2",
-            ArticleCategory = "Ski",
-            Price01 = 299.99,
-            Price02 = 399.99,
-            Status = "im Verkauf"
-        });
-        _articleListItemElements.Add(new ArticleList.ArticleListItem
-        {
-            Id = "2",
-            Vendor = "Reichert, Sven",
-            Number = "00000",
-            Title = "K2 Ski",
-            ArticleBrand = "K2",
-            ArticleCategory = "Ski",
-            Price01 = 299.99,
-            Price02 = 399.99,
-            Status = "im Verkauf"
-        });
-        _articleListItemElements.Add(new ArticleList.ArticleListItem
-        {
-            Id = "3",
-            Vendor = "Reichert, Sven",
-            Number = "00000",
-            Title = "K2 Ski",
-            ArticleBrand = "K2",
-            ArticleCategory = "Ski",
-            Price01 = 299.99,
-            Price02 = 399.99,
-            Status = "im Verkauf"
-        });
-        _articleListItemElements.Add(new ArticleList.ArticleListItem
-        {
-            Id = "4",
-            Vendor = "Reichert, Sven",
-            Number = "40000",
-            Title = "Schwarz-Weis",
-            ArticleBrand = "HEAD",
-            ArticleCategory = "Ski-Stücke",
-            Price01 = 299.99,
-            Price02 = 399.99,
-            Status = "Freigegeben"
-        });
-    }
-
-    private void SetArticleBrands()
-    {
-        _articleBrandElements.Add(new ArticleBrand { Id = "1", Title = "K2", ImgSrc = "./Images/ArticleBrands/K2_Sports_logo.png" });
-        _articleBrandElements.Add(new ArticleBrand { Id = "1", Title = "Head", ImgSrc = "./Images/ArticleBrands/Head-logo.svg" });
-        _articleBrandElements.Add(new ArticleBrand { Id = "1", Title = "Atomic", ImgSrc = "./Images/ArticleBrands/Atomic_logo.jpg" });
-        _articleBrandElements.Add(new ArticleBrand { Id = "1", Title = "K2", ImgSrc = "./Images/ArticleBrands/K2_Sports_logo.png" });
-        _articleBrandElements.Add(new ArticleBrand { Id = "1", Title = "K2", ImgSrc = "./Images/ArticleBrands/K2_Sports_logo.png" });
-        _articleBrandElements.Add(new ArticleBrand { Id = "1", Title = "K2", ImgSrc = "./Images/ArticleBrands/K2_Sports_logo.png" });
-        _articleBrandElements.Add(new ArticleBrand { Id = "1", Title = "K2", ImgSrc = "./Images/ArticleBrands/K2_Sports_logo.png" });
-        _articleBrandElements.Add(new ArticleBrand { Id = "1", Title = "K2" });
-        _articleBrandElements.Add(new ArticleBrand { Id = "1", Title = "K2" });
-    }
-
-    private void SetArticleCategories()
-    {
-        _articleCategoryElements.Add(new ArticleCategory { Id = "1", Title = "K2", ImgSrc = "./Images/ArticleBrands/K2_Sports_logo.png" });
-        _articleCategoryElements.Add(new ArticleCategory { Id = "1", Title = "Head", ImgSrc = "./Images/ArticleBrands/Head-logo.svg" });
-        _articleCategoryElements.Add(new ArticleCategory { Id = "1", Title = "Atomic", ImgSrc = "./Images/ArticleBrands/Atomic_logo.jpg" });
-        _articleCategoryElements.Add(new ArticleCategory { Id = "1", Title = "K2", ImgSrc = "./Images/ArticleBrands/K2_Sports_logo.png" });
-        _articleCategoryElements.Add(new ArticleCategory { Id = "1", Title = "K2", ImgSrc = "./Images/ArticleBrands/K2_Sports_logo.png" });
-        _articleCategoryElements.Add(new ArticleCategory { Id = "1", Title = "K2", ImgSrc = "./Images/ArticleBrands/K2_Sports_logo.png" });
-        _articleCategoryElements.Add(new ArticleCategory { Id = "1", Title = "K2", ImgSrc = "./Images/ArticleBrands/K2_Sports_logo.png" });
-        _articleCategoryElements.Add(new ArticleCategory { Id = "1", Title = "K2" });
-        _articleCategoryElements.Add(new ArticleCategory { Id = "1", Title = "K2" });
-    }
-
-    private void SetAutocompleteElements()
-    {
-        _autocompleteElements.Add(new DvAutocompleteSelect.SelectorItem { Caption = "K2", ImgSrc = "./Images/ArticleBrands/K2_Sports_logo.png" });
-        _autocompleteElements.Add(new DvAutocompleteSelect.SelectorItem { Caption = "Head", ImgSrc = "./Images/ArticleBrands/Head-logo.svg" });
-        _autocompleteElements.Add(new DvAutocompleteSelect.SelectorItem { Caption = "Atomic", ImgSrc = "./Images/ArticleBrands/Atomic_logo.jpg" });
-        _autocompleteElements.Add(new DvAutocompleteSelect.SelectorItem { Caption = "Dymond" });
-    }
-
-    private async Task<IEnumerable<DvAutocompleteSelect.SelectorItem>> SearchFuncAsync(string searchValue, CancellationToken cancellationToken)
-    {
-        await Task.Delay(200, cancellationToken);
-
-        return string.IsNullOrWhiteSpace(searchValue)
-            ? _autocompleteElements
-            : _autocompleteElements
-                .Where(e => e.Caption.Contains(searchValue, StringComparison.OrdinalIgnoreCase))
-                .OrderBy(p => p.Caption);
-    }
-
-    private async Task<DvAutocompleteSelect.SelectorItem?> AddFuncAsync(string value)
-    {
-        await Task.Delay(200);
-
-        var newElement = new DvAutocompleteSelect.SelectorItem { Caption = value };
-
-        _autocompleteElements.Add(newElement);
-
-        return newElement;
-    }
-
-    private static string ToJsonString(object obj)
-    {
-        var options = new JsonSerializerOptions
-        {
-            WriteIndented = true
-        };
-
-        var result = JsonSerializer.Serialize(obj, options);
-
-        return result;
+        DealerFacade.ReLoadAllDealer();
+        ArticleFacade.FetchAll();
     }
 }

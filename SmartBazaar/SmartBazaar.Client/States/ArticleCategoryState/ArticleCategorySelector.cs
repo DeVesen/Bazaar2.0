@@ -1,5 +1,5 @@
 ﻿using Fluxor;
-using SmartBazaar.Client.Models;
+using SmartBazaar.Shared.Models;
 
 namespace SmartBazaar.Client.States.ArticleCategoryState;
 
@@ -8,14 +8,12 @@ public static class ArticleCategorySelector
     public static bool IsLoading(this IState<ArticleCategoryState> state)
         => state.Value.IsLoading;
 
+
     public static void WaitLoadingIsDone(this IState<ArticleCategoryState> state)
-    {
-        Supporter.WaitUntil(() => state.IsLoading() is false)
-                 .Wait();
-    }
+        => Supporter.WaitUntil(() => state.IsLoading() is false);
 
 
-    public static IEnumerable<ArticleCategory> GetAll(this IState<ArticleCategoryState> state, string? filterValue = null)
+    public static IEnumerable<ArticleCategoryModel> GetAll(this IState<ArticleCategoryState> state, string? filterValue = null)
     {
         state.WaitLoadingIsDone();
 
@@ -25,14 +23,14 @@ public static class ArticleCategorySelector
     }
 
 
-    public static ArticleCategory? GetByIdAsync(this IState<ArticleCategoryState> state, string id)
+    public static ArticleCategoryModel? GetByIdAsync(this IState<ArticleCategoryState> state, string id)
     {
         state.WaitLoadingIsDone();
 
         return state.Value.Elements.FirstOrDefault(p => p.Id.Equals(id, StringComparison.OrdinalIgnoreCase));
     }
 
-    public static ArticleCategory? GetByTitleAsync(this IState<ArticleCategoryState> state, string title)
+    public static ArticleCategoryModel? GetByTitleAsync(this IState<ArticleCategoryState> state, string title)
     {
         state.WaitLoadingIsDone();
 
@@ -40,7 +38,7 @@ public static class ArticleCategorySelector
     }
 
 
-    public static bool TryGetByIdAsync(this IState<ArticleCategoryState> state, string id, out ArticleCategory element)
+    public static bool TryGetByIdAsync(this IState<ArticleCategoryState> state, string id, out ArticleCategoryModel element)
     {
         var foundElement = state.GetByIdAsync(id);
 
@@ -49,7 +47,7 @@ public static class ArticleCategorySelector
         return foundElement != null;
     }
 
-    public static bool TryGetByTitleAsync(this IState<ArticleCategoryState> state, string title, out ArticleCategory element)
+    public static bool TryGetByTitleAsync(this IState<ArticleCategoryState> state, string title, out ArticleCategoryModel element)
     {
         var foundElement = state.GetByTitleAsync(title);
 

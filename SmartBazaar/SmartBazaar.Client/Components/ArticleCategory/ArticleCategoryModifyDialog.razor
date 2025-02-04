@@ -1,25 +1,30 @@
-﻿@using SmartBazaar.Client.Models
-@using SmartBazaar.Client.Services
+﻿@using SmartBazaar.Client.Services
+@using SmartBazaar.Shared.Contracts
+@using SmartBazaar.Shared.Extensions
+@using SmartBazaar.Shared.Models
+@using SmartBazaar.Shared.Types
+@using SmartBazaar.Shared.Validator
 
 @inject IArticleCategoryService ArticleCategoryService
-@inject ISnackBarService SnackBarService
+@inject DlgService DlgService
+@inject ArticleCategoryValidator ArticleCategoryValidator
+@inject SnackBarService SnackBarService
 
 <MudDialog>
     <DialogContent>
-        <ArticleCategoryForm @bind-Item="ArticleCategory"
-                             IsValidChanged="@(x => _inputIsValid = x)"
-                             IsTouchedChanged="@(x => _inputIsTouched = x)" />
+        <ArticleCategoryForm Item="@_model"
+                             ItemChanged="OnAfterModelChangedAsync" />
     </DialogContent>
     <DialogActions>
-        <MudGrid>
-            <MudItem xs="4">
-                <DvButtonSave Disabled="@((_inputIsValid && _inputIsTouched) is false)" OnClick="SubmitAsync"/>
+        <MudGrid Spacing="1">
+            <MudItem xs="4" Class="d-flex justify-center">
+                <DvButtonSave Disabled="@(_inputIsValid is false)" OnClick="SubmitAsync" />
             </MudItem>
-            <MudItem xs="4">
-                <DvButtonDelete OnClick="DeleteAsync"/>
+            <MudItem xs="4" Class="d-flex justify-center">
+                <DvButtonDelete IconOnly OnClick="DeleteAsync" />
             </MudItem>
-            <MudItem xs="4">
-                <DvButtonCancel OnClick="@(() => MudDialog.Cancel())"/>
+            <MudItem xs="4" Class="d-flex justify-center">
+                <DvButtonCancel OnClick="@(() => MudDialog.Cancel())" />
             </MudItem>
         </MudGrid>
     </DialogActions>
@@ -27,37 +32,64 @@
 
 @code {
     private bool _inputIsValid;
-    private bool _inputIsTouched;
+    private ArticleCategoryModel _model = null!;
 
 
     [CascadingParameter]
     MudDialogInstance MudDialog { get; set; } = null!;
 
     [Parameter]
-    public ArticleCategory ArticleCategory { get; set; } = null!;
+    public string ArticleCategoryId { get; set; } = null!;
 
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await ArticleCategoryService.GetByIdAsync(ArticleCategoryId);
+        if (result.IsSuccess is false)
+        {
+            SnackBarService.AddInfo($"Fehler beim laden der Kategorie:\r\n{result.ErrorMessage}");
+            MudDialog.Cancel();
+            return;
+        }
+        _model = result.Value;
+    }
+
+
+    private async Task OnAfterModelChangedAsync(ArticleCategoryDataModel data)
+    {
+        _model.Adapt(data);
+        _inputIsValid = (await ArticleCategoryValidator.ValidateAsync(_model)).IsValid;
+    }
 
     private async Task SubmitAsync()
     {
-        var result = await ArticleCategoryService.UpdateAsync(ArticleCategory);
-
-        if (result.IsSuccess)
+        var result = await ArticleCategoryService.UpdateAsync(_model);
+        if (result.IsSuccess is false)
         {
-            SnackBarService.AddInfo($"Hersteller {ArticleCategory.Title} geändert ...");
-
-            MudDialog.Close(DialogResult.Ok(result.Value.Id));
+            SnackBarService.AddInfo($"Fehler beim speichern:\r\n{result.ErrorMessage}");
+            return;
         }
+        
+        SnackBarService.AddInfo($"Hersteller {_model.Title} geändert ...");
+        MudDialog.Close(DialogResult.Ok(result.Value.Id));
     }
 
     private async Task DeleteAsync()
     {
-        var result = await ArticleCategoryService.DeleteAsync(ArticleCategory.Id);
-
-        if (result.IsSuccess)
+        var questionResult = await DlgService.ShowMessageBoxAsync($"Kategorie {_model.Title} wirklich löschen?", "Löschen", "Löschen", "Nein");
+        if (questionResult != MessageBoxResultType.Yes)
         {
-            SnackBarService.AddInfo($"Hersteller {ArticleCategory.Title} gelöscht ...");
-
-            MudDialog.Close(DialogResult.Ok(ArticleCategory.Id));
+            return;
         }
+
+        var result = await ArticleCategoryService.DeleteAsync(_model.Id);
+        if (result.IsSuccess is false)
+        {
+            SnackBarService.AddInfo($"Fehler beim löschen:\r\n{result.ErrorMessage}");
+            return;
+        }
+        
+        SnackBarService.AddInfo($"Hersteller {_model.Title} gelöscht ...");
+        MudDialog.Close(DialogResult.Ok(_model.Id));
     }
 }

@@ -1,0 +1,134 @@
+﻿@using SmartBazaar.Shared.Contracts
+@using SmartBazaar.Shared.Models
+@using SmartBazaar.Client.Components.ArticleCategory
+@using SmartBazaar.Client.Components.ArticleBrand
+
+@inject IArticleService ArticleService
+
+<MudForm FieldChanged="OnFormFieldChangedAsync"
+         Model="Item"
+         Validation="@Validation"
+         Style="margin-bottom: 20px;">
+    
+    <MudStack Spacing="2">
+        
+        <MudGrid Spacing="2">
+            <MudItem xs="12" sm="6">
+                @if (IsUpdate)
+                {
+                    <MudField Label="Nummer"
+                              Variant="Variant.Filled">
+                        <MudText Align="Align.Center">
+                            @Item.Number
+                        </MudText>
+                    </MudField>
+                }
+                else
+                {
+                    <DvTextField T="string"
+                                 Required
+                                 Label="Nummer"
+                                 @bind-Value="Item.Number"
+                                 For="@(() => Item.Number)"/>
+                }
+            </MudItem>
+
+            <MudItem xs="12" sm="6">
+                <MudStack Spacing="1" Row="true" Class="py-3">
+                    @if (IsUpdate is false)
+                    {
+                        <MudButton Color="Color.Primary"
+                                   OnClick="OnCreateNewNumber">
+                            <MudIcon Icon="@Icons.Material.TwoTone.PublishedWithChanges"></MudIcon>
+                        </MudButton>
+                        <MudButton Color="Color.Secondary"
+                                   OnClick="OnScanNumber">
+                            <MudIcon Icon="@Icons.Material.TwoTone.QrCode"></MudIcon>
+                        </MudButton>
+                    }
+                </MudStack>
+            </MudItem>
+
+        </MudGrid>
+        
+        <MudGrid Class="pt-3" Spacing="2">
+
+            <MudItem xs="12" sm="6">
+                <ArticleCategorySelection Required
+                                          @bind-Value="Item.Description.ArticleCategory"
+                                          For="@(() => Item.Description.ArticleCategory)"/>
+            </MudItem>
+
+            <MudItem xs="12" sm="6">
+                <ArticleBrandSelection Required
+                                       @bind-Value="Item.Description.ArticleBrand"
+                                       For="@(() => Item.Description.ArticleBrand)"/>
+            </MudItem>
+
+            <MudItem xs="12" sm="12">
+                <DvTextField T="string"
+                             Required
+                             Label="Beschreibung"
+                             @bind-Value="Item.Description.Description"
+                             For="@(() => Item.Description.Description)"/>
+            </MudItem>
+
+        </MudGrid>
+        
+        <MudGrid Class="pt-3" Spacing="2">
+            
+            <MudItem xs="12" sm="6">
+                <DvTextField T="double"
+                             Required
+                             Label="Preis"
+                             @bind-Value="Item.Price.Price01"
+                             For="@(() => Item.Price.Price01)" />
+            </MudItem>
+
+            <MudItem xs="12" sm="6">
+                <DvTextField T="double?"
+                             Label="Preis alternative"
+                             @bind-Value="Item.Price.Price02"
+                             For="@(() => Item.Price.Price02)" />
+            </MudItem>
+
+        </MudGrid>
+
+    </MudStack>
+
+</MudForm>
+
+
+
+@code {
+    [Parameter]
+    public required ArticleDataModel Item { get; set; }
+
+    [Parameter]
+    public required EventCallback<ArticleDataModel> ItemChanged { get; set; }
+
+    [Parameter] public object Validation { get; set; } = null!;
+
+    [Parameter]
+    public bool IsUpdate { get; set; }
+
+    private async Task OnFormFieldChangedAsync()
+    {
+        await ItemChanged.InvokeAsync(Item);
+    }
+
+
+    private async Task OnCreateNewNumber()
+    {
+        var newNumberResult = await ArticleService.GetNextFreeNumber();
+
+        Item.Number = newNumberResult.IsSuccess
+            ? newNumberResult.Value
+            : string.Empty;
+    }
+
+    private async Task OnScanNumber()
+    {
+        await Task.FromResult(1);
+    }
+}

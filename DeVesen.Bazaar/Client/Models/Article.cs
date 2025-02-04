@@ -15,7 +15,7 @@ public record Article
     }
 
     public string Id { get; init; } = string.Empty;
-    public required string VendorId { get; init; }
+    public required string DealerId { get; init; }
     public long Number { get; set; }
 
     public string ArticleCategory { get; set; } = string.Empty;
@@ -34,7 +34,7 @@ public record Article
 
     public static Article CreateNew(string vendorId, long? number = null) => new()
     {
-        VendorId = vendorId,
+        DealerId = vendorId,
         Number = number ?? default
     };
 

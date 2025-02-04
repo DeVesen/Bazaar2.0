@@ -1,7 +1,6 @@
 ﻿@using Fluxor
-@using SmartBazaar.Client.Models
-@using SmartBazaar.Client.Shared.Components.DvSimpleList
 @using SmartBazaar.Client.States.ArticleCategoryState
+@using SmartBazaar.Shared.Models
 
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 
@@ -24,10 +23,10 @@
     public bool IsDataLoading => ArticleCategoryState.Value.IsLoading;
 
     [Parameter]
-    public EventCallback<ArticleCategory> ElementClick { get; set; }
+    public EventCallback<ArticleCategoryModel> ElementClick { get; set; }
 
     private async Task OnElementClicked(DvSimpleList.Element element)
     {
-        await ElementClick.InvokeAsync((ArticleCategory)element.Tag!);
+        await ElementClick.InvokeAsync((ArticleCategoryModel)element.Tag!);
     }
 }

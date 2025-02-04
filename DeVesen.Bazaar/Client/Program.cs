@@ -30,8 +30,8 @@ builder.Services.AddScoped<AuthenticationStateProvider>(provider => provider.Get
 
 builder.Services.AddTransient<ManufacturerFacade>();
 builder.Services.AddTransient<ArticleCategoryFacade>();
-builder.Services.AddTransient<VendorViewFacade>();
-builder.Services.AddTransient<ArticleViewFacade>();
+builder.Services.AddTransient<DealerViewFacade>();
+builder.Services.AddTransient<ArticleFacade>();
 builder.Services.AddTransient<SettlementFacade>();
 
 builder.Services.AddTransient<ImportFacade>();

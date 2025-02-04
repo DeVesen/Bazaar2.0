@@ -26,6 +26,7 @@ public class Result : IResult
 public interface IResult
 {
     public bool IsSuccess { get; }
+    public string ErrorMessage { get; }
 }
 
 public class Result<T> : IResult<T>

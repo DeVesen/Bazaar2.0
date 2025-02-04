@@ -1,9 +1,8 @@
 ﻿@using Fluxor
-@using SmartBazaar.Client.Models
-@using SmartBazaar.Client.Services
 @using SmartBazaar.Client.Shared.Components.DvAutocompleteSelect
 @using SmartBazaar.Client.States.ArticleCategoryState
-@using SmartBazaar.Shared.Dto
+@using SmartBazaar.Shared.Contracts
+@using SmartBazaar.Shared.Models
 
 @inherits MudBaseInput<string>
 
@@ -125,7 +124,7 @@
     }
 
 
-    private static DvAutocompleteSelect.SelectorItem CreateSelectorItem(ArticleCategory element)
+    private static DvAutocompleteSelect.SelectorItem CreateSelectorItem(ArticleCategoryModel element)
         => CreateSelectorItem(element.Title, element.ImgSrc);
 
     private static DvAutocompleteSelect.SelectorItem CreateSelectorItem(string caption, string? imgSrc = null)

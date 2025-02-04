@@ -3,8 +3,8 @@
 
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 
-@inject IState<ArticleViewState> ArticleState
-@inject ArticleViewFacade ArticleFacade
+@inject IState<ArticleState> ArticleState
+@inject ArticleFacade ArticleFacade
 
 @if (ArticleState.Value.BadVendor)
 {

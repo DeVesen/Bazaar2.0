@@ -1,7 +1,5 @@
 ﻿using Fluxor;
-using Mapster;
-using SmartBazaar.Client.Models;
-using SmartBazaar.Client.Services;
+using SmartBazaar.Shared.Contracts;
 
 namespace SmartBazaar.Client.States.ArticleCategoryState;
 
@@ -18,7 +16,6 @@ public class ArticleCategoryEffects(IArticleCategoryService articleCategoryServi
         }
 
         var domainElements = response.Value
-            .Select(p => p.Adapt<ArticleCategory>())
             .OrderBy(p => p.Title)
             .ToArray();
 

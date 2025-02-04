@@ -7,12 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="tmp\Components\ArticleBrand\ArticleBrandList.razor">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
+    <PackageReference Include="Mapster" Version="7.4.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.*" />
     <PackageReference Include="MudBlazor" Version="7.*" />
     <PackageReference Include="FluentValidation" Version="11.10.0" />
@@ -21,7 +16,6 @@
   <ItemGroup>
     <PackageReference Include="Fluxor" Version="6.1.0" />
     <PackageReference Include="Fluxor.Blazor.Web.ReduxDevTools" Version="6.1.0" />
-    <PackageReference Include="Mapster" Version="7.4.0" />
   </ItemGroup>
 
 </Project>
